@@ -1,6 +1,6 @@
 'use client'
 
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, type Variants } from 'framer-motion'
 import { usePathname } from 'next/navigation'
 import { ReactNode } from 'react'
 
@@ -8,13 +8,13 @@ interface PageTransitionProps {
   children: ReactNode
 }
 
-const variants = {
+const variants: Variants = {
   hidden: {
     opacity: 0,
     filter: 'brightness(0.6) saturate(0)',
     transition: {
       duration: 0.15,
-      ease: [0.00, 0.00, 0.20, 1],
+      ease: [0.00, 0.00, 0.20, 1] as [number, number, number, number],
     },
   },
   enter: {
@@ -22,7 +22,7 @@ const variants = {
     filter: 'brightness(1) saturate(1)',
     transition: {
       duration: 0.3,
-      ease: [0.40, 0.00, 0.20, 1],
+      ease: [0.40, 0.00, 0.20, 1] as [number, number, number, number],
     },
   },
   exit: {
@@ -30,7 +30,7 @@ const variants = {
     filter: 'brightness(1.4) saturate(0)',
     transition: {
       duration: 0.15,
-      ease: [0.00, 0.00, 0.20, 1],
+      ease: [0.00, 0.00, 0.20, 1] as [number, number, number, number],
     },
   },
 }

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import ChromeBackground from '@/components/layout/ChromeBackground'
 import Dock from '@/components/layout/Dock'
+import PageTransition from '@/components/layout/PageTransition'
 import '@/styles/globals.css'
 
 export const metadata: Metadata = {
@@ -17,7 +18,9 @@ export default function RootLayout({ children }: RootLayoutProps) {
     <html lang="en">
       <body>
         <ChromeBackground />
-        <main>{children}</main>
+        <main>
+          <PageTransition>{children}</PageTransition>
+        </main>
         <Dock />
       </body>
     </html>
