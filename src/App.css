@@ -1,0 +1,29 @@
+/* ============================================
+   OWAH.WORLD — App Shell Styles
+   The Operating System Chrome
+   ============================================ */
+
+.owah-os {
+  min-height: 100vh;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- VIEWPORT --- */
+.os-viewport {
+  flex: 1;
+  position: relative;
+  transition: opacity var(--duration-normal) var(--ease-out-expo),
+              transform var(--duration-normal) var(--ease-out-expo);
+}
+
+.os-viewport.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.os-viewport.transitioning {
+  opacity: 0;
+  transform: translateY(4px);
+}

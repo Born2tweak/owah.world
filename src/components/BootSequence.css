@@ -1,0 +1,118 @@
+/* ============================================
+   BOOT SEQUENCE
+   "System initialization ritual"
+   ============================================ */
+
+.boot-sequence {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-max);
+  background: var(--void);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  transition: opacity 0.8s var(--ease-out-expo);
+}
+
+.boot-sequence.exiting {
+  opacity: 0;
+}
+
+/* Grid background */
+.boot-grid-bg {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(0, 229, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 229, 255, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  animation: drift 20s ease infinite;
+}
+
+/* Terminal block */
+.boot-terminal {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  line-height: 1.8;
+  max-width: 480px;
+  width: 90%;
+  position: relative;
+  z-index: 2;
+}
+
+.boot-line {
+  animation: fade-in-up 0.3s var(--ease-out-expo) both;
+  white-space: pre;
+}
+
+.boot-line--header {
+  color: var(--signal-primary);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+}
+
+.boot-line--divider {
+  color: var(--text-ghost);
+}
+
+.boot-line--system {
+  color: var(--text-tertiary);
+}
+
+.boot-line--success {
+  color: var(--signal-alive);
+}
+
+.boot-line--enter {
+  color: var(--signal-primary);
+  font-weight: 600;
+  margin-top: var(--space-sm);
+  animation: pulse-glow 1s ease infinite;
+}
+
+.boot-cursor {
+  display: inline-block;
+  color: var(--signal-primary);
+  animation: type-cursor 0.8s step-end infinite;
+}
+
+/* Glyph */
+.boot-glyph {
+  position: absolute;
+  bottom: 10%;
+  width: 60px;
+  height: 60px;
+  opacity: 0.15;
+}
+
+.boot-glyph-svg {
+  width: 100%;
+  height: 100%;
+  animation: rotate-slow 20s linear infinite;
+}
+
+.boot-ring {
+  fill: none;
+  stroke: var(--signal-primary);
+  stroke-width: 0.5;
+}
+
+.boot-ring--outer {
+  stroke-dasharray: 4 8;
+  animation: rotate-slow 30s linear infinite reverse;
+}
+
+.boot-ring--inner {
+  stroke-dasharray: 2 6;
+}
+
+.boot-core {
+  fill: var(--signal-primary);
+}
+
+.boot-tick {
+  stroke: var(--signal-primary);
+  stroke-width: 0.5;
+}

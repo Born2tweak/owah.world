@@ -1,0 +1,226 @@
+/* ============================================
+   OWAH.WORLD — Design System
+   "Controlled Technological Chaos"
+   ============================================ */
+
+/* --- RESET --- */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* --- ROOT TOKENS --- */
+:root {
+  /* Core Palette — not generic, curated for cybernetic intimacy */
+  --void: #060608;
+  --void-elevated: #0a0a0f;
+  --void-surface: #0e0e16;
+  --void-overlay: #14141f;
+  --void-border: #1a1a2e;
+
+  /* Signal Colors — HUD accent system */
+  --signal-primary: #00e5ff;
+  --signal-primary-dim: rgba(0, 229, 255, 0.15);
+  --signal-primary-glow: rgba(0, 229, 255, 0.4);
+  --signal-secondary: #7b61ff;
+  --signal-secondary-dim: rgba(123, 97, 255, 0.15);
+  --signal-tertiary: #ff3d71;
+  --signal-tertiary-dim: rgba(255, 61, 113, 0.12);
+  --signal-warm: #ffa726;
+  --signal-warm-dim: rgba(255, 167, 38, 0.12);
+  --signal-alive: #00e676;
+  --signal-alive-dim: rgba(0, 230, 118, 0.12);
+
+  /* Text Hierarchy */
+  --text-primary: rgba(255, 255, 255, 0.95);
+  --text-secondary: rgba(255, 255, 255, 0.60);
+  --text-tertiary: rgba(255, 255, 255, 0.35);
+  --text-ghost: rgba(255, 255, 255, 0.15);
+  --text-signal: var(--signal-primary);
+
+  /* Typography */
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --font-body: 'Inter', -apple-system, sans-serif;
+  --font-display: 'Space Grotesk', 'Inter', sans-serif;
+
+  /* Spacing Scale */
+  --space-2xs: 0.25rem;
+  --space-xs: 0.5rem;
+  --space-sm: 0.75rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
+  --space-3xl: 4rem;
+  --space-4xl: 6rem;
+  --space-5xl: 8rem;
+
+  /* Borders */
+  --border-subtle: 1px solid rgba(255, 255, 255, 0.04);
+  --border-dim: 1px solid rgba(255, 255, 255, 0.08);
+  --border-signal: 1px solid rgba(0, 229, 255, 0.2);
+  --border-active: 1px solid rgba(0, 229, 255, 0.5);
+
+  /* Motion */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --duration-fast: 150ms;
+  --duration-normal: 300ms;
+  --duration-slow: 600ms;
+  --duration-dramatic: 1200ms;
+
+  /* Layers */
+  --z-background: -1;
+  --z-base: 0;
+  --z-elevated: 10;
+  --z-overlay: 100;
+  --z-modal: 200;
+  --z-signal: 300;
+  --z-max: 999;
+
+  /* Glow Effects */
+  --glow-primary: 0 0 20px rgba(0, 229, 255, 0.15), 0 0 60px rgba(0, 229, 255, 0.05);
+  --glow-secondary: 0 0 20px rgba(123, 97, 255, 0.15), 0 0 60px rgba(123, 97, 255, 0.05);
+  --glow-warm: 0 0 20px rgba(255, 167, 38, 0.15);
+}
+
+/* --- BASE --- */
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--void);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+
+#root {
+  min-height: 100vh;
+  position: relative;
+}
+
+/* --- SELECTION --- */
+::selection {
+  background: var(--signal-primary-dim);
+  color: var(--signal-primary);
+}
+
+/* --- SCROLLBAR --- */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--void);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--void-border);
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--signal-primary-dim);
+}
+
+/* --- SCANLINE OVERLAY (Global atmospheric effect) --- */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: var(--z-max);
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.03) 2px,
+    rgba(0, 0, 0, 0.03) 4px
+  );
+  mix-blend-mode: multiply;
+}
+
+/* --- UTILITY CLASSES --- */
+.font-mono { font-family: var(--font-mono); }
+.font-display { font-family: var(--font-display); }
+.font-body { font-family: var(--font-body); }
+
+.text-signal { color: var(--text-signal); }
+.text-secondary { color: var(--text-secondary); }
+.text-tertiary { color: var(--text-tertiary); }
+.text-ghost { color: var(--text-ghost); }
+
+/* --- ANIMATIONS --- */
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+@keyframes scan-line {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+@keyframes drift {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(2px, -3px); }
+  50% { transform: translate(-1px, 2px); }
+  75% { transform: translate(3px, 1px); }
+}
+
+@keyframes glitch-x {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-2px); }
+  40% { transform: translateX(2px); }
+  60% { transform: translateX(-1px); }
+  80% { transform: translateX(1px); }
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes type-cursor {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes signal-breathe {
+  0%, 100% { box-shadow: 0 0 4px rgba(0, 229, 255, 0.2); }
+  50% { box-shadow: 0 0 12px rgba(0, 229, 255, 0.4), 0 0 30px rgba(0, 229, 255, 0.1); }
+}
+
+@keyframes rotate-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes noise-shift {
+  0% { background-position: 0 0; }
+  10% { background-position: -5% -10%; }
+  20% { background-position: -15% 5%; }
+  30% { background-position: 7% -25%; }
+  40% { background-position: -20% 15%; }
+  50% { background-position: 10% 10%; }
+  60% { background-position: -10% -5%; }
+  70% { background-position: 15% -10%; }
+  80% { background-position: -5% 20%; }
+  90% { background-position: 10% -15%; }
+  100% { background-position: 0 0; }
+}
