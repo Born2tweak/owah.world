@@ -1,0 +1,77 @@
+@import "tailwindcss";
+@import "./tokens.css";
+
+/* ─── Base reset ─── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: var(--font-display);
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--chrome-light);
+  background: var(--chrome-deeper);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ─── Selection ─── */
+::selection {
+  background: var(--chrome-reflect);
+  color: #fff;
+}
+
+/* ─── Scrollbar — chrome style ─── */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--chrome-dark);
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--chrome-base);
+}
+
+/* ─── Focus ─── */
+:focus-visible {
+  outline: 1px solid var(--chrome-reflect);
+  outline-offset: 2px;
+}
+
+/* ─── Page viewport ─── */
+#__next,
+main {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+/* ─── Utility: no pointer events ─── */
+.no-events {
+  pointer-events: none;
+}
+
+/* ─── Utility: full cover ─── */
+.cover {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}

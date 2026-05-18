@@ -1,0 +1,63 @@
+.glass {
+  position: relative;
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  overflow: hidden;
+  transition:
+    background var(--duration-fast) var(--ease-smooth),
+    border-color var(--duration-fast) var(--ease-smooth);
+}
+
+/* Top-edge shine — mimics physical glass */
+.glass::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.3) 30%,
+    rgba(255, 255, 255, 0.5) 50%,
+    rgba(255, 255, 255, 0.3) 70%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+.inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+/* ─── Variants ─── */
+
+.variant--default {
+  --glass-blur:   20px;
+  background:     var(--glass-bg);
+  border-color:   var(--glass-border);
+}
+
+.variant--heavy {
+  --glass-blur:   40px;
+  background:     var(--glass-bg-heavy);
+  border-color:   var(--glass-border-heavy);
+}
+
+.variant--light {
+  --glass-blur:   10px;
+  background:     var(--glass-bg-light);
+  border-color:   var(--glass-border-light);
+}
+
+/* ─── Radius ─── */
+
+.radius--sm      { border-radius: var(--glass-radius-sm); }
+.radius--default { border-radius: var(--glass-radius); }
+.radius--lg      { border-radius: var(--glass-radius-lg); }

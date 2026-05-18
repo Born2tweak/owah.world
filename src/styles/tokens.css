@@ -1,0 +1,68 @@
+:root {
+  /* ─── Chrome palette — global foundation ─── */
+  --chrome-base:        #c0c0c0;
+  --chrome-light:       #e8e8e8;
+  --chrome-dark:        #808080;
+  --chrome-deeper:      #404040;
+  --chrome-reflect:     rgba(255, 255, 255, 0.4);
+  --chrome-shadow:      rgba(0, 0, 0, 0.6);
+
+  /* ─── Page accent colors — one per section, exclusive ─── */
+  --accent-landing:     #00ff88;
+  --accent-code:        #4400ff;
+  --accent-words:       #8b4513;
+  --accent-world:       #00bfff;
+
+  /* ─── Liquid glass system ─── */
+  --glass-bg:           rgba(255, 255, 255, 0.08);
+  --glass-bg-heavy:     rgba(255, 255, 255, 0.14);
+  --glass-bg-light:     rgba(255, 255, 255, 0.04);
+  --glass-border:       rgba(255, 255, 255, 0.20);
+  --glass-border-heavy: rgba(255, 255, 255, 0.32);
+  --glass-border-light: rgba(255, 255, 255, 0.10);
+  --glass-blur:         20px;
+  --glass-blur-heavy:   40px;
+  --glass-blur-light:   10px;
+  --glass-radius:       20px;
+  --glass-radius-sm:    12px;
+  --glass-radius-lg:    28px;
+
+  /* ─── Motion curves ─── */
+  --ease-spring:        cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-smooth:        cubic-bezier(0.40, 0.00, 0.20, 1);
+  --ease-out:           cubic-bezier(0.00, 0.00, 0.20, 1);
+
+  /* ─── Duration scale ─── */
+  --duration-fast:      150ms;
+  --duration-normal:    300ms;
+  --duration-slow:      600ms;
+
+  /* ─── Typography ─── */
+  --font-mono:          'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+  --font-display:       'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* ─── Z-index scale ─── */
+  --z-background:       0;
+  --z-content:          10;
+  --z-ui:               20;
+  --z-dock:             30;
+  --z-modal:            40;
+  --z-overlay:          50;
+
+  /* ─── Spacing ─── */
+  --space-1:            4px;
+  --space-2:            8px;
+  --space-3:            12px;
+  --space-4:            16px;
+  --space-6:            24px;
+  --space-8:            32px;
+  --space-12:           48px;
+  --space-16:           64px;
+
+  /* ─── Dock ─── */
+  --dock-height:        72px;
+  --dock-icon-size:     48px;
+  --dock-gap:           12px;
+  --dock-padding:       12px;
+  --dock-bottom:        24px;
+}
