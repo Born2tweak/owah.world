@@ -10,10 +10,6 @@ export const metadata: Metadata = {
   description: 'A living operating system.',
 }
 
-interface RootLayoutProps {
-  children: React.ReactNode
-}
-
 export default function RootLayout({
   children,
 }: Readonly<{

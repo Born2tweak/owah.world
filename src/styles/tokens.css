@@ -39,7 +39,8 @@
 
   /* ─── Typography ─── */
   --font-mono:          'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
-  --font-display:       'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display:       'Space Grotesk', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-title:         'Syne', 'Space Grotesk', sans-serif;
 
   /* ─── Z-index scale ─── */
   --z-background:       0;

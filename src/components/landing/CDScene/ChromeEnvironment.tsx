@@ -4,6 +4,38 @@ import { useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 
+
+function LaserBeam({
+  pivot,
+  length,
+  baseAngle,
+  speed,
+  phase,
+}: {
+  pivot: [number, number, number]
+  length: number
+  baseAngle: number
+  speed: number
+  phase: number
+}) {
+  const ref = useRef<THREE.Group>(null)
+
+  useFrame((state) => {
+    if (!ref.current) return
+    const t = state.clock.getElapsedTime()
+    ref.current.rotation.z = baseAngle + Math.sin(t * speed + phase) * 0.28
+  })
+
+  return (
+    <group ref={ref} position={pivot}>
+      <mesh>
+        <boxGeometry args={[length, 0.022, 0.022]} />
+        <meshBasicMaterial color="#00ff88" transparent opacity={0.88} />
+      </mesh>
+    </group>
+  )
+}
+
 // ─── Procedural chrome abstract environment ───────────────────────────────────
 // Inspiration: the first reference image — organic fractal silver/chrome
 // geometry. NO AI-generated images. We build it with real R3F geometry.
@@ -81,6 +113,9 @@ export default function ChromeEnvironment() {
       {shards.map((s) => (
         <ChromeShard key={s.id} {...s} />
       ))}
+      <LaserBeam pivot={[-8, 2, -2]} length={24} baseAngle={0.5} speed={0.25} phase={0} />
+      <LaserBeam pivot={[6, -1, -3]} length={20} baseAngle={-0.8} speed={0.18} phase={1.2} />
+      <LaserBeam pivot={[0, 4, -1]} length={22} baseAngle={1.2} speed={0.3} phase={2.5} />
     </group>
   )
 }

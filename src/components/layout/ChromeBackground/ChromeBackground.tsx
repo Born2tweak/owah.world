@@ -28,34 +28,51 @@ export default function ChromeBackground() {
 
       ctx.clearRect(0, 0, width, height)
 
-      // Base gradient — deep chrome
-      const base = ctx.createLinearGradient(0, 0, width, height)
-      base.addColorStop(0,   '#1a1a1a')
-      base.addColorStop(0.3, '#2a2a2a')
-      base.addColorStop(0.6, '#1c1c1c')
-      base.addColorStop(1,   '#111111')
-      ctx.fillStyle = base
+      // ─── Base: near-black deep chrome ─────────────────────────────────
+      // Chrome is dark. The bright parts are reflections, not the base.
+      ctx.fillStyle = '#06080d'
       ctx.fillRect(0, 0, width, height)
 
-      // Reflective sweep — slow moving highlight
-      const sweep = Math.sin(t * 0.003) * 0.5 + 0.5
-      const sweepX = width * sweep
-      const reflect = ctx.createRadialGradient(
-        sweepX, height * 0.3, 0,
-        sweepX, height * 0.3, width * 0.7
+      // ─── Primary reflection band (the chrome "stripe") ─────────────────
+      const bandY = height * (0.38 + Math.sin(t * 0.004) * 0.07)
+      const band = ctx.createLinearGradient(0, bandY - height * 0.2, 0, bandY + height * 0.2)
+      band.addColorStop(0,    'rgba(0,0,0,0)')
+      band.addColorStop(0.3,  'rgba(80,100,120,0.04)')
+      band.addColorStop(0.45, 'rgba(150,175,200,0.10)')
+      band.addColorStop(0.5,  'rgba(210,225,240,0.18)')
+      band.addColorStop(0.55, 'rgba(150,175,200,0.10)')
+      band.addColorStop(0.7,  'rgba(80,100,120,0.04)')
+      band.addColorStop(1,    'rgba(0,0,0,0)')
+      ctx.fillStyle = band
+      ctx.fillRect(0, 0, width, height)
+
+      // ─── Top catch-light ───────────────────────────────────────────────
+      const topGrad = ctx.createLinearGradient(0, 0, 0, height * 0.18)
+      topGrad.addColorStop(0,   'rgba(160,185,210,0.14)')
+      topGrad.addColorStop(1,   'rgba(0,0,0,0)')
+      ctx.fillStyle = topGrad
+      ctx.fillRect(0, 0, width, height)
+
+      // ─── Sharp specular point (moving slowly) ─────────────────────────
+      const specX = width  * (0.38 + Math.sin(t * 0.0025) * 0.18)
+      const specY = height * (0.20 + Math.sin(t * 0.0018) * 0.04)
+      const spec  = ctx.createRadialGradient(specX, specY, 0, specX, specY, width * 0.20)
+      spec.addColorStop(0,    'rgba(255,255,255,0.22)')
+      spec.addColorStop(0.25, 'rgba(210,228,245,0.10)')
+      spec.addColorStop(0.6,  'rgba(170,195,220,0.03)')
+      spec.addColorStop(1,    'rgba(0,0,0,0)')
+      ctx.fillStyle = spec
+      ctx.fillRect(0, 0, width, height)
+
+      // ─── Deep vignette (corners dark — feels like being inside chrome) ─
+      const vignette = ctx.createRadialGradient(
+        width * 0.5, height * 0.5, height * 0.22,
+        width * 0.5, height * 0.5, height * 0.88
       )
-      reflect.addColorStop(0,   'rgba(200, 200, 200, 0.06)')
-      reflect.addColorStop(0.4, 'rgba(150, 150, 150, 0.03)')
-      reflect.addColorStop(1,   'rgba(0, 0, 0, 0)')
-      ctx.fillStyle = reflect
-      ctx.fillRect(0, 0, width, height)
-
-      // Secondary highlight — bottom edge shine
-      const edgeShine = ctx.createLinearGradient(0, height * 0.7, 0, height)
-      edgeShine.addColorStop(0,   'rgba(255, 255, 255, 0)')
-      edgeShine.addColorStop(0.8, 'rgba(255, 255, 255, 0.02)')
-      edgeShine.addColorStop(1,   'rgba(255, 255, 255, 0.05)')
-      ctx.fillStyle = edgeShine
+      vignette.addColorStop(0,   'rgba(0,0,0,0)')
+      vignette.addColorStop(0.5, 'rgba(0,0,0,0.12)')
+      vignette.addColorStop(1,   'rgba(0,0,0,0.65)')
+      ctx.fillStyle = vignette
       ctx.fillRect(0, 0, width, height)
 
       t++
@@ -75,7 +92,6 @@ export default function ChromeBackground() {
   return (
     <div className={styles.root} aria-hidden="true">
       <canvas ref={canvasRef} className={styles.canvas} />
-      <div className={styles.grain} />
     </div>
   )
 }

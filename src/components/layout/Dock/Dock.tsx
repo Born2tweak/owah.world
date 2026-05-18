@@ -6,9 +6,10 @@ import LiquidGlass from '@/components/ui/LiquidGlass'
 import styles from './Dock.module.css'
 
 const NAV_ITEMS = [
-  { href: '/code', label: 'Code' },
-  { href: '/words', label: 'Words/Philosophy' },
-  { href: '/world', label: 'World' },
+  { href: '/', label: 'Home', exact: true },
+  { href: '/code', label: 'Code', exact: false },
+  { href: '/words', label: 'Words', exact: false },
+  { href: '/world', label: 'World', exact: false },
 ]
 
 export default function Dock() {
@@ -18,7 +19,9 @@ export default function Dock() {
     <nav className={styles.root} aria-label="Main navigation">
       <div className={styles.buttonContainer}>
         {NAV_ITEMS.map((item) => {
-          const isActive = pathname.startsWith(item.href)
+          const isActive = item.exact
+            ? pathname === item.href
+            : pathname.startsWith(item.href)
 
           return (
             <Link

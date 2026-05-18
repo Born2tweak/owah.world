@@ -9,25 +9,18 @@ export default function LaserGrid() {
 
   useFrame((state) => {
     if (!gridRef.current) return
-    // Subtle breathing/moving animation
     const t = state.clock.getElapsedTime()
-    gridRef.current.position.y = -10 + Math.sin(t * 0.5) * 0.2
-    // Move grid backwards slightly to simulate endless forward motion
-    gridRef.current.position.z = (t * 0.5) % 1
+    // Slow forward scroll — feels like flying over the grid
+    gridRef.current.position.z = (t * 0.8) % 2
   })
 
   return (
-    <group position={[0, -3, -5]}>
-      {/* Primary bright green laser grid */}
+    <group position={[0, -2.8, -2]}>
+      {/* Neon green laser grid — visible in frame, perspective receding into distance */}
       <gridHelper
         ref={gridRef}
-        args={[100, 50, '#00ff88', '#004422']}
+        args={[80, 40, '#00ff88', '#003316']}
       />
-      {/* Grid fade out in the distance */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.1, 0]}>
-        <planeGeometry args={[100, 100]} />
-        <meshBasicMaterial transparent opacity={0.8} color="#111" />
-      </mesh>
     </group>
   )
 }

@@ -11,7 +11,7 @@ interface CDStore {
 export const useCDStore = create<CDStore>((set) => ({
   isSpinning: true,
   isDragging: false,
-  rotation: { x: Math.PI / 2, y: 0 },
+  rotation: { x: -0.15, y: 0.4 },
   setIsDragging: (isDragging) => set({ isDragging }),
   setRotation: (rotation) => set({ rotation }),
 }))
