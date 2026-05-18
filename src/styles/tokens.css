@@ -8,7 +8,7 @@
   --chrome-shadow:      rgba(0, 0, 0, 0.6);
 
   /* ─── Page accent colors — one per section, exclusive ─── */
-  --accent-landing:     #00ff88;
+  --accent-landing:     #00c4a8;
   --accent-code:        #4400ff;
   --accent-words:       #8b4513;
   --accent-world:       #00bfff;
@@ -40,7 +40,7 @@
   /* ─── Typography ─── */
   --font-mono:          'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
   --font-display:       'Space Grotesk', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-title:         'Syne', 'Space Grotesk', sans-serif;
+  --font-title:         'Syncopate', 'Space Grotesk', sans-serif;
 
   /* ─── Z-index scale ─── */
   --z-background:       0;
@@ -60,10 +60,23 @@
   --space-12:           48px;
   --space-16:           64px;
 
+  /* ─── Dark glass nav system (TopNav + Dock share this) ─── */
+  --nav-bg:             rgba(8, 12, 20, 0.50);
+  --nav-bg-hover:       rgba(12, 18, 30, 0.62);
+  --nav-border:         rgba(255, 255, 255, 0.09);
+  --nav-border-hover:   rgba(255, 255, 255, 0.15);
+  --nav-blur:           32px;
+  --nav-radius:         100px;
+  --nav-inset-top:      rgba(255, 255, 255, 0.10);
+  --nav-inset-bottom:   rgba(0, 0, 0, 0.22);
+  --nav-shadow:         0 8px 40px rgba(0, 0, 0, 0.38);
+
+  /* ─── Content glass (overlays, panels) — squared, less dominant ─── */
+  --panel-bg:           rgba(6, 8, 14, 0.44);
+  --panel-border:       rgba(255, 255, 255, 0.055);
+  --panel-blur:         14px;
+  --panel-radius:       10px;
+
   /* ─── Dock ─── */
-  --dock-height:        72px;
-  --dock-icon-size:     48px;
-  --dock-gap:           12px;
-  --dock-padding:       12px;
-  --dock-bottom:        24px;
+  --dock-bottom:        28px;
 }

@@ -1,76 +1,99 @@
 .root {
   position: fixed;
-  bottom: 36px;
+  bottom: 28px;
   left: 50%;
   transform: translateX(-50%);
   z-index: var(--z-dock);
+  pointer-events: none;
+}
+
+/* ─── Row of separate pills ─────────────────────────────────── */
+
+.pills {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   pointer-events: all;
-  width: 100%;
-  max-width: 560px;
 }
 
-.buttonContainer {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-  padding: 0 20px;
-}
+/* ─── Individual pill ────────────────────────────────────────── */
 
-.link {
-  text-decoration: none;
-  transition: transform var(--duration-fast) var(--ease-spring);
-}
-
-.link:hover {
-  transform: translateY(-3px);
-}
-
-.link:active {
-  transform: translateY(-1px) scale(0.98);
-}
-
-/* Understated, elegant container */
 .pill {
+  position: relative;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 8px 16px;
-  min-width: 0;
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  border-bottom: 1px solid transparent !important;
+  padding: 12px 24px 9px;
+  gap: 5px;
+  text-decoration: none;
+
+  background: var(--nav-bg);
+  backdrop-filter: blur(var(--nav-blur)) saturate(160%);
+  -webkit-backdrop-filter: blur(var(--nav-blur)) saturate(160%);
+  border-radius: var(--nav-radius);
+  border: 1px solid var(--nav-border);
+  box-shadow:
+    0 1px 0 0 var(--nav-inset-top) inset,
+    0 -1px 0 0 var(--nav-inset-bottom) inset,
+    var(--nav-shadow);
+
   transition:
-    border-color var(--duration-fast) var(--ease-smooth);
+    background var(--duration-fast) var(--ease-smooth),
+    border-color var(--duration-fast) var(--ease-smooth),
+    transform var(--duration-fast) var(--ease-spring);
 }
 
-.link:hover .pill {
-  background: transparent !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
+.pill:hover {
+  background: var(--nav-bg-hover);
+  border-color: var(--nav-border-hover);
+  transform: translateY(-2px);
 }
+
+.pill:active {
+  transform: translateY(0px) scale(0.98);
+}
+
+/* ─── Active indicator dot ───────────────────────────────────── */
+
+/* Always present — invisible until active, avoids layout shift */
+.pill::after {
+  content: '';
+  display: block;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: transparent;
+  flex-shrink: 0;
+  transition:
+    background var(--duration-fast) var(--ease-smooth),
+    box-shadow var(--duration-fast) var(--ease-smooth);
+}
+
+.pill.active::after {
+  background: var(--accent-landing);
+  box-shadow: 0 0 8px rgba(0, 196, 168, 0.55);
+}
+
+/* ─── Label ──────────────────────────────────────────────────── */
 
 .label {
   font-family: var(--font-title);
-  font-size: 11px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: rgba(200, 215, 235, 0.70);
+  font-size: 10px;
   font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(160, 182, 215, 0.50);
   white-space: nowrap;
+  line-height: 1;
   transition: color var(--duration-fast) var(--ease-smooth);
 }
 
-.link:hover .label {
-  color: rgba(225, 235, 248, 0.90);
+.pill:hover .label {
+  color: rgba(210, 225, 245, 0.82);
 }
 
-.link.active .label {
-  color: rgba(238, 245, 255, 0.95);
+.pill.active .label {
+  color: rgba(232, 240, 255, 0.96);
   font-weight: 600;
-}
-
-.link.active .pill {
-  background: transparent !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.6) !important;
+  letter-spacing: 0.25em;
 }

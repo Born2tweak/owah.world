@@ -1,0 +1,143 @@
+.root {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: var(--z-ui);
+}
+
+/* ─── Corner containers ─────────────────────────────────────── */
+
+.corner {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 18px 22px;
+}
+
+.tl { top: 0; left: 0; }
+.tr { top: 0; right: 0; align-items: flex-end; }
+.bl { bottom: 28px; left: 0; }
+.br { bottom: 28px; right: 0; align-items: flex-end; }
+
+/* ─── Typography ─────────────────────────────────────────────── */
+
+.label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: rgba(180, 200, 228, 0.28);
+  line-height: 1.7;
+  white-space: nowrap;
+}
+
+.accent {
+  color: rgba(0, 196, 168, 0.40);
+}
+
+/* ─── Status row (ONLINE + dot) ──────────────────────────────── */
+
+.statusRow {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  margin-top: 1px;
+}
+
+.onlineDot {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent-landing);
+  box-shadow: 0 0 7px rgba(0, 196, 168, 0.55);
+  flex-shrink: 0;
+  animation: pulse 2.8s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1;    box-shadow: 0 0 7px rgba(0, 196, 168, 0.55); }
+  50%       { opacity: 0.30; box-shadow: 0 0 3px rgba(0, 196, 168, 0.20); }
+}
+
+/* ─── Globe icon ─────────────────────────────────────────────── */
+
+.globeIcon {
+  display: block;
+  width: 13px;
+  height: 13px;
+  position: relative;
+  margin-bottom: 5px;
+}
+
+.globeRing {
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgba(180, 200, 228, 0.26);
+  border-radius: 50%;
+}
+
+.globeH {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(180, 200, 228, 0.26);
+  transform: translateY(-50%);
+}
+
+.globeV {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: rgba(180, 200, 228, 0.26);
+  transform: translateX(-50%);
+}
+
+/* ─── Crosshair icon ─────────────────────────────────────────── */
+
+.crosshairIcon {
+  display: block;
+  width: 13px;
+  height: 13px;
+  position: relative;
+  margin-bottom: 5px;
+}
+
+.br .crosshairIcon {
+  margin-bottom: 0;
+  margin-top: 5px;
+}
+
+.ch {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(180, 200, 228, 0.26);
+  transform: translateY(-50%);
+}
+
+.cv {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: rgba(180, 200, 228, 0.26);
+  transform: translateX(-50%);
+}
+
+/* ─── Hide on narrow viewports ───────────────────────────────── */
+
+@media (max-width: 640px) {
+  .root { display: none; }
+}
