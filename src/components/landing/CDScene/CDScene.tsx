@@ -3,7 +3,7 @@
 import { Canvas } from '@react-three/fiber'
 import { Environment, ContactShadows } from '@react-three/drei'
 import CDMesh from './CDMesh'
-import LaserGrid from './LaserGrid'
+import ChromeEnvironment from './ChromeEnvironment'
 
 export default function CDScene() {
   return (
@@ -21,7 +21,7 @@ export default function CDScene() {
         <Environment preset="studio" />
         
         <CDMesh />
-        <LaserGrid />
+        <ChromeEnvironment />
         
         <ContactShadows 
           position={[0, -2.9, 0]} 

@@ -1,4 +1,8 @@
-import CDScene from '@/components/landing/CDScene/CDScene'
+'use client'
+
+import dynamic from 'next/dynamic'
+
+const CDScene = dynamic(() => import('@/components/landing/CDScene/CDScene'), { ssr: false })
 
 export default function LandingPage() {
   return (

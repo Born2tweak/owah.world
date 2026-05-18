@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import ChromeBackground from '@/components/layout/ChromeBackground'
 import Dock from '@/components/layout/Dock'
 import PageTransition from '@/components/layout/PageTransition'
+import TopNav from '@/components/layout/TopNav/TopNav'
 import '@/styles/globals.css'
 
 export const metadata: Metadata = {
@@ -13,14 +14,19 @@ interface RootLayoutProps {
   children: React.ReactNode
 }
 
-export default function RootLayout({ children }: RootLayoutProps) {
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode
+}>) {
   return (
     <html lang="en">
       <body>
         <ChromeBackground />
-        <main>
-          <PageTransition>{children}</PageTransition>
-        </main>
+        <TopNav />
+        <PageTransition>
+          {children}
+        </PageTransition>
         <Dock />
       </body>
     </html>

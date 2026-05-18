@@ -2,7 +2,7 @@
 
 import { useRef, useState, useMemo } from 'react'
 import { useFrame } from '@react-three/fiber'
-import { useTexture } from '@react-three/drei'
+import { useTexture, Text } from '@react-three/drei'
 import type { ThreeEvent } from '@react-three/fiber'
 import * as THREE from 'three'
 import { useCDStore } from '@/lib/stores/cd.store'
@@ -98,6 +98,10 @@ export default function CDMesh() {
     if (!pointerDown.current) document.body.style.cursor = 'auto'
   }
 
+  const textRadius = 1.3
+  const textString = "OWAH.WORLD   "
+  const textArray = textString.split("")
+
   return (
     <group
       ref={groupRef}
@@ -107,32 +111,63 @@ export default function CDMesh() {
       onPointerOver={handlePointerOver}
       onPointerOut={handlePointerOut}
       onPointerLeave={handlePointerUp}
+      rotation={[0.3, -0.3, 0]}
     >
       {/* Front face — WATTBA artwork */}
       <mesh position={[0, 0, 0.01]} castShadow>
         <ringGeometry args={[0.4, 2.5, 64]} />
-        <primitive object={coverMaterial} attach="material" />
-      </mesh>
-
-      {/* Back face — iridescent chrome */}
-      <mesh position={[0, 0, -0.01]}>
-        <ringGeometry args={[0.4, 2.5, 64]} />
-        <primitive object={iridescentMaterial} attach="material" />
-      </mesh>
-
-      {/* Inner plastic hub ring */}
-      <mesh position={[0, 0, 0]}>
-        <ringGeometry args={[0.4, 0.6, 64]} />
-        <meshPhysicalMaterial
-          color="#ffffff"
-          transparent
-          opacity={0.3}
-          roughness={0.1}
-          transmission={0.9}
-          thickness={0.1}
-          side={THREE.DoubleSide}
+        <meshStandardMaterial 
+          map={texture} 
+          roughness={0.2}
+          metalness={0.1}
+          side={THREE.FrontSide}
         />
       </mesh>
+
+      {/* Back face — Hyper-realistic glass/transparent material */}
+      <mesh position={[0, 0, -0.01]}>
+        <ringGeometry args={[0.4, 2.5, 64]} />
+        <meshPhysicalMaterial 
+          side={THREE.BackSide}
+          transmission={1}
+          opacity={1}
+          metalness={0}
+          roughness={0.05}
+          ior={1.5}
+          thickness={0.5}
+          clearcoat={1}
+          clearcoatRoughness={0.1}
+          iridescence={1}
+          iridescenceIOR={1.3}
+          iridescenceThicknessRange={[100, 400]}
+          color="#ffffff"
+        />
+      </mesh>
+
+      {/* Render text on the back side (glass side) */}
+      <group position={[0, 0, -0.02]} rotation={[0, Math.PI, 0]}>
+        {textArray.map((char, i) => {
+          const angle = (i / textArray.length) * Math.PI * 2
+          return (
+            <Text
+              key={i}
+              position={[
+                Math.sin(angle) * textRadius,
+                Math.cos(angle) * textRadius,
+                0
+              ]}
+              rotation={[0, 0, -angle]}
+              fontSize={0.2}
+              color="white"
+              anchorX="center"
+              anchorY="middle"
+              material-toneMapped={false}
+            >
+              {char}
+            </Text>
+          )
+        })}
+      </group>
     </group>
   )
 }
