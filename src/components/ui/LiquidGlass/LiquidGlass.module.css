@@ -1,32 +1,47 @@
 .glass {
   position: relative;
-  backdrop-filter: blur(var(--glass-blur));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
+  backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(180%);
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
   overflow: hidden;
   transition:
     background var(--duration-fast) var(--ease-smooth),
-    border-color var(--duration-fast) var(--ease-smooth);
+    border-color var(--duration-fast) var(--ease-smooth),
+    box-shadow var(--duration-fast) var(--ease-smooth);
 }
 
-/* Top-edge shine — mimics physical glass */
+/* Top-edge shine — mimics physical glass edge highlight */
 .glass::before {
   content: '';
   position: absolute;
   top: 0;
-  left: 0;
-  right: 0;
+  left: 10%;
+  right: 10%;
   height: 1px;
   background: linear-gradient(
     90deg,
     transparent 0%,
-    rgba(255, 255, 255, 0.3) 30%,
-    rgba(255, 255, 255, 0.5) 50%,
-    rgba(255, 255, 255, 0.3) 70%,
+    rgba(255, 255, 255, 0.5) 30%,
+    rgba(255, 255, 255, 0.8) 50%,
+    rgba(255, 255, 255, 0.5) 70%,
     transparent 100%
   );
   pointer-events: none;
+  z-index: 2;
+}
+
+/* Bottom-edge subtle shadow line */
+.glass::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(0, 0, 0, 0.2);
+  pointer-events: none;
+  z-index: 2;
 }
 
 .inner {
@@ -39,21 +54,29 @@
 /* ─── Variants ─── */
 
 .variant--default {
-  --glass-blur:   20px;
-  background:     var(--glass-bg);
-  border-color:   var(--glass-border);
+  --glass-blur: 20px;
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 1px 0 0 rgba(255, 255, 255, 0.15) inset,
+    0 8px 32px rgba(0, 0, 0, 0.2);
 }
 
 .variant--heavy {
-  --glass-blur:   40px;
-  background:     var(--glass-bg-heavy);
-  border-color:   var(--glass-border-heavy);
+  --glass-blur: 40px;
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.18);
+  box-shadow:
+    0 1px 0 0 rgba(255, 255, 255, 0.25) inset,
+    0 -1px 0 0 rgba(0, 0, 0, 0.08) inset,
+    0 12px 40px rgba(0, 0, 0, 0.3);
 }
 
 .variant--light {
-  --glass-blur:   10px;
-  background:     var(--glass-bg-light);
-  border-color:   var(--glass-border-light);
+  --glass-blur: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
 }
 
 /* ─── Radius ─── */
