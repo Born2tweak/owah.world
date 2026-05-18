@@ -8,22 +8,73 @@
   position: relative;
   display: flex;
   flex-direction: column;
+  background: var(--void);
+  transition: background 1.2s ease;
 }
 
 /* --- VIEWPORT --- */
 .os-viewport {
   flex: 1;
   position: relative;
-  transition: opacity var(--duration-normal) var(--ease-out-expo),
-              transform var(--duration-normal) var(--ease-out-expo);
+  transition: all var(--duration-normal) var(--ease-out-expo);
 }
 
-.os-viewport.active {
+/* Transition Phases */
+.os-viewport--idle {
+  opacity: 1;
+  transform: translateY(0) skewX(0deg);
+  filter: none;
+}
+
+.os-viewport--fracture {
+  opacity: 0.6;
+  transform: translateX(-2px) skewX(-0.5deg);
+  filter: hue-rotate(10deg) saturate(1.4);
+  animation: glitch-x 200ms steps(4) both;
+}
+
+.os-viewport--void {
+  opacity: 0;
+  transform: translateY(0);
+  filter: brightness(0);
+}
+
+.os-viewport--assemble {
   opacity: 1;
   transform: translateY(0);
+  filter: none;
+  animation: fracture-in 0.5s var(--ease-out-expo) both;
 }
 
-.os-viewport.transitioning {
-  opacity: 0;
-  transform: translateY(4px);
+/* --- TEMPERATURE THEMES --- */
+/* These subtly shift the ambient atmosphere per screen */
+
+.owah-temp--ice {
+  --screen-accent: var(--signal-ice);
+  --screen-accent-dim: var(--signal-ice-dim);
+}
+
+.owah-temp--chrome {
+  --screen-accent: var(--signal-steel);
+  --screen-accent-dim: rgba(148, 163, 184, 0.1);
+}
+
+.owah-temp--live {
+  --screen-accent: var(--thermal-bio);
+  --screen-accent-dim: var(--thermal-bio-dim);
+}
+
+.owah-temp--amber {
+  --screen-accent: var(--thermal-blaze);
+  --screen-accent-dim: var(--thermal-blaze-dim);
+}
+
+.owah-temp--thermal {
+  --screen-accent: var(--thermal-ember);
+  --screen-accent-dim: var(--thermal-ember-dim);
+}
+
+.owah-temp--neural {
+  --screen-accent: var(--thermal-neural);
+  --screen-accent-dim: var(--thermal-neural-dim);
 }
