@@ -14,36 +14,25 @@
 .title {
   margin: 0;
   font-family: var(--font-title);
-  font-size: clamp(11px, 1.1vw, 14px);
+  font-size: clamp(12px, 1.2vw, 15px);
   font-weight: 600;
-  letter-spacing: 0.34em;
+  letter-spacing: 0.28em;
   text-transform: uppercase;
   line-height: 1;
   display: flex;
   align-items: baseline;
   gap: 0;
 
-  padding: 11px 30px 12px;
-  background: rgba(8, 12, 20, 0.45);
-  backdrop-filter: blur(32px) saturate(180%);
-  -webkit-backdrop-filter: blur(32px) saturate(180%);
-  border-radius: 100px;
-  border: 1px solid rgba(255, 255, 255, 0.10);
-  box-shadow:
-    0 1px 0 0 rgba(255, 255, 255, 0.12) inset,
-    0 -1px 0 0 rgba(0, 0, 0, 0.20) inset,
-    0 8px 40px rgba(0, 0, 0, 0.35);
-
+  padding: 10px 0;
+  background: transparent;
   pointer-events: all;
   cursor: pointer;
-  transition:
-    background var(--duration-fast) var(--ease-smooth),
-    border-color var(--duration-fast) var(--ease-smooth);
+  opacity: 0.8;
+  transition: opacity var(--duration-fast) var(--ease-smooth);
 }
 
 .homeLink:hover .title {
-  background: rgba(12, 18, 30, 0.60);
-  border-color: rgba(255, 255, 255, 0.16);
+  opacity: 1.0;
 }
 
 .homeLink {
@@ -52,12 +41,12 @@
 }
 
 .wordA {
-  color: rgba(238, 242, 250, 0.94);
-  font-weight: 700;
+  color: rgba(255, 255, 255, 0.98);
+  font-weight: 600;
 }
 
 .sep {
-  color: rgba(0, 255, 136, 0.70);
+  color: rgba(255, 255, 255, 0.3);
   font-weight: 300;
   margin: 0 0.5px;
   position: relative;
@@ -65,8 +54,8 @@
 }
 
 .wordB {
-  color: rgba(190, 205, 228, 0.60);
+  color: rgba(210, 225, 240, 0.75);
   font-weight: 400;
-  letter-spacing: 0.40em;
+  letter-spacing: 0.32em;
 }
 

@@ -2,88 +2,85 @@
 
 import { useRef } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
-import type * as THREE from 'three'
+import { Environment } from '@react-three/drei'
+import { EffectComposer, Bloom, ChromaticAberration, Vignette } from '@react-three/postprocessing'
+import { BlendFunction } from 'postprocessing'
+import * as THREE from 'three'
 import CDMesh from './CDMesh'
-import LaserGrid from './LaserGrid'
 
-// ─── Chrome shard background ──────────────────────────────────────────────────
-function ChromeShard({ position, rotation, scale, brightness }: {
-  position: [number, number, number]
-  rotation: [number, number, number]
-  scale: [number, number, number]
-  brightness: number
-}) {
+// ─── Art-Directed Chrome Monoliths ──────────────────────────────────────────
+// Replaces random procedural scattering with intentional, architectural framing.
+function Monolith({ position, rotation, scale, material }: any) {
+  const meshRef = useRef<THREE.Mesh>(null)
+  
+  useFrame((state) => {
+    if (!meshRef.current) return
+    // Very subtle, heavy, slow drifting — feeling of massive weight, not floating pebbles
+    const t = state.clock.getElapsedTime()
+    meshRef.current.position.y = position[1] + Math.sin(t * 0.2 + position[0]) * 0.2
+    meshRef.current.rotation.z = rotation[2] + Math.sin(t * 0.1) * 0.02
+  })
+
   return (
-    <mesh position={position} rotation={rotation} scale={scale}>
-      <boxGeometry args={[1, 4, 0.04]} />
-      {/* R3F declarative material — no new() leaks */}
-      <meshPhysicalMaterial
-        color={[brightness, brightness, brightness]}
-        metalness={0.98}
-        roughness={0.02}
-        clearcoat={1}
-        clearcoatRoughness={0.01}
-        reflectivity={1}
-      />
+    <mesh ref={meshRef} position={position} rotation={rotation} scale={scale} castShadow receiveShadow>
+      {/* A tetrahedron or flattened cylinder gives a sharp, blade-like architectural feel */}
+      <cylinderGeometry args={[0, 1, 4, 3]} />
+      <primitive object={material} />
     </mesh>
   )
 }
 
-function ChromeShards() {
-  const groupRef = useRef<THREE.Group>(null)
-  const shards = Array.from({ length: 55 }, (_, i) => {
-    const t = i * 2.399963
-    const r = 8 + (i % 7) * 1.5
-    return {
-      id: i,
-      position: [
-        Math.cos(t) * r * (0.5 + (i % 5) * 0.3),
-        ((i % 9) - 4) * 3.5,
-        -6 - (i % 8) * 2.5,
-      ] as [number, number, number],
-      rotation: [
-        (i * 17 % 180) * (Math.PI / 180),
-        (i * 37 % 360) * (Math.PI / 180),
-        (i * 53 % 180) * (Math.PI / 180),
-      ] as [number, number, number],
-      scale: [0.08 + (i % 5) * 0.04, 1 + (i % 6) * 0.7, 0.04] as [number, number, number],
-      brightness: 0.5 + (i % 3) * 0.25,
-    }
-  })
-
-  useFrame((state) => {
-    if (!groupRef.current) return
-    const t = state.clock.getElapsedTime()
-    groupRef.current.rotation.z = t * 0.02
-    groupRef.current.rotation.y = Math.sin(t * 0.1) * 0.08
+function ArchitecturalFraming() {
+  // Shared luxury chrome/glass material for the monoliths
+  const monolithMaterial = new THREE.MeshPhysicalMaterial({
+    color: '#060a10', // Deep cold shadow base
+    metalness: 1.0,
+    roughness: 0.12,  // Sharp but slightly diffused reflections
+    clearcoat: 1.0,
+    clearcoatRoughness: 0.05,
+    envMapIntensity: 2.0,
   })
 
   return (
-    <group ref={groupRef}>
-      {shards.map((s) => <ChromeShard key={s.id} {...s} />)}
-    </group>
-  )
-}
+    <group>
+      {/* Background Left: Massive supporting monolith */}
+      <Monolith 
+        position={[-8, 2, -12]} 
+        rotation={[0.4, 0.2, 0.3]} 
+        scale={[4, 18, 4]} 
+        material={monolithMaterial} 
+      />
+      {/* Background Right: Counter-balance angled blade */}
+      <Monolith 
+        position={[9, -4, -15]} 
+        rotation={[-0.2, -0.5, -0.6]} 
+        scale={[3, 15, 3]} 
+        material={monolithMaterial} 
+      />
+      
+      {/* Midground Left: Pointing inward toward the CD */}
+      <Monolith 
+        position={[-5, -6, -5]} 
+        rotation={[-0.8, 0.4, 0.5]} 
+        scale={[1.5, 8, 1.5]} 
+        material={monolithMaterial} 
+      />
+      
+      {/* Foreground Right: Dramatic depth of field out-of-focus element */}
+      <Monolith 
+        position={[6, 5, -2]} 
+        rotation={[2.1, 0.1, -0.4]} 
+        scale={[1, 6, 1]} 
+        material={monolithMaterial} 
+      />
 
-// ─── Sweeping laser beams ─────────────────────────────────────────────────────
-function LaserBeam({ pivot, length, baseAngle, speed, phase }: {
-  pivot: [number, number, number]
-  length: number
-  baseAngle: number
-  speed: number
-  phase: number
-}) {
-  const ref = useRef<THREE.Group>(null)
-  useFrame((state) => {
-    if (!ref.current) return
-    ref.current.rotation.z = baseAngle + Math.sin(state.clock.getElapsedTime() * speed + phase) * 0.28
-  })
-  return (
-    <group ref={ref} position={pivot}>
-      <mesh>
-        <boxGeometry args={[length, 0.022, 0.022]} />
-        <meshBasicMaterial color="#00ff88" transparent={true} opacity={0.85} />
-      </mesh>
+      {/* Deep Background: Atmospheric framing */}
+      <Monolith 
+        position={[0, 12, -20]} 
+        rotation={[0, 0, 1.57]} 
+        scale={[3, 30, 3]} 
+        material={monolithMaterial} 
+      />
     </group>
   )
 }
@@ -91,36 +88,68 @@ function LaserBeam({ pivot, length, baseAngle, speed, phase }: {
 // ─── Scene ────────────────────────────────────────────────────────────────────
 export default function CDScene() {
   return (
-    <div style={{ width: '100%', height: '100vh', position: 'absolute', inset: 0 }}>
+    <div style={{ width: '100%', height: '100vh', position: 'absolute', inset: 0, background: '#010204' }}>
       <Canvas
-        camera={{ position: [0, 0, 7], fov: 42 }}
+        camera={{ position: [0, 0, 8], fov: 40 }}
         gl={{
-          antialias: true,
-          alpha: true,
-          toneMapping: 3,
-          toneMappingExposure: 2.2,
+          antialias: false, 
+          powerPreference: "high-performance",
+          toneMapping: THREE.ACESFilmicToneMapping,
+          toneMappingExposure: 1.1, // Controlled contrast
         }}
         shadows
       >
-        <ambientLight intensity={3.0} color="#d0e4f8" />
-        <hemisphereLight args={["#c8d8f0", "#1a2a3a", 2.0]} />
-        <directionalLight position={[5, 6, 4]} intensity={8} color="#ffffff" castShadow />
-        <directionalLight position={[-4, 2, 3]} intensity={4} color="#c0d8f4" />
-        <directionalLight position={[0, -3, -4]} intensity={3} color="#ffffff" />
-        <directionalLight position={[3, -2, 5]} intensity={4} color="#e8f4ff" />
-        <pointLight position={[0, -4, 3]} intensity={5} color="#00ff88" />
-        <pointLight position={[2, 5, 5]} intensity={4} color="#fffaf0" />
-        <pointLight position={[-3, 3, 2]} intensity={3} color="#b0d0ff" />
+        <color attach="background" args={['#010204']} />
+        
+        {/* Subtle atmospheric perspective, pushing background monoliths into deep shadow */}
+        <fog attach="fog" args={['#010204', 10, 30]} />
 
-        <ChromeShards />
+        {/* Studio Environment for sharp, high-end commercial reflections */}
+        <Environment preset="studio" />
+        
+        {/* Cinematic Lighting: Cold, intentional, high contrast */}
+        {/* Cold ambient fill */}
+        <ambientLight intensity={0.4} color="#a0b0d0" />
+        
+        {/* Single Strong Hero Glare (Key Light) */}
+        <spotLight 
+          position={[8, 12, 10]} 
+          intensity={15} 
+          angle={0.2} 
+          penumbra={0.8} 
+          color="#ffffff" 
+          castShadow 
+          shadow-bias={-0.0001}
+        />
+        
+        {/* Subtle cold rim light to define silhouettes against the dark */}
+        <spotLight 
+          position={[-10, -10, -5]} 
+          intensity={8} 
+          angle={0.5} 
+          penumbra={1} 
+          color="#80a0ff" 
+        />
+        
+        {/* Core Elements */}
+        <ArchitecturalFraming />
         <CDMesh />
-        <LaserGrid />
 
-        <LaserBeam pivot={[-8, 2, -2]} length={24} baseAngle={0.5} speed={0.25} phase={0} />
-        <LaserBeam pivot={[6, -1, -3]} length={20} baseAngle={-0.8} speed={0.18} phase={1.2} />
-        <LaserBeam pivot={[0, 4, -1]} length={22} baseAngle={1.2} speed={0.3} phase={2.5} />
-
-        {/* ContactShadows removed — uses expensive FBO that stresses headless renderers */}
+        {/* Post Processing: Restrained, sharp, expensive feeling */}
+        <EffectComposer disableNormalPass multisampling={4}>
+          <Bloom 
+            luminanceThreshold={0.8} // Only brightest glares bloom
+            luminanceSmoothing={0.1} 
+            intensity={0.6} // Subdued, elegant glow
+            mipmapBlur 
+          />
+          <ChromaticAberration 
+            blendFunction={BlendFunction.NORMAL} 
+            offset={new THREE.Vector2(0.0005, 0.0005)} // Micro-aberration for physical lens feel
+          />
+          {/* Vignette focuses the eye on the center artifact */}
+          <Vignette eskil={false} offset={0.1} darkness={1.1} />
+        </EffectComposer>
       </Canvas>
     </div>
   )
