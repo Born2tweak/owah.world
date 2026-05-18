@@ -17,16 +17,16 @@ export default function LaserGrid() {
   })
 
   return (
-    <group position={[0, -10, 0]}>
+    <group position={[0, -3, -5]}>
       {/* Primary bright green laser grid */}
       <gridHelper
         ref={gridRef}
-        args={[100, 50, '#00ff88', 'rgba(0, 255, 136, 0.2)']}
+        args={[100, 50, '#00ff88', '#004422']}
       />
       {/* Grid fade out in the distance */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.1, 0]}>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.1, 0]}>
         <planeGeometry args={[100, 100]} />
-        <meshBasicMaterial transparent color="#111" />
+        <meshBasicMaterial transparent opacity={0.8} color="#111" />
       </mesh>
     </group>
   )

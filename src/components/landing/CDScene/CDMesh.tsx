@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState, useMemo, useEffect } from 'react'
+import { useRef, useState, useMemo } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { useTexture } from '@react-three/drei'
 import type { ThreeEvent } from '@react-three/fiber'
@@ -11,12 +11,9 @@ export default function CDMesh() {
   const groupRef = useRef<THREE.Group>(null)
   const { rotation, setIsDragging, setRotation } = useCDStore()
 
-  const texture = useTexture('/textures/wattba.png')
-
-  useEffect(() => {
-    texture.colorSpace = THREE.SRGBColorSpace
-    texture.needsUpdate = true
-  }, [texture])
+  const texture = useTexture('/textures/wattba.png', (tex) => {
+    tex.colorSpace = THREE.SRGBColorSpace
+  })
 
   const [hovered, setHovered] = useState(false)
   const pointerDown = useRef(false)
