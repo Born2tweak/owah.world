@@ -10,16 +10,17 @@ export default function LaserGrid() {
   useFrame((state) => {
     if (!gridRef.current) return
     const t = state.clock.getElapsedTime()
-    // Slow forward scroll — feels like flying over the grid
-    gridRef.current.position.z = (t * 0.8) % 2
+    // Slow forward scroll — recedes into the black void behind the crystal field
+    gridRef.current.position.z = (t * 0.6) % 2
   })
 
   return (
-    <group position={[0, -2.8, -2]}>
-      {/* Neon green laser grid — visible in frame, perspective receding into distance */}
+    // y=-3.85: just above the floor plane at y=-4.0
+    // Teal/cyan matches reference — distinctly different from pure green
+    <group position={[0, -3.85, -2]}>
       <gridHelper
         ref={gridRef}
-        args={[80, 40, '#00ff88', '#003316']}
+        args={[80, 40, '#00ddb8', '#002e2a']}
       />
     </group>
   )

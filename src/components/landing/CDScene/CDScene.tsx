@@ -7,148 +7,379 @@ import { EffectComposer, Bloom, ChromaticAberration, Vignette } from '@react-thr
 import { BlendFunction } from 'postprocessing'
 import * as THREE from 'three'
 import CDMesh from './CDMesh'
+import LaserGrid from './LaserGrid'
 
-// ─── Art-Directed Chrome Monoliths ──────────────────────────────────────────
-// Replaces random procedural scattering with intentional, architectural framing.
-function Monolith({ position, rotation, scale, material }: any) {
-  const meshRef = useRef<THREE.Mesh>(null)
-  
-  useFrame((state) => {
-    if (!meshRef.current) return
-    // Very subtle, heavy, slow drifting — feeling of massive weight, not floating pebbles
-    const t = state.clock.getElapsedTime()
-    meshRef.current.position.y = position[1] + Math.sin(t * 0.2 + position[0]) * 0.2
-    meshRef.current.rotation.z = rotation[2] + Math.sin(t * 0.1) * 0.02
-  })
+// Hoisted — never allocated inside render or useFrame
+const _caOffset = new THREE.Vector2(0.0006, 0.0006)
 
+// ─── Crystal Shard ─────────────────────────────────────────────────────────────
+// The environment is a crystalline artifact chamber — not chrome blades.
+// Each shard is diamond-refractive, iridescent, semi-transparent.
+// Geometry: octahedron (main diamond form), tetrahedron (fragment), dodecahedron (deep bg)
+
+interface ShardProps {
+  position: [number, number, number]
+  rotation: [number, number, number]
+  scale: [number, number, number]
+  geo: 'oct' | 'tet' | 'dodec'
+}
+
+function CrystalShard({ position, rotation, scale, geo }: ShardProps) {
   return (
-    <mesh ref={meshRef} position={position} rotation={rotation} scale={scale} castShadow receiveShadow>
-      {/* A tetrahedron or flattened cylinder gives a sharp, blade-like architectural feel */}
-      <cylinderGeometry args={[0, 1, 4, 3]} />
-      <primitive object={material} />
+    <mesh position={position} rotation={rotation} scale={scale} castShadow>
+      {geo === 'oct' && <octahedronGeometry args={[1, 0]} />}
+      {geo === 'tet' && <tetrahedronGeometry args={[1, 0]} />}
+      {geo === 'dodec' && <dodecahedronGeometry args={[1, 0]} />}
+      <meshPhysicalMaterial
+        color="#f4f8ff"
+        metalness={0.0}
+        roughness={0.02}
+        transmission={0.72}
+        ior={2.42}
+        thickness={1.8}
+        iridescence={1.0}
+        iridescenceIOR={2.3}
+        iridescenceThicknessRange={[80, 900]}
+        clearcoat={1.0}
+        clearcoatRoughness={0.01}
+        envMapIntensity={5.5}
+        side={THREE.DoubleSide}
+      />
     </mesh>
   )
 }
 
-function ArchitecturalFraming() {
-  // Shared luxury chrome/glass material for the monoliths
-  const monolithMaterial = new THREE.MeshPhysicalMaterial({
-    color: '#060a10', // Deep cold shadow base
-    metalness: 1.0,
-    roughness: 0.12,  // Sharp but slightly diffused reflections
-    clearcoat: 1.0,
-    clearcoatRoughness: 0.05,
-    envMapIntensity: 2.0,
+// ─── Crystal Field ─────────────────────────────────────────────────────────────
+// Authored composition reading the reference image:
+// - Dense at ALL frame edges — crystals bleed past the viewport boundary
+// - Foreground crystals overlap the CD edges (in front of it, creating depth layers)
+// - Multiple depth layers: z=+1 (extreme fore), z=-2 (near), z=-6 (mid), z=-10 (deep bg)
+// - NOT symmetrical — more mass left-bottom-back, more negative space upper-right
+// - Single useFrame for the entire field — 1 callback, not 22
+
+function CrystalField() {
+  const groupRef = useRef<THREE.Group>(null)
+
+  useFrame((state) => {
+    if (!groupRef.current) return
+    const t = state.clock.getElapsedTime()
+    // The chamber breathes — imperceptible without a stillness reference point
+    groupRef.current.rotation.y = Math.sin(t * 0.034) * 0.022
+    groupRef.current.position.y = Math.sin(t * 0.052) * 0.028
   })
 
   return (
-    <group>
-      {/* Background Left: Massive supporting monolith */}
-      <Monolith 
-        position={[-8, 2, -12]} 
-        rotation={[0.4, 0.2, 0.3]} 
-        scale={[4, 18, 4]} 
-        material={monolithMaterial} 
+    <group ref={groupRef}>
+
+      {/* ── EXTREME FOREGROUND (z +0.5 → +1.5) ──────────────────────────────
+          These sit BETWEEN the camera and the CD.
+          At camera z=4.5 these are at ~3.5 units from camera → appear massive.
+          They partially clip out of frame — creating the "inside the crystal" feeling */}
+
+      {/* Massive left foreground pillar */}
+      <CrystalShard
+        position={[-7.8, 2.2, 0.8]}
+        rotation={[0.4, 0.9, 0.2]}
+        scale={[2.6, 5.0, 2.4]}
+        geo="oct"
       />
-      {/* Background Right: Counter-balance angled blade */}
-      <Monolith 
-        position={[9, -4, -15]} 
-        rotation={[-0.2, -0.5, -0.6]} 
-        scale={[3, 15, 3]} 
-        material={monolithMaterial} 
+      {/* Massive right foreground form */}
+      <CrystalShard
+        position={[7.0, -2.8, 0.5]}
+        rotation={[-0.3, -1.1, 0.5]}
+        scale={[2.2, 4.2, 2.0]}
+        geo="oct"
       />
-      
-      {/* Midground Left: Pointing inward toward the CD */}
-      <Monolith 
-        position={[-5, -6, -5]} 
-        rotation={[-0.8, 0.4, 0.5]} 
-        scale={[1.5, 8, 1.5]} 
-        material={monolithMaterial} 
+      {/* Upper right foreground */}
+      <CrystalShard
+        position={[5.5, 5.5, 1.2]}
+        rotation={[0.8, -0.6, -0.7]}
+        scale={[1.8, 3.4, 1.6]}
+        geo="oct"
       />
-      
-      {/* Foreground Right: Dramatic depth of field out-of-focus element */}
-      <Monolith 
-        position={[6, 5, -2]} 
-        rotation={[2.1, 0.1, -0.4]} 
-        scale={[1, 6, 1]} 
-        material={monolithMaterial} 
+      {/* Lower left foreground */}
+      <CrystalShard
+        position={[-6.0, -5.2, 1.0]}
+        rotation={[-0.7, 0.8, 0.6]}
+        scale={[2.0, 3.8, 1.8]}
+        geo="oct"
       />
 
-      {/* Deep Background: Atmospheric framing */}
-      <Monolith 
-        position={[0, 12, -20]} 
-        rotation={[0, 0, 1.57]} 
-        scale={[3, 30, 3]} 
-        material={monolithMaterial} 
+      {/* ── NEAR MIDGROUND (z -1.5 → -4.5) ──────────────────────────────────
+          The primary visible crystal architecture surrounding the CD */}
+
+      {/* Left wing — heavy, anchoring */}
+      <CrystalShard
+        position={[-6.2, 1.2, -2.5]}
+        rotation={[0.5, 1.3, -0.3]}
+        scale={[1.8, 3.5, 1.6]}
+        geo="oct"
+      />
+      <CrystalShard
+        position={[-7.8, -1.2, -3.8]}
+        rotation={[0.3, 1.8, 0.4]}
+        scale={[1.5, 2.8, 1.3]}
+        geo="tet"
+      />
+      <CrystalShard
+        position={[-4.8, 3.8, -3.2]}
+        rotation={[1.2, 0.5, 0.7]}
+        scale={[1.2, 2.3, 1.1]}
+        geo="oct"
+      />
+
+      {/* Right wing — counter-balance */}
+      <CrystalShard
+        position={[6.2, 1.8, -2.2]}
+        rotation={[-0.4, -1.4, 0.5]}
+        scale={[1.7, 3.2, 1.5]}
+        geo="oct"
+      />
+      <CrystalShard
+        position={[7.5, -0.5, -4.0]}
+        rotation={[0.6, -2.0, -0.3]}
+        scale={[1.4, 2.6, 1.3]}
+        geo="oct"
+      />
+      <CrystalShard
+        position={[5.0, -3.5, -2.0]}
+        rotation={[-0.9, -0.6, -0.7]}
+        scale={[1.3, 2.4, 1.2]}
+        geo="tet"
+      />
+
+      {/* Top crown */}
+      <CrystalShard
+        position={[-1.8, 5.8, -3.2]}
+        rotation={[0.9, 0.6, 0.4]}
+        scale={[1.5, 2.8, 1.3]}
+        geo="oct"
+      />
+      <CrystalShard
+        position={[2.8, 5.2, -3.8]}
+        rotation={[-0.7, -0.5, 0.8]}
+        scale={[1.3, 2.4, 1.2]}
+        geo="tet"
+      />
+      <CrystalShard
+        position={[0.2, 7.0, -5.0]}
+        rotation={[0.3, 1.1, -0.4]}
+        scale={[2.0, 3.6, 1.8]}
+        geo="oct"
+      />
+
+      {/* Bottom floor crystals */}
+      <CrystalShard
+        position={[-2.8, -4.8, -2.8]}
+        rotation={[-0.6, 0.9, 0.7]}
+        scale={[1.6, 3.0, 1.4]}
+        geo="oct"
+      />
+      <CrystalShard
+        position={[2.2, -4.5, -3.2]}
+        rotation={[0.8, -0.7, -0.5]}
+        scale={[1.3, 2.4, 1.2]}
+        geo="tet"
+      />
+
+      {/* Behind-CD mid (z=-3.5 to -4.5) — visible around CD edges */}
+      <CrystalShard
+        position={[-3.5, 1.5, -4.2]}
+        rotation={[0.4, 0.7, 0.3]}
+        scale={[1.4, 2.6, 1.2]}
+        geo="oct"
+      />
+      <CrystalShard
+        position={[3.2, -1.0, -4.0]}
+        rotation={[-0.3, -0.9, 0.4]}
+        scale={[1.2, 2.2, 1.1]}
+        geo="tet"
+      />
+
+      {/* ── DEEP BACKGROUND (z -6 → -12) ────────────────────────────────────
+          Large forms, fog reduces them to silhouettes — creates infinite depth */}
+
+      <CrystalShard
+        position={[-5.0, 2.5, -7.5]}
+        rotation={[0.3, 0.7, 0.2]}
+        scale={[2.8, 5.2, 2.5]}
+        geo="dodec"
+      />
+      <CrystalShard
+        position={[5.5, 0.5, -9.0]}
+        rotation={[-0.2, -1.0, 0.4]}
+        scale={[2.4, 4.5, 2.2]}
+        geo="oct"
+      />
+      <CrystalShard
+        position={[0.0, 4.0, -11.0]}
+        rotation={[0.5, 1.3, -0.3]}
+        scale={[3.2, 6.0, 3.0]}
+        geo="dodec"
+      />
+      <CrystalShard
+        position={[-4.0, -2.5, -6.5]}
+        rotation={[0.4, 0.5, 0.6]}
+        scale={[2.0, 3.8, 1.8]}
+        geo="oct"
+      />
+      <CrystalShard
+        position={[4.5, 3.5, -7.0]}
+        rotation={[-0.3, -0.8, 0.3]}
+        scale={[1.8, 3.4, 1.6]}
+        geo="tet"
+      />
+
+      {/* ── MICRO FRAGMENTS (detail layer, near midground) ────────────────── */}
+
+      <CrystalShard
+        position={[-3.8, -1.8, -1.2]}
+        rotation={[2.1, 0.9, 1.6]}
+        scale={[0.45, 0.85, 0.42]}
+        geo="tet"
+      />
+      <CrystalShard
+        position={[3.5, 1.8, -1.5]}
+        rotation={[1.6, -1.3, 0.9]}
+        scale={[0.52, 0.95, 0.48]}
+        geo="tet"
+      />
+      <CrystalShard
+        position={[-1.8, -3.2, -0.9]}
+        rotation={[0.9, 2.2, 1.3]}
+        scale={[0.38, 0.72, 0.35]}
+        geo="tet"
+      />
+      <CrystalShard
+        position={[1.5, 3.8, -1.8]}
+        rotation={[1.9, 0.6, -1.0]}
+        scale={[0.48, 0.88, 0.44]}
+        geo="tet"
+      />
+      <CrystalShard
+        position={[-5.5, -2.5, -1.5]}
+        rotation={[0.5, 1.8, 0.9]}
+        scale={[0.6, 1.1, 0.55]}
+        geo="tet"
+      />
+      <CrystalShard
+        position={[4.8, 2.8, -1.8]}
+        rotation={[-1.2, 0.4, 1.5]}
+        scale={[0.55, 1.0, 0.5]}
+        geo="tet"
       />
     </group>
   )
 }
 
-// ─── Scene ────────────────────────────────────────────────────────────────────
+// ─── Artifact Floor ────────────────────────────────────────────────────────────
+// The sacred chamber's ground plane — deep black mirror.
+// Relies on environment map for reflections (no extra render pass).
+function ArtifactFloor() {
+  return (
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -4.0, 0]} receiveShadow>
+      <planeGeometry args={[80, 80]} />
+      <meshPhysicalMaterial
+        color="#010306"
+        metalness={0.98}
+        roughness={0.14}
+        envMapIntensity={2.5}
+      />
+    </mesh>
+  )
+}
+
+// ─── Scene ─────────────────────────────────────────────────────────────────────
 export default function CDScene() {
   return (
     <div style={{ width: '100%', height: '100vh', position: 'absolute', inset: 0, background: '#010204' }}>
       <Canvas
-        camera={{ position: [0, 0, 8], fov: 40 }}
+        camera={{ position: [0, 0.2, 4.5], fov: 45, near: 0.1, far: 80 }}
         gl={{
-          antialias: false, 
-          powerPreference: "high-performance",
+          antialias: false,
+          powerPreference: 'high-performance',
           toneMapping: THREE.ACESFilmicToneMapping,
-          toneMappingExposure: 1.1, // Controlled contrast
+          toneMappingExposure: 1.15,
         }}
+        dpr={[1, 1.5]}
         shadows
       >
         <color attach="background" args={['#010204']} />
-        
-        {/* Subtle atmospheric perspective, pushing background monoliths into deep shadow */}
-        <fog attach="fog" args={['#010204', 10, 30]} />
+        {/* Fog starts far — let the crystal world be fully visible, only deep bg dissolves */}
+        <fog attach="fog" args={['#010204', 20, 45]} />
 
-        {/* Studio Environment for sharp, high-end commercial reflections */}
-        <Environment preset="studio" />
-        
-        {/* Cinematic Lighting: Cold, intentional, high contrast */}
-        {/* Cold ambient fill */}
-        <ambientLight intensity={0.4} color="#a0b0d0" />
-        
-        {/* Single Strong Hero Glare (Key Light) */}
-        <spotLight 
-          position={[8, 12, 10]} 
-          intensity={15} 
-          angle={0.2} 
-          penumbra={0.8} 
-          color="#ffffff" 
-          castShadow 
+        {/* Studio environment: gives every crystal face a sharp, commercial-quality reflection */}
+        <Environment preset="studio" background={false} />
+
+        {/* ─── LIGHTING ───────────────────────────────────────────────────────
+            Reference reads: massive hot-white glare at top-left of CD.
+            This is the god-ray that makes the scene feel divine and expensive. */}
+
+        {/* KEY: Hot white overhead-left — the primary glare source matching reference */}
+        <spotLight
+          position={[-5, 16, 7]}
+          intensity={45}
+          angle={0.13}
+          penumbra={0.85}
+          color="#f2f6ff"
+          castShadow
           shadow-bias={-0.0001}
+          shadow-mapSize={[1024, 1024]}
         />
-        
-        {/* Subtle cold rim light to define silhouettes against the dark */}
-        <spotLight 
-          position={[-10, -10, -5]} 
-          intensity={8} 
-          angle={0.5} 
-          penumbra={1} 
-          color="#80a0ff" 
+
+        {/* SECONDARY FILL: Front-right — illuminates CD face and right crystal cluster */}
+        <spotLight
+          position={[5, 9, 10]}
+          intensity={20}
+          angle={0.22}
+          penumbra={0.95}
+          color="#e8f2ff"
         />
-        
-        {/* Core Elements */}
-        <ArchitecturalFraming />
+
+        {/* COLD RIM: From deep behind-right — silhouette separation against the void */}
+        <spotLight
+          position={[10, -6, -9]}
+          intensity={16}
+          angle={0.5}
+          penumbra={1.0}
+          color="#1e3ba8"
+        />
+
+        {/* LASER ATMOSPHERE: Teal bounce from the floor grid — creates environmental color */}
+        <pointLight
+          position={[0, -3.0, 0]}
+          intensity={6}
+          color="#00ddb8"
+          distance={18}
+          decay={2}
+        />
+
+        {/* FILL: Minimal ambient — shadows stay deep, high contrast maintained */}
+        <ambientLight intensity={0.12} color="#5868a0" />
+
+        {/* ─── WORLD ──────────────────────────────────────────────────────── */}
+        <CrystalField />
+        <ArtifactFloor />
+        <LaserGrid />
         <CDMesh />
 
-        {/* Post Processing: Restrained, sharp, expensive feeling */}
-        <EffectComposer disableNormalPass multisampling={4}>
-          <Bloom 
-            luminanceThreshold={0.8} // Only brightest glares bloom
-            luminanceSmoothing={0.1} 
-            intensity={0.6} // Subdued, elegant glow
-            mipmapBlur 
+        {/* ─── POSTPROCESSING ─────────────────────────────────────────────────
+            Philosophy: restrained luxury. Every effect has a precise purpose.
+            Bloom: crystal specular highlights + CD glare only — not a glow haze.
+            CA: physical glass lens character — barely perceptible.
+            Vignette: compresses the eye toward the sacred center artifact. */}
+        <EffectComposer enableNormalPass={false} multisampling={0}>
+          <Bloom
+            luminanceThreshold={0.72}
+            luminanceSmoothing={0.08}
+            intensity={0.8}
+            mipmapBlur
           />
-          <ChromaticAberration 
-            blendFunction={BlendFunction.NORMAL} 
-            offset={new THREE.Vector2(0.0005, 0.0005)} // Micro-aberration for physical lens feel
+          <ChromaticAberration
+            blendFunction={BlendFunction.NORMAL}
+            offset={_caOffset}
           />
-          {/* Vignette focuses the eye on the center artifact */}
-          <Vignette eskil={false} offset={0.1} darkness={1.1} />
+          <Vignette eskil={false} offset={0.10} darkness={1.25} />
         </EffectComposer>
       </Canvas>
     </div>
