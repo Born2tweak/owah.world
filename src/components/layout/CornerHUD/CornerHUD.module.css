@@ -29,13 +29,26 @@
   font-weight: 400;
   letter-spacing: 0.13em;
   text-transform: uppercase;
-  color: rgba(180, 200, 228, 0.28);
+  color: rgba(180, 200, 228, 0.52);
   line-height: 1.7;
   white-space: nowrap;
 }
 
 .accent {
   color: rgba(0, 196, 168, 0.40);
+}
+
+.stat {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 8px;
+  font-weight: 400;
+  letter-spacing: 0.10em;
+  text-transform: none;
+  color: rgba(180, 200, 228, 0.32);
+  line-height: 1.5;
+  white-space: nowrap;
+  margin-top: 2px;
 }
 
 /* ─── Status row (ONLINE + dot) ──────────────────────────────── */
