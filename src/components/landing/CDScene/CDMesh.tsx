@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense, useRef, useState, useEffect, useMemo } from 'react'
+import { Suspense, useMemo, useRef, useState } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { useTexture } from '@react-three/drei'
 import type { ThreeEvent } from '@react-three/fiber'
@@ -8,110 +8,155 @@ import * as THREE from 'three'
 import { useCDStore } from '@/lib/stores/cd.store'
 
 const _lerpTarget = new THREE.Vector3()
-const LABEL_SIZE = 2048
 
-// Creates the physical label texture: large arc title + track rings + hub inscription
-function buildLabelTexture(): THREE.CanvasTexture {
+function createVinylTextTexture() {
+  const size = 1024
   const canvas = document.createElement('canvas')
-  canvas.width = LABEL_SIZE
-  canvas.height = LABEL_SIZE
+  canvas.width = size
+  canvas.height = size
   const ctx = canvas.getContext('2d')!
-  const cx = LABEL_SIZE / 2
-  const cy = LABEL_SIZE / 2
-  const discR = LABEL_SIZE * 0.499
+  const cx = size / 2
+  const cy = size / 2
+  const radius = size * 0.39
+  const text = 'O W A H . W O R L D   SYSTEM V1.0   LIVING DIGITAL WORLD   '
 
-  ctx.clearRect(0, 0, LABEL_SIZE, LABEL_SIZE)
-
-  // ─── Data track separation rings (fine machined lines) ──────────────────
-  // 28 concentric rings across the data zone, like the visible track bands on a CD
-  const ringInR = discR * 0.365
-  const ringOutR = discR * 0.955
-  for (let i = 0; i <= 28; i++) {
-    const r = ringInR + (ringOutR - ringInR) * (i / 28)
-    ctx.strokeStyle = `rgba(255, 255, 255, ${i % 4 === 0 ? 0.22 : 0.08})`
-    ctx.lineWidth = i % 4 === 0 ? 1.5 : 0.6
-    ctx.beginPath()
-    ctx.arc(cx, cy, r, 0, Math.PI * 2)
-    ctx.stroke()
-  }
-
-  // ─── Large arc title: OWAH • WORLD ──────────────────────────────────────
-  // Spans ~220° across the upper portion of the disc, matching the reference
-  const titleText = 'OWAH  •  WORLD'
-  const titleR = discR * 0.800
-  const titleArc = Math.PI * 1.22
-  const titleStart = -Math.PI / 2 - titleArc / 2
-
-  ctx.font = `700 ${Math.round(LABEL_SIZE * 0.072)}px Syncopate, "Space Grotesk", "Helvetica Neue", Arial, sans-serif`
+  ctx.clearRect(0, 0, size, size)
+  ctx.font = '700 30px "Arial", sans-serif'
+  ctx.fillStyle = 'rgba(235, 245, 255, 0.88)'
+  ctx.strokeStyle = 'rgba(0, 8, 18, 0.92)'
+  ctx.lineWidth = 5
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
 
-  const charWidths: number[] = []
-  let totalW = 0
-  for (const ch of titleText) {
-    const w = ctx.measureText(ch).width
-    charWidths.push(w)
-    totalW += w
+  for (let i = 0; i < text.length; i++) {
+    const angle = (i / text.length) * Math.PI * 2 - Math.PI / 2
+    ctx.save()
+    ctx.translate(cx + Math.cos(angle) * radius, cy + Math.sin(angle) * radius)
+    ctx.rotate(angle + Math.PI / 2)
+    ctx.strokeText(text[i], 0, 0)
+    ctx.fillText(text[i], 0, 0)
+    ctx.restore()
   }
 
-  const arcLen = 2 * Math.PI * titleR * (titleArc / (2 * Math.PI))
-  const wScale = arcLen / totalW
-  let curAngle = titleStart
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.24)'
+  ctx.lineWidth = 1
+  for (let i = 0; i < 4; i++) {
+    ctx.beginPath()
+    ctx.arc(cx, cy, radius - 24 - i * 5, 0, Math.PI * 2)
+    ctx.stroke()
+  }
 
-  for (let i = 0; i < titleText.length; i++) {
-    const charArc = (charWidths[i] * wScale) / titleR
-    const midAngle = curAngle + charArc / 2
+  return new THREE.CanvasTexture(canvas)
+}
 
-    ctx.save()
-    ctx.translate(
-      cx + Math.cos(midAngle) * titleR,
-      cy + Math.sin(midAngle) * titleR,
+function createHologramTexture() {
+  const size = 1024
+  const canvas = document.createElement('canvas')
+  canvas.width = size
+  canvas.height = size
+  const ctx = canvas.getContext('2d')!
+  const cx = size / 2
+  const cy = size / 2
+
+  ctx.clearRect(0, 0, size, size)
+  ctx.globalCompositeOperation = 'lighter'
+
+  for (let i = 0; i < 22; i++) {
+    const angle = (i / 22) * Math.PI * 2
+    const grad = ctx.createLinearGradient(
+      cx,
+      cy,
+      cx + Math.cos(angle) * size * 0.52,
+      cy + Math.sin(angle) * size * 0.52
     )
-    ctx.rotate(midAngle + Math.PI / 2)
-    ctx.shadowColor = 'rgba(0, 0, 0, 0.75)'
-    ctx.shadowBlur = 12
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.96)'
-    ctx.fillText(titleText[i], 0, 0)
-    ctx.restore()
-
-    curAngle += charArc
+    grad.addColorStop(0, 'rgba(255,255,255,0)')
+    grad.addColorStop(0.34, i % 3 === 0 ? 'rgba(0,255,240,0.15)' : 'rgba(95,150,255,0.12)')
+    grad.addColorStop(0.62, i % 3 === 1 ? 'rgba(255,205,80,0.13)' : 'rgba(255,74,220,0.11)')
+    grad.addColorStop(1, 'rgba(255,255,255,0)')
+    ctx.fillStyle = grad
+    ctx.beginPath()
+    ctx.moveTo(cx, cy)
+    ctx.arc(cx, cy, size * 0.49, angle - 0.05, angle + 0.08)
+    ctx.closePath()
+    ctx.fill()
   }
 
-  // ─── Mid-radius inscription ring ──────────────────────────────────────────
-  const midText = 'OWAH.WORLD  •  SYSTEM v1.0  •  LIVING DIGITAL WORLD  •  '
-  const midR = discR * 0.620
-  ctx.font = `400 ${Math.round(LABEL_SIZE * 0.0175)}px "Courier New", Courier, monospace`
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.52)'
-  for (let i = 0; i < midText.length; i++) {
-    const angle = (i / midText.length) * Math.PI * 2 - Math.PI / 2
+  for (let r = 0.18; r <= 0.48; r += 0.045) {
+    ctx.beginPath()
+    ctx.arc(cx, cy, size * r, 0, Math.PI * 2)
+    ctx.strokeStyle = 'rgba(210,245,255,0.10)'
+    ctx.lineWidth = 2
+    ctx.stroke()
+  }
+
+  const flare = ctx.createRadialGradient(size * 0.27, size * 0.25, 0, size * 0.27, size * 0.25, size * 0.34)
+  flare.addColorStop(0, 'rgba(255,255,255,0.32)')
+  flare.addColorStop(0.28, 'rgba(80,210,255,0.16)')
+  flare.addColorStop(1, 'rgba(255,255,255,0)')
+  ctx.fillStyle = flare
+  ctx.fillRect(0, 0, size, size)
+
+  return new THREE.CanvasTexture(canvas)
+}
+
+function createFacetTexture() {
+  const size = 1024
+  const canvas = document.createElement('canvas')
+  canvas.width = size
+  canvas.height = size
+  const ctx = canvas.getContext('2d')!
+  const cx = size / 2
+  const cy = size / 2
+
+  ctx.clearRect(0, 0, size, size)
+  ctx.globalCompositeOperation = 'lighter'
+
+  for (let i = 0; i < 96; i++) {
+    const a = (i / 96) * Math.PI * 2
+    const next = ((i + 1.35) / 96) * Math.PI * 2
+    const inner = size * (0.16 + (i % 5) * 0.035)
+    const outer = size * (0.38 + (i % 7) * 0.018)
+    const tone = i % 4
+
+    ctx.beginPath()
+    ctx.moveTo(cx + Math.cos(a) * inner, cy + Math.sin(a) * inner)
+    ctx.lineTo(cx + Math.cos(next) * outer, cy + Math.sin(next) * outer)
+    ctx.lineTo(cx + Math.cos(a + 0.12) * outer, cy + Math.sin(a + 0.12) * outer)
+    ctx.closePath()
+    ctx.fillStyle = [
+      'rgba(230,248,255,0.09)',
+      'rgba(74,214,255,0.07)',
+      'rgba(255,205,96,0.055)',
+      'rgba(195,90,255,0.065)',
+    ][tone]
+    ctx.fill()
+  }
+
+  for (let i = 0; i < 42; i++) {
+    const a = (i / 42) * Math.PI * 2
+    const r = size * (0.22 + (i % 6) * 0.045)
+    const w = size * (0.05 + (i % 4) * 0.015)
+    const h = size * (0.035 + (i % 5) * 0.012)
+
     ctx.save()
-    ctx.translate(cx + Math.cos(angle) * midR, cy + Math.sin(angle) * midR)
-    ctx.rotate(angle + Math.PI / 2)
-    ctx.textAlign = 'center'
-    ctx.textBaseline = 'middle'
-    ctx.fillText(midText[i], 0, 0)
+    ctx.translate(cx + Math.cos(a) * r, cy + Math.sin(a) * r)
+    ctx.rotate(a + (i % 3) * 0.55)
+    const grad = ctx.createLinearGradient(-w, -h, w, h)
+    grad.addColorStop(0, 'rgba(255,255,255,0.02)')
+    grad.addColorStop(0.45, 'rgba(218,244,255,0.16)')
+    grad.addColorStop(1, 'rgba(22,42,62,0.02)')
+    ctx.fillStyle = grad
+    ctx.beginPath()
+    ctx.moveTo(0, -h)
+    ctx.lineTo(w, 0)
+    ctx.lineTo(0, h)
+    ctx.lineTo(-w, 0)
+    ctx.closePath()
+    ctx.fill()
     ctx.restore()
   }
 
-  // ─── Hub ring inscription ─────────────────────────────────────────────────
-  const hubText = 'OWAH.WORLD   —   ℗ 2024   —   '
-  const hubR = discR * 0.388
-  ctx.font = `400 ${Math.round(LABEL_SIZE * 0.0135)}px "Courier New", Courier, monospace`
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.30)'
-  for (let i = 0; i < hubText.length; i++) {
-    const angle = (i / hubText.length) * Math.PI * 2 - Math.PI / 2
-    ctx.save()
-    ctx.translate(cx + Math.cos(angle) * hubR, cy + Math.sin(angle) * hubR)
-    ctx.rotate(angle + Math.PI / 2)
-    ctx.textAlign = 'center'
-    ctx.textBaseline = 'middle'
-    ctx.fillText(hubText[i], 0, 0)
-    ctx.restore()
-  }
-
-  const tex = new THREE.CanvasTexture(canvas)
-  tex.needsUpdate = true
-  return tex
+  return new THREE.CanvasTexture(canvas)
 }
 
 function CDMeshInner() {
@@ -122,12 +167,9 @@ function CDMeshInner() {
     tex.colorSpace = THREE.SRGBColorSpace
   })
 
-  const [labelTex, setLabelTex] = useState<THREE.CanvasTexture | null>(null)
-
-  useEffect(() => {
-    // Wait for fonts so Syne renders correctly in canvas
-    document.fonts.ready.then(() => setLabelTex(buildLabelTexture()))
-  }, [])
+  const vinylTex = useMemo(() => createVinylTextTexture(), [])
+  const hologramTex = useMemo(() => createHologramTexture(), [])
+  const facetTex = useMemo(() => createFacetTexture(), [])
 
   const [hovered, setHovered] = useState(false)
   const pointerDown = useRef(false)
@@ -144,20 +186,21 @@ function CDMeshInner() {
     return shape
   }, [])
 
-  // Normalized bounding-box UVs so the WATTBA texture maps squarely to the disc
   const cdGeometry = useMemo(() => {
     const geo = new THREE.ShapeGeometry(cdShape, 128)
     geo.computeBoundingBox()
-    const uv  = geo.attributes.uv as THREE.BufferAttribute
-    const pos = geo.attributes.position as THREE.BufferAttribute
-    const minX  = geo.boundingBox!.min.x
-    const minY  = geo.boundingBox!.min.y
+    const uvAttribute = geo.attributes.uv
+    const posAttribute = geo.attributes.position
+    const minX = geo.boundingBox!.min.x
+    const minY = geo.boundingBox!.min.y
     const rangeX = geo.boundingBox!.max.x - minX
     const rangeY = geo.boundingBox!.max.y - minY
-    for (let i = 0; i < uv.count; i++) {
-      uv.setXY(i, (pos.getX(i) - minX) / rangeX, (pos.getY(i) - minY) / rangeY)
+
+    for (let i = 0; i < uvAttribute.count; i++) {
+      const x = posAttribute.getX(i)
+      const y = posAttribute.getY(i)
+      uvAttribute.setXY(i, (x - minX) / rangeX, (y - minY) / rangeY)
     }
-    uv.needsUpdate = true
     return geo
   }, [cdShape])
 
@@ -171,26 +214,25 @@ function CDMeshInner() {
       _lerpTarget.set(1.02, 1.02, 1.02)
       groupRef.current.scale.lerp(_lerpTarget, 0.1)
     } else {
-      velocity.current.x *= 0.97
-      velocity.current.y *= 0.97
+      velocity.current.x *= 0.96
+      velocity.current.y *= 0.96
 
-      if (Math.abs(velocity.current.y) < 0.0008) {
-        velocity.current.y = 0.0015
+      if (Math.abs(velocity.current.x) < 0.001 && Math.abs(velocity.current.y) < 0.001) {
+        velocity.current.y = 0.002
       }
 
       groupRef.current.rotation.y += velocity.current.y
-      // Gentle sacred float: slow tilt oscillation
-      groupRef.current.rotation.x = Math.sin(elapsed * 0.38) * 0.055 + 0.12
+      groupRef.current.rotation.x = Math.sin(elapsed * 0.5) * 0.05 + 0.1
 
       localRotation.current.x = groupRef.current.rotation.x
       localRotation.current.y = groupRef.current.rotation.y
 
-      const targetScale = hovered ? 1.01 : 1.0
+      const targetScale = hovered ? 1.01 : 1
       _lerpTarget.set(targetScale, targetScale, targetScale)
-      groupRef.current.scale.lerp(_lerpTarget, 0.08)
+      groupRef.current.scale.lerp(_lerpTarget, 0.1)
     }
 
-    groupRef.current.position.y = Math.sin(elapsed * 0.75) * 0.055
+    groupRef.current.position.y = Math.sin(elapsed * 1.0) * 0.05
   })
 
   const handlePointerDown = (e: ThreeEvent<PointerEvent>) => {
@@ -241,124 +283,82 @@ function CDMeshInner() {
       onPointerOut={handlePointerOut}
       onPointerLeave={handlePointerUp}
     >
-      {/* ─── Front face: polycarbonate with transmitted diamond environment ── */}
-      {/* WATTBA diamond texture tints what passes through — matching the       */}
-      {/* reference where you see the crystal background through the disc.      */}
       <mesh geometry={cdGeometry}>
-        <meshPhysicalMaterial
+        <meshBasicMaterial
           map={texture}
-          transmission={0.58}
-          ior={1.585}
-          thickness={0.06}
-          roughness={0.04}
-          metalness={0}
-          iridescence={0.85}
-          iridescenceIOR={1.38}
-          iridescenceThicknessRange={[160, 520]}
-          envMapIntensity={2.2}
-          clearcoat={1.0}
-          clearcoatRoughness={0.014}
+          color="#9fb7c9"
+          toneMapped={false}
           side={THREE.FrontSide}
         />
       </mesh>
 
-      {/* ─── Label overlay: arced OWAH•WORLD title + track rings ─────────── */}
-      {labelTex && (
-        <mesh geometry={cdGeometry}>
-          <meshPhysicalMaterial
-            map={labelTex}
-            transparent={true}
-            metalness={0.25}
-            roughness={0.25}
-            clearcoat={1.0}
-            clearcoatRoughness={0.015}
-            envMapIntensity={0.8}
+      <mesh geometry={cdGeometry} position={[0, 0, 0.002]} renderOrder={2}>
+        <meshBasicMaterial
+          map={facetTex}
+          transparent
+          opacity={0.58}
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
+          side={THREE.FrontSide}
+        />
+      </mesh>
+
+      <mesh geometry={cdGeometry} position={[0, 0, 0.004]} renderOrder={3}>
+        {hologramTex && (
+          <meshBasicMaterial
+            map={hologramTex}
+            transparent
+            opacity={0.34}
+            blending={THREE.AdditiveBlending}
+            depthWrite={false}
+            side={THREE.FrontSide}
+          />
+        )}
+      </mesh>
+
+      <mesh geometry={cdGeometry} position={[0, 0, 0.006]} renderOrder={4}>
+        {vinylTex && (
+          <meshBasicMaterial
+            map={vinylTex}
+            transparent
+            opacity={0.92}
             side={THREE.FrontSide}
             depthWrite={false}
-            polygonOffset={true}
-            polygonOffsetFactor={-2}
+            polygonOffset
+            polygonOffsetFactor={-1}
           />
-        </mesh>
-      )}
-
-      {/* ─── Data track shimmer ring ──────────────────────────────────────── */}
-      {/* r = 0.9→2.35 = the data zone of a physical CD. Intense iridescence  */}
-      {/* with ultra-low roughness produces the rainbow diffraction band.      */}
-      <mesh>
-        <ringGeometry args={[0.9, 2.35, 256]} />
-        <meshPhysicalMaterial
-          color="#c0d0e8"
-          roughness={0.012}
-          metalness={0}
-          iridescence={1.0}
-          iridescenceIOR={1.42}
-          iridescenceThicknessRange={[100, 780]}
-          envMapIntensity={1.8}
-          clearcoat={1.0}
-          clearcoatRoughness={0.006}
-          transparent={true}
-          opacity={0.30}
-          side={THREE.FrontSide}
-          depthWrite={false}
-          polygonOffset={true}
-          polygonOffsetFactor={-3}
-        />
+        )}
       </mesh>
 
-      {/* ─── Back face: iridescent chrome polycarbonate ───────────────────── */}
-      <mesh geometry={cdGeometry}>
+      <mesh geometry={cdGeometry} renderOrder={0}>
         <meshPhysicalMaterial
-          color="#909090"
-          metalness={0.98}
-          roughness={0.032}
-          iridescence={0.92}
-          iridescenceIOR={1.85}
-          iridescenceThicknessRange={[120, 700]}
-          clearcoat={1.0}
-          clearcoatRoughness={0.012}
-          reflectivity={1.0}
-          envMapIntensity={3.0}
+          color="#888888"
+          metalness={1}
+          roughness={0.05}
+          iridescence={1}
+          iridescenceIOR={2}
+          iridescenceThicknessRange={[80, 500]}
+          clearcoat={1}
+          clearcoatRoughness={0.02}
+          reflectivity={1}
+          envMapIntensity={3}
           side={THREE.BackSide}
         />
       </mesh>
 
-      {/* ─── Outer rim: mirror-smooth machined polycarbonate edge ─────────── */}
       <mesh rotation={[Math.PI / 2, 0, 0]}>
-        <cylinderGeometry args={[2.5, 2.5, 0.04, 256, 1, true]} />
-        <meshPhysicalMaterial
-          color="#b0b8c4"
-          metalness={0.95}
-          roughness={0.04}
-          clearcoat={1.0}
-          clearcoatRoughness={0.02}
-          envMapIntensity={3.0}
-          side={THREE.DoubleSide}
-        />
+        <cylinderGeometry args={[2.5, 2.5, 0.04, 128, 1, true]} />
+        <meshPhysicalMaterial color="#d8edf8" metalness={0.95} roughness={0.16} envMapIntensity={2.4} clearcoat={1} side={THREE.DoubleSide} />
       </mesh>
 
-      {/* ─── Inner hole rim ───────────────────────────────────────────────── */}
       <mesh rotation={[Math.PI / 2, 0, 0]}>
-        <cylinderGeometry args={[0.22, 0.22, 0.04, 128, 1, true]} />
-        <meshPhysicalMaterial
-          color="#30303a"
-          metalness={0.92}
-          roughness={0.10}
-          side={THREE.DoubleSide}
-        />
+        <cylinderGeometry args={[0.22, 0.22, 0.04, 64, 1, true]} />
+        <meshPhysicalMaterial color="#8ea0b4" metalness={0.9} roughness={0.34} envMapIntensity={1.5} side={THREE.DoubleSide} />
       </mesh>
 
-      {/* ─── Hub ring: dark brushed machined metal ────────────────────────── */}
       <mesh>
-        <ringGeometry args={[0.22, 0.58, 128]} />
-        <meshPhysicalMaterial
-          color="#0e1218"
-          metalness={0.96}
-          roughness={0.20}
-          envMapIntensity={1.8}
-          clearcoat={0.25}
-          clearcoatRoughness={0.12}
-          side={THREE.FrontSide}
-        />
+        <ringGeometry args={[0.22, 0.55, 64]} />
+        <meshPhysicalMaterial color="#101722" metalness={0.95} roughness={0.28} envMapIntensity={1.9} clearcoat={0.4} side={THREE.DoubleSide} />
       </mesh>
     </group>
   )

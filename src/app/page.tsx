@@ -9,94 +9,60 @@ export default function LandingPage() {
     <div style={{ position: 'relative', width: '100%', height: '100vh', overflow: 'hidden' }}>
       <CDScene />
 
-      {/* Description panel — manifesto card below CD, above dock */}
       <div
         style={{
           position: 'fixed',
-          bottom: 96,
+          bottom: 118,
           left: '50%',
           transform: 'translateX(-50%)',
           zIndex: 10,
-          maxWidth: 620,
-          width: '92%',
+          maxWidth: 760,
+          width: 'min(78vw, 760px)',
           pointerEvents: 'none',
         }}
       >
         <div
           style={{
-            background: 'rgba(3, 6, 14, 0.72)',
-            backdropFilter: 'blur(24px) saturate(140%)',
-            WebkitBackdropFilter: 'blur(24px) saturate(140%)',
-            border: '1px solid rgba(0, 196, 168, 0.22)',
+            background:
+              'linear-gradient(180deg, rgba(18, 30, 48, 0.34) 0%, rgba(3, 9, 18, 0.24) 100%)',
+            backdropFilter: 'blur(26px) saturate(190%)',
+            WebkitBackdropFilter: 'blur(26px) saturate(190%)',
+            borderTop: '1px solid rgba(228, 246, 255, 0.26)',
+            borderBottom: '1px solid rgba(100, 255, 238, 0.12)',
+            borderLeft: '1px solid rgba(210, 235, 255, 0.14)',
+            borderRight: '1px solid rgba(210, 235, 255, 0.14)',
             borderRadius: 16,
-            padding: '20px 32px 22px',
-            textAlign: 'center',
-            boxShadow: [
-              '0 1px 0 0 rgba(255, 255, 255, 0.08) inset',
-              '0 -1px 0 0 rgba(0, 0, 0, 0.22) inset',
-              '0 0 0 1px rgba(0, 196, 168, 0.06) inset',
-              '0 0 40px rgba(0, 196, 168, 0.08)',
-              '0 24px 64px rgba(0, 0, 0, 0.48)',
-            ].join(', '),
+            padding: '24px 34px',
+            boxShadow:
+              '0 1px 0 rgba(255,255,255,0.18) inset, 0 0 28px rgba(60,210,255,0.10), 0 18px 48px rgba(0,0,0,0.28)',
           }}
         >
-          {/* Sparkle anchor */}
           <div
             style={{
-              fontSize: 11,
-              color: 'rgba(0, 196, 168, 0.65)',
-              marginBottom: 12,
-              letterSpacing: 0,
-              lineHeight: 1,
-              filter: 'drop-shadow(0 0 6px rgba(0, 196, 168, 0.40))',
+              width: 44,
+              height: 1,
+              margin: '0 auto 18px',
+              background:
+                'linear-gradient(90deg, transparent, rgba(255,255,255,0.86), transparent)',
+              boxShadow: '0 0 18px rgba(134,226,255,0.55)',
             }}
-          >
-            ✦
-          </div>
-
-          {/* Hero manifesto line */}
-          <p
-            style={{
-              margin: '0 0 8px',
-              fontFamily: 'var(--font-title)',
-              fontSize: 'clamp(13px, 1.4vw, 17px)',
-              lineHeight: 1.25,
-              letterSpacing: '0.15em',
-              textTransform: 'uppercase',
-              color: 'rgba(220, 232, 255, 0.92)',
-              fontWeight: 700,
-            }}
-          >
-            I build digital worlds that remember.
-          </p>
-
-          {/* Supporting lines */}
-          <p
-            style={{
-              margin: '0 0 3px',
-              fontFamily: 'var(--font-title)',
-              fontSize: 'clamp(8px, 0.85vw, 10px)',
-              lineHeight: 1.7,
-              letterSpacing: '0.13em',
-              textTransform: 'uppercase',
-              color: 'rgba(170, 198, 230, 0.48)',
-              fontWeight: 400,
-            }}
-          >
-            OWAH.WORLD is where memory, code, and feeling collide.
-          </p>
+          />
           <p
             style={{
               margin: 0,
               fontFamily: 'var(--font-title)',
-              fontSize: 'clamp(8px, 0.85vw, 10px)',
-              lineHeight: 1.7,
-              letterSpacing: '0.13em',
-              textTransform: 'uppercase',
-              color: 'rgba(170, 198, 230, 0.48)',
+              fontSize: 'clamp(11px, 1vw, 14px)',
+              lineHeight: 1.85,
+              color: 'rgba(232, 244, 255, 0.92)',
+              letterSpacing: '0.16em',
               fontWeight: 400,
+              textAlign: 'center',
+              textTransform: 'uppercase',
+              textShadow: '0 2px 12px rgba(0,0,0,0.72)',
             }}
           >
+            OWAH.WORLD is where memory, code, and feeling collide.
+            <br />
             Every system. Every story. Everything I&apos;m becoming.
           </p>
         </div>

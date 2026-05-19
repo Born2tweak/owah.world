@@ -2,12 +2,13 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import LiquidGlass from '@/components/ui/LiquidGlass'
 import styles from './Dock.module.css'
 
 const NAV_ITEMS = [
-  { href: '/code',  label: 'Code'  },
-  { href: '/words', label: 'Words' },
-  { href: '/world', label: 'World' },
+  { href: '/code', label: 'Code', exact: false },
+  { href: '/words', label: 'Words', exact: false },
+  { href: '/world', label: 'World', exact: false },
 ]
 
 export default function Dock() {
@@ -15,19 +16,23 @@ export default function Dock() {
 
   return (
     <nav className={styles.root} aria-label="Main navigation">
-      <div className={styles.pills}>
+      <div className={styles.buttonContainer}>
         {NAV_ITEMS.map((item) => {
-          const isActive = pathname.startsWith(item.href)
+          const isActive = item.exact
+            ? pathname === item.href
+            : pathname.startsWith(item.href)
 
           return (
             <Link
               key={item.href}
               href={item.href}
-              className={[styles.pill, isActive ? styles.active : ''].join(' ')}
+              className={[styles.link, isActive ? styles.active : ''].join(' ')}
+              aria-label={item.label}
               aria-current={isActive ? 'page' : undefined}
             >
-              <span className={styles.sparkle} aria-hidden="true">✦</span>
-              <span className={styles.label}>{item.label}</span>
+              <LiquidGlass variant="heavy" radius="lg" className={styles.pill}>
+                <span className={styles.label}>{item.label}</span>
+              </LiquidGlass>
             </Link>
           )
         })}

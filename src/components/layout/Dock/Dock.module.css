@@ -4,105 +4,114 @@
   left: 50%;
   transform: translateX(-50%);
   z-index: var(--z-dock);
-  pointer-events: none;
-}
-
-/* ─── Row of pills ─────────────────────────────────────── */
-
-.pills {
-  display: flex;
-  align-items: center;
-  gap: 10px;
   pointer-events: all;
+  width: min(100%, 720px);
+  max-width: 720px;
 }
 
-/* ─── Individual pill ────────────────────────────────────────── */
+.buttonContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
+  padding: 0 20px;
+}
+
+.link {
+  text-decoration: none;
+  transition: transform var(--duration-fast) var(--ease-spring);
+}
+
+.link:hover {
+  transform: translateY(-3px);
+}
+
+.link:active {
+  transform: translateY(-1px) scale(0.98);
+}
 
 .pill {
-  position: relative;
   display: flex;
-  flex-direction: row;
   align-items: center;
-  padding: 14px 32px;
-  gap: 12px;
-  text-decoration: none;
-
-  background: var(--nav-bg);
-  backdrop-filter: blur(var(--nav-blur)) saturate(160%);
-  -webkit-backdrop-filter: blur(var(--nav-blur)) saturate(160%);
-  border-radius: var(--nav-radius);
-  border: 1px solid var(--nav-border);
+  justify-content: center;
+  min-width: 140px;
+  min-height: 46px;
+  padding: 12px 28px;
+  background:
+    radial-gradient(circle at 24% 15%, rgba(255, 255, 255, 0.22), transparent 22%),
+    linear-gradient(180deg, rgba(28, 45, 67, 0.34), rgba(4, 10, 20, 0.24)) !important;
+  border: 1px solid rgba(210, 239, 255, 0.22) !important;
   box-shadow:
-    0 1px 0 0 var(--nav-inset-top) inset,
-    0 -1px 0 0 var(--nav-inset-bottom) inset,
-    0 0 24px rgba(0, 196, 168, 0.06),
-    var(--nav-shadow);
-
-  will-change: transform;
+    0 1px 0 rgba(255, 255, 255, 0.28) inset,
+    0 -1px 0 rgba(57, 255, 238, 0.12) inset,
+    0 0 22px rgba(34, 233, 255, 0.08),
+    0 14px 34px rgba(0, 0, 0, 0.22) !important;
   transition:
     background var(--duration-fast) var(--ease-smooth),
     border-color var(--duration-fast) var(--ease-smooth),
-    box-shadow var(--duration-fast) var(--ease-smooth),
-    transform var(--duration-fast) var(--ease-spring);
+    box-shadow var(--duration-fast) var(--ease-smooth);
 }
 
-.pill:hover {
-  background: var(--nav-bg-hover);
-  border-color: var(--nav-border-hover);
-  transform: translateY(-2px);
+.link:hover .pill {
+  background:
+    radial-gradient(circle at 24% 15%, rgba(255, 255, 255, 0.28), transparent 24%),
+    linear-gradient(180deg, rgba(34, 58, 84, 0.42), rgba(5, 13, 25, 0.30)) !important;
+  border-color: rgba(234, 248, 255, 0.36) !important;
   box-shadow:
-    0 1px 0 0 var(--nav-inset-top) inset,
-    0 -1px 0 0 var(--nav-inset-bottom) inset,
-    0 0 32px rgba(0, 196, 168, 0.12),
-    var(--nav-shadow);
+    0 1px 0 rgba(255, 255, 255, 0.34) inset,
+    0 0 28px rgba(45, 243, 255, 0.16),
+    0 14px 34px rgba(0, 0, 0, 0.24) !important;
 }
-
-.pill:active {
-  transform: translateY(0px) scale(0.98);
-}
-
-/* ─── Sparkle icon ───────────────────────────────────────── */
-
-.sparkle {
-  color: rgba(0, 196, 168, 0.38);
-  font-size: 10px;
-  line-height: 1;
-  flex-shrink: 0;
-  transition:
-    color var(--duration-fast) var(--ease-smooth),
-    filter var(--duration-fast) var(--ease-smooth);
-}
-
-.pill:hover .sparkle {
-  color: rgba(0, 196, 168, 0.72);
-  filter: drop-shadow(0 0 4px rgba(0, 196, 168, 0.42));
-}
-
-.pill.active .sparkle {
-  color: rgba(0, 196, 168, 0.90);
-  filter: drop-shadow(0 0 6px rgba(0, 196, 168, 0.55));
-}
-
-/* ─── Label ──────────────────────────────────────────────── */
 
 .label {
   font-family: var(--font-title);
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.22em;
+  font-size: 12px;
+  letter-spacing: 0.20em;
   text-transform: uppercase;
-  color: rgba(160, 182, 215, 0.50);
+  color: rgba(215, 230, 247, 0.78);
+  font-weight: 500;
   white-space: nowrap;
-  line-height: 1;
   transition: color var(--duration-fast) var(--ease-smooth);
 }
 
-.pill:hover .label {
-  color: rgba(210, 225, 245, 0.82);
+.link:hover .label {
+  color: rgba(225, 235, 248, 0.90);
 }
 
-.pill.active .label {
-  color: rgba(232, 240, 255, 0.96);
+.link.active .label {
+  color: rgba(238, 245, 255, 0.95);
   font-weight: 600;
-  letter-spacing: 0.25em;
+}
+
+.link.active .pill {
+  background:
+    radial-gradient(circle at 24% 15%, rgba(255, 255, 255, 0.36), transparent 24%),
+    linear-gradient(180deg, rgba(44, 70, 100, 0.46), rgba(5, 14, 28, 0.34)) !important;
+  border-color: rgba(236, 249, 255, 0.44) !important;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.38) inset,
+    0 0 34px rgba(67, 251, 255, 0.20),
+    0 14px 34px rgba(0, 0, 0, 0.26) !important;
+}
+
+@media (max-width: 640px) {
+  .root {
+    bottom: 20px;
+  }
+
+  .buttonContainer {
+    gap: 8px;
+    padding: 0 12px;
+  }
+
+  .pill {
+    min-width: 0;
+    min-height: 42px;
+    padding: 10px 14px;
+  }
+
+  .label {
+    font-size: 10px;
+    letter-spacing: 0.14em;
+  }
 }
