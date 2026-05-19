@@ -3,6 +3,25 @@ _Most recent first — lessons learned included_
 
 ---
 
+## 2026-05-18 — Systems Integration + Final Landing Page Polish
+
+**Finalization Agent pass:**
+- Deleted orphaned ChromeEnvironment.tsx (BUG-001 closed)
+- Fixed tokens.css `--font-title` fallback: `'Syne'` → `'Syncopate'`
+- Fixed CDMesh canvas font string: `Syne` → `Syncopate` (Canvas 2D uses actual font name)
+- TopNav: added dark glass pill (`--nav-bg/blur/border`) to `.homeLink`, teal separator `rgba(0,196,168,0.70)`
+- Dock: removed HOME item (accessed via TopNav wordmark), added ✦ sparkle icon to each pill, switched to row layout with teal glow effect
+- Description panel: switched to dark glass with teal glow border `rgba(0,196,168,0.22)`, teal ✦ sparkle anchor, 3-line manifesto copy matching reference
+- CornerHUD: cleaned "INTENT+" → "INTENT", "REALITY+" → "REALITY"; added "006" stat + GPS coordinates `33.7490° N, 84.3880° W`
+- Architecture docs updated to reflect CrystalField (not ChromeShards), studio env, current CD material state
+- TypeScript: 0 errors
+
+**Visual accent system consolidated:**
+- `--accent-landing` is now `#00c4a8` (teal) — matches LaserGrid `#00ddb8`
+- All hardcoded `rgba(0,255,136,...)` replaced with `rgba(0,196,168,...)`
+
+---
+
 ## 2026-05-18 — Context Stabilization + Architecture Audit
 
 **Architecture Agent pass:**

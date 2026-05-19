@@ -31,18 +31,18 @@ function CrystalShard({ position, rotation, scale, geo }: ShardProps) {
       {geo === 'tet' && <tetrahedronGeometry args={[1, 0]} />}
       {geo === 'dodec' && <dodecahedronGeometry args={[1, 0]} />}
       <meshPhysicalMaterial
-        color="#f4f8ff"
+        color="#eef4ff"
         metalness={0.0}
         roughness={0.02}
-        transmission={0.72}
+        transmission={0.78}
         ior={2.42}
-        thickness={1.8}
-        iridescence={1.0}
-        iridescenceIOR={2.3}
-        iridescenceThicknessRange={[80, 900]}
+        thickness={1.6}
+        iridescence={0.22}
+        iridescenceIOR={1.5}
+        iridescenceThicknessRange={[120, 360]}
         clearcoat={1.0}
         clearcoatRoughness={0.01}
-        envMapIntensity={5.5}
+        envMapIntensity={3.2}
         side={THREE.DoubleSide}
       />
     </mesh>
@@ -299,7 +299,7 @@ export default function CDScene() {
           antialias: false,
           powerPreference: 'high-performance',
           toneMapping: THREE.ACESFilmicToneMapping,
-          toneMappingExposure: 1.15,
+          toneMappingExposure: 0.88,
         }}
         dpr={[1, 1.5]}
         shadows
@@ -318,10 +318,10 @@ export default function CDScene() {
         {/* KEY: Hot white overhead-left — the primary glare source matching reference */}
         <spotLight
           position={[-5, 16, 7]}
-          intensity={45}
-          angle={0.13}
-          penumbra={0.85}
-          color="#f2f6ff"
+          intensity={32}
+          angle={0.10}
+          penumbra={0.72}
+          color="#f8fbff"
           castShadow
           shadow-bias={-0.0001}
           shadow-mapSize={[1024, 1024]}
@@ -330,7 +330,7 @@ export default function CDScene() {
         {/* SECONDARY FILL: Front-right — illuminates CD face and right crystal cluster */}
         <spotLight
           position={[5, 9, 10]}
-          intensity={20}
+          intensity={12}
           angle={0.22}
           penumbra={0.95}
           color="#e8f2ff"
@@ -339,7 +339,7 @@ export default function CDScene() {
         {/* COLD RIM: From deep behind-right — silhouette separation against the void */}
         <spotLight
           position={[10, -6, -9]}
-          intensity={16}
+          intensity={11}
           angle={0.5}
           penumbra={1.0}
           color="#1e3ba8"
@@ -348,14 +348,23 @@ export default function CDScene() {
         {/* LASER ATMOSPHERE: Teal bounce from the floor grid — creates environmental color */}
         <pointLight
           position={[0, -3.0, 0]}
-          intensity={6}
+          intensity={9}
           color="#00ddb8"
-          distance={18}
+          distance={22}
+          decay={1.8}
+        />
+
+        {/* TEAL CROSS: Second teal source at eye level — illuminates side crystal faces */}
+        <pointLight
+          position={[-4.0, 0.5, 2.0]}
+          intensity={4}
+          color="#00b8a0"
+          distance={14}
           decay={2}
         />
 
         {/* FILL: Minimal ambient — shadows stay deep, high contrast maintained */}
-        <ambientLight intensity={0.12} color="#5868a0" />
+        <ambientLight intensity={0.14} color="#5868a0" />
 
         {/* ─── WORLD ──────────────────────────────────────────────────────── */}
         <CrystalField />
@@ -370,16 +379,16 @@ export default function CDScene() {
             Vignette: compresses the eye toward the sacred center artifact. */}
         <EffectComposer enableNormalPass={false} multisampling={0}>
           <Bloom
-            luminanceThreshold={0.72}
-            luminanceSmoothing={0.08}
-            intensity={0.8}
+            luminanceThreshold={0.86}
+            luminanceSmoothing={0.06}
+            intensity={0.55}
             mipmapBlur
           />
           <ChromaticAberration
             blendFunction={BlendFunction.NORMAL}
             offset={_caOffset}
           />
-          <Vignette eskil={false} offset={0.10} darkness={1.25} />
+          <Vignette eskil={false} offset={0.12} darkness={1.35} />
         </EffectComposer>
       </Canvas>
     </div>

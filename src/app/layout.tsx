@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Syncopate, Space_Grotesk, JetBrains_Mono } from 'next/font/google'
 import ChromeBackground from '@/components/layout/ChromeBackground'
+import CornerHUD from '@/components/layout/CornerHUD'
 import Dock from '@/components/layout/Dock'
 import PageTransition from '@/components/layout/PageTransition'
 import TopNav from '@/components/layout/TopNav/TopNav'
@@ -40,6 +41,7 @@ export default function RootLayout({
     <html lang="en" className={`${syncopate.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable}`}>
       <body>
         <ChromeBackground />
+        <CornerHUD />
         <TopNav />
         <PageTransition>
           {children}

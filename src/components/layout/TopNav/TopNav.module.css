@@ -22,22 +22,32 @@
   display: flex;
   align-items: baseline;
   gap: 0;
-
-  padding: 10px 0;
-  background: transparent;
-  pointer-events: all;
-  cursor: pointer;
-  opacity: 0.8;
-  transition: opacity var(--duration-fast) var(--ease-smooth);
-}
-
-.homeLink:hover .title {
-  opacity: 1.0;
 }
 
 .homeLink {
   text-decoration: none;
   pointer-events: all;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 28px;
+  background: var(--nav-bg);
+  backdrop-filter: blur(var(--nav-blur)) saturate(160%);
+  -webkit-backdrop-filter: blur(var(--nav-blur)) saturate(160%);
+  border-radius: var(--nav-radius);
+  border: 1px solid var(--nav-border);
+  box-shadow:
+    0 1px 0 0 var(--nav-inset-top) inset,
+    0 -1px 0 0 var(--nav-inset-bottom) inset,
+    var(--nav-shadow);
+  transition:
+    background var(--duration-fast) var(--ease-smooth),
+    border-color var(--duration-fast) var(--ease-smooth);
+}
+
+.homeLink:hover {
+  background: var(--nav-bg-hover);
+  border-color: var(--nav-border-hover);
 }
 
 .wordA {
@@ -46,7 +56,7 @@
 }
 
 .sep {
-  color: rgba(255, 255, 255, 0.3);
+  color: rgba(0, 196, 168, 0.70);
   font-weight: 300;
   margin: 0 0.5px;
   position: relative;
