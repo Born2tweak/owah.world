@@ -24,3 +24,6 @@ dist-ssr
 *.sw?
 
 .vercel
+
+# AutoClaw KDream data
+.autoclaw/

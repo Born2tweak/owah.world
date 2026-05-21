@@ -1,7 +1,8 @@
 'use client'
 
 import { useRef } from 'react'
-import { Canvas, useFrame } from '@react-three/fiber'
+import { useFrame } from '@react-three/fiber'
+import WebGLCanvas from './WebGLCanvas'
 import { Environment } from '@react-three/drei'
 import { EffectComposer, Bloom, ChromaticAberration, Vignette } from '@react-three/postprocessing'
 import { BlendFunction } from 'postprocessing'
@@ -164,7 +165,7 @@ function ArchitecturalFraming() {
 export default function CDScene() {
   return (
     <div style={{ width: '100%', height: '100vh', position: 'absolute', inset: 0, zIndex: 1, background: '#01050d' }}>
-      <Canvas
+      <WebGLCanvas
         camera={{ position: [0, 0, 10.5], fov: 39 }}
         gl={{
           antialias: true,
@@ -209,7 +210,7 @@ export default function CDScene() {
           <ChromaticAberration blendFunction={BlendFunction.NORMAL} offset={new THREE.Vector2(0.00055, 0.00055)} />
           <Vignette eskil={false} offset={0.14} darkness={0.82} />
         </EffectComposer>
-      </Canvas>
+      </WebGLCanvas>
     </div>
   )
 }

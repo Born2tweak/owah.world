@@ -1,5 +1,5 @@
 # ACTIVE BUGS
-_Last updated: 2026-05-18_
+_Last updated: 2026-05-20_
 
 ---
 
@@ -12,9 +12,8 @@ _No critical bugs._
 ## SEVERITY: HIGH
 
 ### BUG-002: Possible blank screen after WebGL context loss
-**Status:** Unconfirmed — not reproduced  
-**Suspected cause:** R3F Canvas has no error boundary; if WebGL context lost (iOS, GPU reset), Canvas goes blank  
-**Fix needed:** Add error boundary around `<Canvas>`, add `webglcontextlost` handler  
+**Status:** Mitigated 2026-05-20 — needs device QA  
+**Fix:** `WebGLCanvas.tsx` + `CanvasErrorBoundary.tsx` — React error boundary and `webglcontextlost` / `webglcontextrestored` handlers  
 **Owner:** CD/Visual Agent
 
 ---
@@ -33,9 +32,9 @@ _No critical bugs._
 ## SEVERITY: LOW
 
 ### BUG-007: Dock label overflow on mobile
-**Status:** Open — not tested on < 390px viewport  
-**File:** `src/components/layout/Dock/Dock.tsx`  
-**Note:** Dock now has 3 items (HOME removed) + sparkle icons. May need `@media` breakpoint for very small screens.
+**Status:** Partial fix 2026-05-20 — verify on < 390px viewport  
+**File:** `src/components/layout/Dock/Dock.module.css` (`@media (max-width: 390px)`)  
+**Note:** Dock has 3 items (HOME via TopNav). Confirm pills do not clip or wrap on narrow phones.
 
 ### BUG-008: R3F Canvas cold-start on return navigation
 **Status:** Accepted behavior  

@@ -1,6 +1,8 @@
 # CURRENT STATE
 _Last updated: 2026-05-18_
 
+**New session handoff:** paste [`docs/CONTEXT-EXPORT.md`](docs/CONTEXT-EXPORT.md) (≤8000 chars) for milestone, bugs, ownership, and QA.
+
 ---
 
 ## Phase 1 Status: COMPLETE (pending browser visual QA)

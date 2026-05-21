@@ -1,25 +1,48 @@
 {
   "pages": {
+    "/_not-found/page": [
+      "static/chunks/webpack-48baef3870e59050.js",
+      "static/chunks/4bd1b696-c023c6e3521b1417.js",
+      "static/chunks/255-4f84124391a7dac4.js",
+      "static/chunks/main-app-7293e7f81cd648ff.js",
+      "static/chunks/app/_not-found/page-b6dde90ae1698711.js"
+    ],
     "/layout": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/css/app/layout.css",
-      "static/chunks/app/layout.js"
+      "static/chunks/webpack-48baef3870e59050.js",
+      "static/chunks/4bd1b696-c023c6e3521b1417.js",
+      "static/chunks/255-4f84124391a7dac4.js",
+      "static/chunks/main-app-7293e7f81cd648ff.js",
+      "static/css/98bd8324ce7c87d1.css",
+      "static/chunks/750-3db32e65d6ec1b25.js",
+      "static/chunks/app/layout-e991a8bb99ea9e3f.js"
     ],
     "/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/page.js"
+      "static/chunks/webpack-48baef3870e59050.js",
+      "static/chunks/4bd1b696-c023c6e3521b1417.js",
+      "static/chunks/255-4f84124391a7dac4.js",
+      "static/chunks/main-app-7293e7f81cd648ff.js",
+      "static/chunks/app/page-42667d07d9d1adf3.js"
+    ],
+    "/world/page": [
+      "static/chunks/webpack-48baef3870e59050.js",
+      "static/chunks/4bd1b696-c023c6e3521b1417.js",
+      "static/chunks/255-4f84124391a7dac4.js",
+      "static/chunks/main-app-7293e7f81cd648ff.js",
+      "static/chunks/app/world/page-0c394a6b8f9d6594.js"
     ],
     "/code/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/code/page.js"
+      "static/chunks/webpack-48baef3870e59050.js",
+      "static/chunks/4bd1b696-c023c6e3521b1417.js",
+      "static/chunks/255-4f84124391a7dac4.js",
+      "static/chunks/main-app-7293e7f81cd648ff.js",
+      "static/chunks/app/code/page-73fdb6a82840a527.js"
     ],
     "/words/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/words/page.js"
+      "static/chunks/webpack-48baef3870e59050.js",
+      "static/chunks/4bd1b696-c023c6e3521b1417.js",
+      "static/chunks/255-4f84124391a7dac4.js",
+      "static/chunks/main-app-7293e7f81cd648ff.js",
+      "static/chunks/app/words/page-0c394a6b8f9d6594.js"
     ]
   }
 }

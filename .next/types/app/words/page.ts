@@ -1,4 +1,4 @@
-// File: C:\Users\acetu\.gemini\antigravity\scratch\owah.world\src\app\words\page.tsx
+// File: C:\Users\acetu\.gemini\antigravity\scratch\owah.world-1\src\app\words\page.tsx
 import * as entry from '../../../../src/app/words/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

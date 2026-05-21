@@ -36,6 +36,13 @@
   --duration-fast:      150ms;
   --duration-normal:    300ms;
   --duration-slow:      600ms;
+  --transition-exit-duration: 220ms;
+  --transition-enter-duration: 460ms;
+  --transition-field-duration: 540ms;
+  --transition-field-opacity: 0.28;
+  --transition-field-blur: 12px;
+  --transition-scale-exit: 0.985;
+  --transition-scale-enter: 1;
 
   /* ─── Typography ─── */
   --font-mono:          'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
