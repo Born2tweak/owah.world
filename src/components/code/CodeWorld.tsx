@@ -229,11 +229,7 @@ export default function CodeWorld() {
         progress={progress}
         setProgress={setProgress}
         focusedTitle={pillars.find((pillar) => pillar.project.id === focusedId)?.project.title ?? null}
-        onInspectFocused={() => {
-          if (!focusedId) return
-          setSelectedId(focusedId)
-          setModalProjectId(focusedId)
-        }}
+        modalOpen={Boolean(modalProject)}
       />
       {modalProject ? <ProjectModal project={modalProject} onClose={() => setModalProjectId(null)} /> : null}
 

@@ -3,6 +3,7 @@
 import { Text } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
 import { useMemo, useRef, useState } from 'react'
+import type { ThreeEvent } from '@react-three/fiber'
 import * as THREE from 'three'
 import type { CodeProject } from '@/data/projects'
 
@@ -35,7 +36,9 @@ export default function ProjectPillar({
   const detailPlaneRef = useRef<THREE.Mesh>(null)
   const haloRef = useRef<THREE.Mesh>(null)
   const [hovered, setHovered] = useState(false)
+  const pointerDownRef = useRef<{ x: number; y: number } | null>(null)
   const previewTexture = useMemo(() => {
+    if (!project.previewImage) return null
     const texture = new THREE.TextureLoader().load(project.previewImage)
     texture.colorSpace = THREE.SRGBColorSpace
     return texture
@@ -124,22 +127,26 @@ export default function ProjectPillar({
     )
   })
 
+  function handlePointerDown(event: ThreeEvent<PointerEvent>) {
+    pointerDownRef.current = { x: event.clientX, y: event.clientY }
+    event.stopPropagation()
+  }
+
+  function handlePointerUp(event: ThreeEvent<PointerEvent>) {
+    const start = pointerDownRef.current
+    pointerDownRef.current = null
+    if (!start) return
+    const dx = event.clientX - start.x
+    const dy = event.clientY - start.y
+    const moved = Math.hypot(dx, dy)
+    if (moved > 7) return
+    event.stopPropagation()
+    onSelect()
+  }
+
   return (
-    <group
-      ref={groupRef}
-      position={position}
-      rotation={[0, rotationY, 0]}
-      onPointerOver={() => {
-        setHovered(true)
-        onHoverChange(true)
-      }}
-      onPointerOut={() => {
-        setHovered(false)
-        onHoverChange(false)
-      }}
-      onClick={onSelect}
-    >
-      <mesh ref={haloRef} position={[0, 3.3, -0.04]}>
+    <group ref={groupRef} position={position} rotation={[0, rotationY, 0]}>
+      <mesh ref={haloRef} position={[0, 3.3, -0.04]} raycast={() => null}>
         <planeGeometry args={[3.1, 7.8]} />
         <meshBasicMaterial color={project.accent} transparent opacity={0.16} />
       </mesh>
@@ -159,7 +166,7 @@ export default function ProjectPillar({
         />
       </mesh>
 
-      <mesh ref={frameRef} position={[0, 0, 0.03]}>
+      <mesh ref={frameRef} position={[0, 0, 0.03]} raycast={() => null}>
         <boxGeometry args={[2.27, 7.32, 0.08]} />
         <meshPhysicalMaterial
           color="#d9ecff"
@@ -173,7 +180,22 @@ export default function ProjectPillar({
         />
       </mesh>
 
-      <mesh ref={coreRef} position={[0, 0, 0.19]}>
+      <mesh
+        ref={coreRef}
+        position={[0, 0, 0.19]}
+        onPointerOver={(event) => {
+          event.stopPropagation()
+          setHovered(true)
+          onHoverChange(true)
+        }}
+        onPointerOut={(event) => {
+          event.stopPropagation()
+          setHovered(false)
+          onHoverChange(false)
+        }}
+        onPointerDown={handlePointerDown}
+        onPointerUp={handlePointerUp}
+      >
         <boxGeometry args={[1.84, 6.88, 0.08]} />
         <meshPhysicalMaterial
           color="#050f1e"
@@ -186,7 +208,7 @@ export default function ProjectPillar({
         />
       </mesh>
 
-      <mesh ref={detailPlaneRef} position={[0, 0, 0.24]}>
+      <mesh ref={detailPlaneRef} position={[0, 0, 0.24]} raycast={() => null}>
         <planeGeometry args={[1.58, 6.4]} />
         <meshPhysicalMaterial
           color="#0a1626"
@@ -199,17 +221,21 @@ export default function ProjectPillar({
         />
       </mesh>
 
-      <mesh position={[0, -0.15, 0.249]}>
+      <mesh position={[0, -0.15, 0.249]} raycast={() => null}>
         <planeGeometry args={[1.48, 2.18]} />
-        <meshBasicMaterial map={previewTexture} transparent opacity={0.87} />
+        {previewTexture ? (
+          <meshBasicMaterial map={previewTexture} transparent opacity={0.87} />
+        ) : (
+          <meshBasicMaterial color={project.accent} transparent opacity={0.32} />
+        )}
       </mesh>
 
-      <mesh ref={scanPlaneRef} position={[0, -2.4, 0.245]}>
+      <mesh ref={scanPlaneRef} position={[0, -2.4, 0.245]} raycast={() => null}>
         <planeGeometry args={[1.52, 0.22]} />
         <meshBasicMaterial color={project.accent} transparent opacity={0.04} />
       </mesh>
 
-      <mesh position={[0, -3.71, 0]}>
+      <mesh position={[0, -3.71, 0]} raycast={() => null}>
         <cylinderGeometry args={[1.3, 1.5, 0.24, 6]} />
         <meshStandardMaterial color="#b8dfff" metalness={0.84} roughness={0.18} />
       </mesh>

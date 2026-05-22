@@ -13,7 +13,9 @@ export interface CodeProject {
   type: string
   githubUrl: string
   liveUrl?: string
-  previewImage: string
+  previewImage?: string
+  repoLabel: string
+  liveLabel: string
   accent: string
 }
 
@@ -38,6 +40,8 @@ export const CODE_PROJECTS: CodeProject[] = [
     githubUrl: 'https://github.com/Born2tweak/owah.world',
     liveUrl: 'https://owah-world.vercel.app',
     previewImage: '/projects/owahworld-landing.png',
+    repoLabel: 'View Repo',
+    liveLabel: 'View Live',
     accent: '#00c4a8',
   },
   {
@@ -58,7 +62,8 @@ export const CODE_PROJECTS: CodeProject[] = [
     status: 'in_progress',
     type: 'Applied AI / Biomechanics',
     githubUrl: 'https://github.com/Born2tweak/KinematicIQ',
-    previewImage: '/projects/kinematiciq-camera.png',
+    repoLabel: 'View Repo',
+    liveLabel: 'No Live Demo',
     accent: '#57c7ff',
   },
   {
@@ -79,7 +84,8 @@ export const CODE_PROJECTS: CodeProject[] = [
     status: 'in_progress',
     type: 'Marketplace Platform',
     githubUrl: 'https://github.com/Born2tweak/OhmPlace',
-    previewImage: '/projects/ohmplace-hero.png',
+    repoLabel: 'View Repo',
+    liveLabel: 'No Live Demo',
     accent: '#9d8cff',
   },
   {
@@ -100,7 +106,8 @@ export const CODE_PROJECTS: CodeProject[] = [
     status: 'archived',
     type: 'Marketplace Prototype',
     githubUrl: 'https://github.com/Born2tweak/BackpackVol2',
-    previewImage: '/projects/backpack-home.png',
+    repoLabel: 'View Repo',
+    liveLabel: 'No Live Demo',
     accent: '#7fd6b4',
   },
   {
@@ -122,7 +129,8 @@ export const CODE_PROJECTS: CodeProject[] = [
     type: 'Interactive Learning Tool',
     githubUrl: 'https://github.com/Born2tweak/MotoIQ',
     liveUrl: 'https://motoiq.netlify.app',
-    previewImage: '/projects/motoiq-explorer.png',
+    repoLabel: 'View Repo',
+    liveLabel: 'View Live',
     accent: '#ffbf73',
   },
   {
@@ -143,7 +151,8 @@ export const CODE_PROJECTS: CodeProject[] = [
     status: 'prototype',
     type: 'Audio Engineering Prototype',
     githubUrl: 'https://github.com/Born2tweak/DrakoTune',
-    previewImage: '/projects/drakotune-alpha.png',
+    repoLabel: 'View Repo',
+    liveLabel: 'No Live Demo',
     accent: '#c7a0ff',
   },
 ]

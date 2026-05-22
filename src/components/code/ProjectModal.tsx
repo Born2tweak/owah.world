@@ -55,10 +55,24 @@ export default function ProjectModal({ project, onClose }: ProjectModalProps) {
         <div className={styles.body}>
           <div className={styles.preview}>
             <span className={styles.previewLabel}>Project preview</span>
-            <p className={styles.previewTitle}>{project.title} environment capture</p>
-            <div className={styles.previewImageWrap}>
-              <Image src={project.previewImage} alt={`${project.title} preview`} fill sizes="(max-width: 860px) 100vw, 920px" />
-            </div>
+            <p className={styles.previewTitle}>
+              {project.previewImage ? `${project.title} environment capture` : `${project.title} placeholder preview`}
+            </p>
+            {project.previewImage ? (
+              <div className={styles.previewImageWrap}>
+                <Image src={project.previewImage} alt={`${project.title} preview`} fill sizes="(max-width: 860px) 100vw, 920px" />
+              </div>
+            ) : (
+              <div className={styles.previewFallback} role="img" aria-label={`${project.title} generated preview`}>
+                <p className={styles.previewFallbackTitle}>{project.title}</p>
+                <p className={styles.previewFallbackTag}>{project.tagline}</p>
+                <div className={styles.previewFallbackChips}>
+                  {project.stack.slice(0, 4).map((item) => (
+                    <span key={item}>{item}</span>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           <div className={styles.grid}>
@@ -96,18 +110,18 @@ export default function ProjectModal({ project, onClose }: ProjectModalProps) {
               <h3 className={styles.cardTitle}>Links</h3>
               <div className={styles.actions}>
                 {project.githubUrl ? (
-                  <a className={styles.action} href={project.githubUrl} target="_blank" rel="noreferrer">
-                    GitHub
+                  <a className={styles.action} href={project.githubUrl} target="_blank" rel="noopener noreferrer">
+                    {project.repoLabel}
                   </a>
                 ) : (
-                  <span className={`${styles.action} ${styles.actionDisabled}`}>GitHub Soon</span>
+                  <span className={`${styles.action} ${styles.actionDisabled}`}>Repo Unavailable</span>
                 )}
                 {project.liveUrl ? (
-                  <a className={styles.action} href={project.liveUrl} target="_blank" rel="noreferrer">
-                    Live
+                  <a className={styles.action} href={project.liveUrl} target="_blank" rel="noopener noreferrer">
+                    {project.liveLabel}
                   </a>
                 ) : (
-                  <span className={`${styles.action} ${styles.actionDisabled}`}>Live Soon</span>
+                  <span className={`${styles.action} ${styles.actionDisabled}`}>No Live Demo</span>
                 )}
               </div>
             </article>

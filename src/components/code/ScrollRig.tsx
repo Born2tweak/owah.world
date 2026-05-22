@@ -1,32 +1,100 @@
 'use client'
 
+import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
 import type { Dispatch, SetStateAction } from 'react'
 
 interface ScrollRigProps {
   progress: number
   setProgress: Dispatch<SetStateAction<number>>
   focusedTitle: string | null
-  onInspectFocused: () => void
+  modalOpen: boolean
 }
 
-export default function ScrollRig({ progress, setProgress, focusedTitle, onInspectFocused }: ScrollRigProps) {
+const KEY_STEP_SMALL = 0.03
+const KEY_STEP_MEDIUM = 0.08
+
+function clampProgress(value: number) {
+  return Math.min(Math.max(value, 0), 1)
+}
+
+export default function ScrollRig({ progress, setProgress, focusedTitle, modalOpen }: ScrollRigProps) {
+  const railRef = useRef<HTMLDivElement>(null)
+  const [dragging, setDragging] = useState(false)
+
+  useEffect(() => {
+    function isEditableTarget(target: EventTarget | null) {
+      if (!(target instanceof HTMLElement)) return false
+      const tag = target.tagName.toLowerCase()
+      return tag === 'input' || tag === 'textarea' || tag === 'select' || target.isContentEditable
+    }
+
+    function onWheel(event: WheelEvent) {
+      if (modalOpen || isEditableTarget(event.target)) return
+      event.preventDefault()
+      const delta = event.deltaY * 0.0011
+      setProgress((current) => clampProgress(current + delta))
+    }
+
+    function onKeyDown(event: KeyboardEvent) {
+      if (modalOpen || isEditableTarget(event.target)) return
+
+      let step = 0
+      if (event.key === 'ArrowDown') step = KEY_STEP_SMALL
+      if (event.key === 'ArrowUp') step = -KEY_STEP_SMALL
+      if (event.key === 'PageDown' || event.key === ' ') step = KEY_STEP_MEDIUM
+      if (event.key === 'PageUp') step = -KEY_STEP_MEDIUM
+      if (event.key === 'Home') {
+        event.preventDefault()
+        setProgress(0)
+        return
+      }
+      if (event.key === 'End') {
+        event.preventDefault()
+        setProgress(1)
+        return
+      }
+      if (step === 0) return
+
+      event.preventDefault()
+      setProgress((current) => clampProgress(current + step))
+    }
+
+    window.addEventListener('wheel', onWheel, { passive: false })
+    window.addEventListener('keydown', onKeyDown)
+    return () => {
+      window.removeEventListener('wheel', onWheel)
+      window.removeEventListener('keydown', onKeyDown)
+    }
+  }, [modalOpen, setProgress])
+
+  function updateFromPointer(clientY: number) {
+    const rail = railRef.current
+    if (!rail) return
+    const rect = rail.getBoundingClientRect()
+    const ratio = (clientY - rect.top) / rect.height
+    setProgress(clampProgress(ratio))
+  }
+
+  function onRailPointerDown(event: ReactPointerEvent<HTMLDivElement>) {
+    event.preventDefault()
+    setDragging(true)
+    event.currentTarget.setPointerCapture(event.pointerId)
+    updateFromPointer(event.clientY)
+  }
+
+  function onRailPointerMove(event: ReactPointerEvent<HTMLDivElement>) {
+    if (!dragging) return
+    event.preventDefault()
+    updateFromPointer(event.clientY)
+  }
+
+  function onRailPointerUp(event: ReactPointerEvent<HTMLDivElement>) {
+    setDragging(false)
+    event.currentTarget.releasePointerCapture(event.pointerId)
+  }
+
   return (
-    <div
-      className="code-scrollRig"
-      onClick={(event) => {
-        const target = event.target as HTMLElement
-        if (target.closest('.code-scrollRig__hud')) return
-        onInspectFocused()
-      }}
-      onScroll={(event) => {
-        const target = event.currentTarget
-        const next =
-          target.scrollHeight <= target.clientHeight
-            ? 0
-            : target.scrollTop / (target.scrollHeight - target.clientHeight)
-        setProgress(next)
-      }}
-    >
+    <div className="code-scrollRig">
       <div className="code-scrollRig__sticky">
         <div className="code-scrollRig__hud">
           <p className="code-scrollRig__eyebrow">OWAH.WORLD / CODE</p>
@@ -52,29 +120,45 @@ export default function ScrollRig({ progress, setProgress, focusedTitle, onInspe
             <p className="code-scrollRig__focusReadout">
               Focus: <strong>{focusedTitle ?? 'OWAHWORLD'}</strong>
             </p>
-            <p className="code-scrollRig__inspectHint">Click world to inspect focused project</p>
+          </div>
+        </div>
+
+        <div className="code-scrollRig__railWrap">
+          <div
+            ref={railRef}
+            className={`code-scrollRig__rail${dragging ? ' is-dragging' : ''}`}
+            role="slider"
+            aria-label="Code world scroll position"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={Math.round(progress * 100)}
+            tabIndex={0}
+            onPointerDown={onRailPointerDown}
+            onPointerMove={onRailPointerMove}
+            onPointerUp={onRailPointerUp}
+            onPointerCancel={() => setDragging(false)}
+          >
+            <span className="code-scrollRig__railTrack" />
+            <span className="code-scrollRig__railThumb" style={{ top: `calc(${progress * 100}% - 14px)` }} />
           </div>
         </div>
       </div>
-      <div className="code-scrollRig__spacer" />
 
       <style jsx>{`
         .code-scrollRig {
           position: absolute;
           inset: 0;
-          overflow-y: auto;
-          overflow-x: hidden;
           z-index: 2;
+          pointer-events: none;
         }
 
         .code-scrollRig__sticky {
-          position: sticky;
-          top: 0;
+          position: absolute;
+          inset: 0;
           height: 100vh;
-          pointer-events: none;
           display: flex;
           align-items: flex-start;
-          justify-content: flex-start;
+          justify-content: space-between;
           padding: 112px 24px 136px;
         }
 
@@ -86,6 +170,7 @@ export default function ScrollRig({ progress, setProgress, focusedTitle, onInspe
           background: rgba(5, 10, 18, 0.28);
           backdrop-filter: blur(12px);
           box-shadow: 0 24px 70px rgba(0, 0, 0, 0.24);
+          pointer-events: auto;
         }
 
         .code-scrollRig__eyebrow {
@@ -194,17 +279,66 @@ export default function ScrollRig({ progress, setProgress, focusedTitle, onInspe
           font-weight: 500;
         }
 
-        .code-scrollRig__inspectHint {
-          margin-top: 8px;
-          font-family: var(--font-mono);
-          font-size: 9px;
-          letter-spacing: 0.1em;
-          text-transform: uppercase;
-          color: rgba(160, 204, 236, 0.74);
+        .code-scrollRig__railWrap {
+          height: 100%;
+          display: flex;
+          align-items: center;
+          pointer-events: none;
         }
 
-        .code-scrollRig__spacer {
-          height: 540vh;
+        .code-scrollRig__rail {
+          position: relative;
+          width: 44px;
+          height: min(62vh, 560px);
+          border-radius: 999px;
+          pointer-events: auto;
+          cursor: grab;
+          touch-action: none;
+        }
+
+        .code-scrollRig__rail.is-dragging {
+          cursor: grabbing;
+        }
+
+        .code-scrollRig__railTrack {
+          position: absolute;
+          top: 0;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 8px;
+          height: 100%;
+          border-radius: 999px;
+          border: 1px solid rgba(178, 220, 255, 0.28);
+          background: linear-gradient(180deg, rgba(12, 22, 34, 0.5), rgba(9, 15, 25, 0.32));
+          box-shadow: 0 0 24px rgba(87, 199, 255, 0.16);
+          transition: border-color 160ms ease, box-shadow 160ms ease;
+        }
+
+        .code-scrollRig__rail:hover .code-scrollRig__railTrack,
+        .code-scrollRig__rail.is-dragging .code-scrollRig__railTrack {
+          border-color: rgba(207, 233, 255, 0.46);
+          box-shadow: 0 0 28px rgba(87, 199, 255, 0.26);
+        }
+
+        .code-scrollRig__railThumb {
+          position: absolute;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 28px;
+          height: 28px;
+          border-radius: 999px;
+          border: 1px solid rgba(208, 236, 255, 0.55);
+          background:
+            radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.86), rgba(143, 214, 255, 0.26) 58%),
+            linear-gradient(180deg, rgba(15, 28, 42, 0.96), rgba(9, 16, 24, 0.78));
+          box-shadow: 0 0 30px rgba(87, 199, 255, 0.34);
+          transition: transform 120ms ease, box-shadow 120ms ease;
+        }
+
+        .code-scrollRig__rail:hover .code-scrollRig__railThumb,
+        .code-scrollRig__rail.is-dragging .code-scrollRig__railThumb {
+          transform: translateX(-50%) scale(1.06);
+          box-shadow: 0 0 38px rgba(87, 199, 255, 0.45);
         }
 
         @keyframes hintTick {
@@ -237,15 +371,16 @@ export default function ScrollRig({ progress, setProgress, focusedTitle, onInspe
 
         @media (max-width: 700px) {
           .code-scrollRig__sticky {
-            padding: 96px 16px 128px;
+            padding: 96px 16px 120px;
           }
 
           .code-scrollRig__hud {
             width: min(100%, 340px);
           }
 
-          .code-scrollRig__spacer {
-            height: 500vh;
+          .code-scrollRig__rail {
+            width: 40px;
+            height: 56vh;
           }
         }
       `}</style>
