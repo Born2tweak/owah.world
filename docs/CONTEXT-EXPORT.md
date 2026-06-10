@@ -1,71 +1,85 @@
 # OWAH.WORLD — Context Export (≤8000 chars)
-**Updated:** 2026-05-20 · Paste whole file into new sessions · Refresh with `CURRENT_STATE.md` / `ACTIVE_BUGS.md`
+**Updated:** 2026-06-03 · Paste whole file into new sessions · See also `AGENTS.md`, `CURRENT_STATE.md`, `ACTIVE_BUGS.md`
 
 ## Project
-Personal “living OS” site — four chrome/glass worlds (Landing, Code, Words, World), not a portfolio. **Stack:** Next.js 15 App Router, React 19, R3F/Three, Framer Motion, Zustand, Tailwind 4; GSAP planned for Code. **Repo:** `owah.world-1`
+Personal “living OS” site — four chrome/glass worlds (Landing, Code, Words, World). **Stack:** Next.js 15 App Router, React 19, R3F/Three, Framer Motion, Zustand, Tailwind 4. **Repo:** `owah.world-1` · **Remote:** `Born2tweak/owah.world` (`master`) · **Prod:** https://owah-world.vercel.app
 
 ## Milestone
 | | |
 |---|---|
-| **Phase** | **1 Landing** — code-complete, **browser QA not signed off** |
-| **Next** | Phase 2 `/code` synthwave grid + pillars + GSAP scroll |
-| **Build** | `npm run build` + `tsc --noEmit` clean |
+| **Phase** | **4 World** — M2B on `origin/master` (`3efde14`); **local WIP: M2C Redux** (portrait readability, uncommitted) |
+| **World canon** | Organic translucent gradient fragments in bust silhouette — **no** pasted images, memory-tile cards, texture crops, or M2C–M2F hero experiments |
+| **Next** | Browser QA M2C Redux → commit if approved → room hotspots / real assets later (no APIs) |
+| **Build** | `npm run build` + `npx tsc --noEmit` clean |
 
-**Routes:** `/` working (CDScene `dynamic` ssr:false + manifesto) · `/code` `/words` `/world` stubs
+**Routes:** `/` landing (3D CD) · `/code` 3D pillars + modal · `/words` text-first archive + viewer images · `/world` **WorldScene** (mosaic + drawer)
 
-**Phases:** 0 Foundation → **1 Landing** → 2 Code → 3 Words → 4 World → 5 Live Data → 6 Polish. Detail: `docs/04-ROADMAP.md`, `docs/01-PRD.md`
+**Phases:** 0–2 done · **3 Words** (skeleton+assets) · **4 World (M2B + M2C readability)** · 5 Live Data → 6 Polish. `docs/04-ROADMAP.md`
 
 ## Global layout (never duplicate in pages)
-`layout.tsx` → ChromeBackground, CornerHUD, TopNav (`Link /`), PageTransition (one AnimatePresence, pathname key), Dock (CODE/WORDS/WORLD only — home is TopNav)
+`layout.tsx` → ChromeBackground, CornerHUD, TopNav (`Link /`), PageTransition (pathname key; landing-only enter fade), Dock (CODE/WORDS/WORLD)
 
-## Landing 3D (`src/components/landing/CDScene/`)
-Root: `CDScene.tsx` → `WebGLCanvas` + `CanvasErrorBoundary` (webglcontextlost handlers)
-→ Environment studio, lights, **ArchitecturalFraming** (inline: ChromeBlade, CrystalShard, ChromeSliver, TealLaser, ReflectiveFloor), **CDMesh**, EffectComposer (Bloom, CA, Vignette). Camera `[0,0,10.5]` fov 39. `LaserGrid.tsx` on disk — verify import before use; `CURRENT_STATE.md` may describe older tree.
+## PageTransition
+Two-layer: content scale/dim/blur + route-accent field flash (`--accent-code|words|world|landing`). Crystal field **landing only**. Non-landing routes must not SSR at opacity 0.
 
-## CDMesh invariants (`CDMesh.tsx`) — DO NOT BREAK
-- `frontMaterial.map = texture` **required** (WATTBA visible)
-- `transmission: 0.58` on front **intentional** (tint through disc)
-- Label: Canvas 2D 2048², **Syncopate 700** after fonts.ready; hub = dark metal, no transmission
-- `SYSTEM_OWNERSHIP.md` “no transmission” is **stale** — trust code + BUG-003
+## Code (`src/components/code/`)
+`CodePageClient` → `CodeWorld` / `GridFloor` / pillars from `projects.ts` / `ScrollRig` / `ProjectModal`. Input nav + modal fixes on `master` (`ead4cb8`).
+
+## World (`src/components/world/`) — **M2B + local M2C Redux**
+`WorldScene`: sidebar (category hints) + `FigureMosaic` + `ContentDrawer`.
+
+**M2B (shipped `3efde14`):** `portraitMask` + `mosaicFragments` organic fills; `useMosaicSelection` + `mosaicNeighbors`; Framer Motion hover glow, neighbor illumination, click focus/zoom, drawer, return. No APIs; no layout-shell edits.
+
+**Rejected (rolled back):** `public/world/*` textures, `src/content/world/*` memory tiles, category zones, placeholder cards, Spotify/Pinterest/Letterboxd UI.
+
+**M2C Redux (local, 2026-06-03):** Bust silhouette reads as person at distance — wider shoulders, larger head/hair, face-weighted density; no legs/arm sticks; scatter 48 (was 72), biased body placement toward head/shoulders; seed `42858`. Files: `portraitMask.ts`, `mosaicFragments.ts`, `FigureMosaic.module.css` (backdrop only). **Interactions unchanged.**
+
+**Do not:** redesign page, add dashboards, image fragments, or APIs.
+
+## Words (`src/components/words/WordsDesktopSkeleton.tsx`)
+Text-first cards; images in excerpt viewer + full-text modal only (`public/words/archive/`). Hide broken images.
+
+## Landing (`src/components/landing/CDScene/`)
+`CDMesh`: `map: texture` + `transmission: 0.58` intentional. `CanvasErrorBoundary` + context-loss handlers.
 
 ## Visual (quick)
-Near-black chrome `#06080d`, teal landing accent `#00c4a8` / lasers `#00ddb8`. Fonts: Syncopate, Space Grotesk, JetBrains Mono. Glass: `LiquidGlass` (Dock=heavy). Full: `VISUAL_LANGUAGE.md`
+Near-black chrome `#06080d`, teal accents. Fonts: Syncopate, Space Grotesk, JetBrains Mono. `VISUAL_LANGUAGE.md`
 
 ## Ownership
 | Area | Owner |
 |------|--------|
-| layout, ChromeBackground, TopNav, Dock, PageTransition, CornerHUD, tokens.css | Architecture |
-| page.tsx, CDScene/*, cd.store.ts | CD/Visual |
-| code/words/world stubs | TBD feature agents |
+| layout shell, tokens | Architecture |
+| CDScene, CodeWorld | CD/Visual |
+| WordsDesktopSkeleton | Words |
+| WorldScene, FigureMosaic, ContentDrawer | World |
 
-Rules: `SYSTEM_OWNERSHIP.md`
+`SYSTEM_OWNERSHIP.md`
 
-## Bugs
+## Bugs / ops
 | ID | Status |
 |----|--------|
-| BUG-002 | Mitigated: WebGLCanvas + error boundary — device QA |
-| BUG-003 | By design: map + transmission 0.58 |
-| BUG-007 | Partial: Dock CSS ≤390px — verify phone |
-| BUG-008 | Accepted: CD remount ~200–400ms on return `/` (Phase 6) |
+| BUG-002 | Mitigated WebGL loss — device QA |
+| BUG-003 | By design: CD map + transmission |
+| BUG-007 | Dock mobile — verify |
+| BUG-008 | Accepted: CD remount on `/` return |
+| **Dev** | Corrupt `.next` → CSS 404, unstyled HUD-only page, `Cannot find module './79.js'` — **`npm run dev:clean`** or delete `.next` + `npm run dev`; hard-refresh **`/world`** |
 
-**Drift:** CURRENT_STATE sparkle Dock / old scene tree may ≠ code; README is Vite boilerplate; ignore. `ACTIVE_BUGS.md`
-
-## Phase 1 browser QA (gate before Phase 2)
-CD texture+transmission, drag, framing/crystals/lasers, floor mirror, TopNav home, Dock nav×3, manifesto panel, CornerHUD+GPS, transitions 150/300ms, optional WebGL recovery UI
+## Agent memory
+Root **`AGENTS.md`** — learned prefs (commit only when asked, M2B world direction, CONTEXT-EXPORT ≤8k, scoped milestones). Index: `.cursor/hooks/state/continual-learning-index.json`
 
 ## Commands
-`npm run dev` · `npm run build` · `npm run lint` · `npx tsc --noEmit`
+`npm run dev` · **`npm run dev:clean`** (wipe `.next` + dev) · `npm run build` · `npx tsc --noEmit`
 
 ## Next work
-1. Browser QA → update CURRENT_STATE  
-2. Reconcile docs vs CDScene/Dock code  
-3. Phase 2 SynthwaveScene / GridFloor / projects.json / ScrollTrigger  
-4. Optional: Playwright smoke, fix README
+1. QA **http://localhost:3000/world** — M2C bust readability + M2B interactions intact
+2. Commit M2C Redux if approved (not pushed yet)
+3. Words: Fall of Rome / philosophy boxes (roadmap)
+4. Landing: Phase 1 browser QA + Crystalline OS refinements
 
-## Agents
-`.agent/rules/cross-agent-protocol.md` · `.autoclaw/orchestrator/comms/` · MAteam scratch `.autoclaw/mateam/scratch/<id>/` on demand
+## Agents / orchestration
+`.claude/rules/cross-agent-protocol.md` · `.autoclaw/orchestrator/comms/` · `.cursorrules` (Merge CLI)
 
-## Sources (deep dive)
-`CURRENT_STATE.md` · `ACTIVE_BUGS.md` · `SYSTEM_OWNERSHIP.md` · `VISUAL_LANGUAGE.md` · `CHANGELOG.md` · `docs/01-PRD.md` · `docs/02-ARCHITECTURE.md` · `docs/03-AI-RULES.md` · `docs/04-ROADMAP.md`
+## Sources
+`CURRENT_STATE.md` (may lag) · `ACTIVE_BUGS.md` · `CHANGELOG.md` · `docs/01-PRD.md` · `docs/04-ROADMAP.md`
 
-**Maintain:** On phase/bug/arch change → update canonical docs + this file + Last updated.
+**Maintain:** phase/bug/arch change → update this file + canonical docs + date.

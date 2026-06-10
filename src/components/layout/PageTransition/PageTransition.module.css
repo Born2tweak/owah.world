@@ -1,23 +1,26 @@
 .root {
   position: relative;
   width: 100%;
+  min-height: 100dvh;
   height: 100%;
   isolation: isolate;
 }
 
 .content {
   position: relative;
-  z-index: 6;
+  z-index: var(--z-content);
   width: 100%;
+  min-height: 100dvh;
   height: 100%;
-  will-change: opacity, transform, filter;
+  opacity: 1;
+  will-change: opacity, transform;
 }
 
 .field {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  z-index: 5;
+  z-index: calc(var(--z-content) - 1);
   mix-blend-mode: plus-lighter;
   --field-opacity: var(--transition-field-opacity, 0.36);
   --field-blur: var(--transition-field-blur, 12px);

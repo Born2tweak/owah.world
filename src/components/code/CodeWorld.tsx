@@ -6,6 +6,7 @@ import { Suspense, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
 import WebGLCanvas from '@/components/landing/CDScene/WebGLCanvas'
 import CurvedPath, { createCodeCurve } from './CurvedPath'
+import GridFloor from './GridFloor'
 import ProjectPillar from './ProjectPillar'
 import ProjectModal from './ProjectModal'
 import ScrollRig from './ScrollRig'
@@ -83,7 +84,8 @@ function Atmosphere() {
       <pointLight position={[0, 4, -10]} intensity={5.5} color="#5ac6ff" distance={18} />
       <pointLight position={[0, 2, -26]} intensity={4} color="#c7d9ff" distance={20} />
       <pointLight position={[0, 3, -40]} intensity={4} color="#84baff" distance={18} />
-      <Stars radius={110} depth={80} count={900} factor={3} saturation={0} speed={0.3} fade />
+      <pointLight position={[0, 1.5, -18]} intensity={3.2} color="#6b3dff" distance={14} />
+      <Stars radius={110} depth={80} count={900} factor={3} saturation={0} fade speed={0.3} />
       <Environment preset="night" />
     </>
   )
@@ -197,6 +199,7 @@ export default function CodeWorld() {
           <Suspense fallback={<SceneFallback />}>
             <Atmosphere />
             <CameraRig curve={curve} progress={progress} />
+            <GridFloor scrollProgress={progress} />
             <ReflectiveFloor />
             <CurvedPath curve={curve} />
             <CrystalMarkers />
@@ -231,7 +234,15 @@ export default function CodeWorld() {
         focusedTitle={pillars.find((pillar) => pillar.project.id === focusedId)?.project.title ?? null}
         modalOpen={Boolean(modalProject)}
       />
-      {modalProject ? <ProjectModal project={modalProject} onClose={() => setModalProjectId(null)} /> : null}
+      {modalProject ? (
+        <ProjectModal
+          project={modalProject}
+          onClose={() => {
+            setModalProjectId(null)
+            setSelectedId(null)
+          }}
+        />
+      ) : null}
 
       <style jsx>{`
         .code-world {

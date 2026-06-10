@@ -2,80 +2,121 @@ import type { WorldCategory } from '../world.types'
 
 /** Normalized coords (0–1) inside the mosaic frame. */
 
-function ellipse(nx: number, ny: number, cx: number, cy: number, rx: number, ry: number): boolean {
-  const dx = (nx - cx) / rx
-  const dy = (ny - cy) / ry
-  return dx * dx + dy * dy <= 1
+const BUST_CENTER_X = 0.5
+
+function bustHalfWidth(ny: number): number {
+  if (ny < 0.07) {
+    return 0.28 + (ny / 0.07) * 0.06
+  }
+  if (ny < 0.16) {
+    return 0.34 + ((ny - 0.07) / 0.09) * 0.1
+  }
+  if (ny < 0.26) {
+    return 0.44
+  }
+  if (ny < 0.32) {
+    const t = (ny - 0.26) / 0.06
+    return 0.44 - t * 0.2
+  }
+  if (ny < 0.36) {
+    return 0.18
+  }
+  if (ny < 0.42) {
+    const t = (ny - 0.36) / 0.06
+    return 0.18 + t * 0.32
+  }
+  if (ny < 0.5) {
+    return 0.5
+  }
+  if (ny < 0.54) {
+    const t = (ny - 0.5) / 0.04
+    return 0.5 - t * 0.24
+  }
+  return 0.26
 }
 
-function torsoHalfWidth(ny: number): number {
-  if (ny < 0.34) return 0.34
-  if (ny < 0.52) return 0.34 - (ny - 0.34) * 0.35
-  if (ny < 0.68) return 0.27 - (ny - 0.52) * 0.12
-  return 0.15
-}
-
-/** Shinji-inspired slender anime figure: hair mass, face, torso, arms, legs. */
+/** Bust only: head, neck, shoulders, short upper torso (no legs). */
 export function inPortraitSilhouette(nx: number, ny: number): boolean {
-  if (ny < 0.1 && nx > 0.28 && nx < 0.72) return true
-  if (ellipse(nx, ny, 0.5, 0.1, 0.2, 0.09)) return true
-  if (ellipse(nx, ny, 0.5, 0.2, 0.12, 0.1)) return true
-  if (ny >= 0.27 && ny < 0.33 && nx > 0.44 && nx < 0.56) return true
+  if (ny < 0.05 || ny > 0.54) return false
 
-  if (ny >= 0.31 && ny < 0.7) {
-    if (Math.abs(nx - 0.5) < torsoHalfWidth(ny)) return true
-  }
-
-  if (ny >= 0.34 && ny < 0.58) {
-    if (nx < 0.26 && ny < 0.56) return true
-    if (nx > 0.74 && ny < 0.56) return true
-  }
-
-  if (ny >= 0.68 && ny < 0.93) {
-    const spread = 0.07 + (ny - 0.68) * 0.04
-    if (Math.abs(nx - 0.44) < spread || Math.abs(nx - 0.56) < spread) return true
-  }
-
-  return false
+  const half = bustHalfWidth(ny)
+  return Math.abs(nx - BUST_CENTER_X) <= half
 }
 
-/** 0 = deep interior, 1 = near silhouette edge (for opacity + size falloff). */
-export function portraitInteriorWeight(nx: number, ny: number): number {
+function interiorWeight(nx: number, ny: number): number {
+  const half = bustHalfWidth(ny)
+  const dx = Math.abs(nx - BUST_CENTER_X)
+  const edge = dx / Math.max(half, 0.001)
+  const edgeSoft = 1 - edge * edge * 0.5
+
+  if (ny < 0.28) {
+    const cheek = 1 - Math.abs(nx - BUST_CENTER_X) * 1.85
+    return Math.max(0.38, edgeSoft * (0.78 + cheek * 0.22))
+  }
+  if (ny < 0.36) {
+    return edgeSoft * 0.45
+  }
+  if (ny < 0.52) {
+    const shoulder = 1 - Math.abs(nx - BUST_CENTER_X) * 1.15
+    return Math.max(0.45, edgeSoft * (0.7 + shoulder * 0.3))
+  }
+  return edgeSoft * 0.38
+}
+
+/** Placement weight with eye-line / face-axis negative-space hints. */
+export function bodyPlacementWeight(nx: number, ny: number): number {
   if (!inPortraitSilhouette(nx, ny)) return 0
 
-  const samples = [
-    [0, 0],
-    [0.02, 0],
-    [-0.02, 0],
-    [0, 0.02],
-    [0, -0.02],
-    [0.03, 0.03],
-    [-0.03, -0.02],
-  ]
-  let edgeHits = 0
-  for (const [dx, dy] of samples) {
-    if (!inPortraitSilhouette(nx + dx, ny + dy)) edgeHits += 1
+  let w = interiorWeight(nx, ny)
+
+  if (ny >= 0.218 && ny <= 0.268 && nx >= 0.2 && nx <= 0.8) {
+    w *= 0.28
+  }
+  if (ny >= 0.28 && ny <= 0.5 && nx >= 0.43 && nx <= 0.57) {
+    w *= 0.2
+  }
+  if (ny >= 0.17 && ny <= 0.32 && nx >= 0.47 && nx <= 0.53) {
+    w *= 0.42
   }
 
-  const edgeFactor = edgeHits / samples.length
-  const centerBias =
-    1 - Math.min(1, Math.hypot(nx - 0.5, ny - 0.38) / 0.42)
-
-  return Math.min(1, centerBias * 0.65 + (1 - edgeFactor) * 0.35)
+  return Math.min(1, w)
 }
 
+/** 0 = deep interior, 1 = near silhouette edge (opacity + size falloff). */
+export function portraitInteriorWeight(nx: number, ny: number): number {
+  return bodyPlacementWeight(nx, ny)
+}
+
+/** Spatial zones so categories do not stack on the vertical center axis. */
 export function categoryForPosition(x: number, y: number): WorldCategory {
-  if (x < 42 && y < 46) return 'fashion'
-  if (x < 50 && y < 58) return 'watching'
-  if (x >= 50 && y < 54) return 'music'
-  if (x >= 52 && y >= 54) return 'life'
-  if (y >= 58) return 'life'
-  if (x >= 48) return 'music'
-  return 'watching'
+  if (y < 40) {
+    return x < 44 ? 'fashion' : x > 58 ? 'music' : 'fashion'
+  }
+  if (y < 50) {
+    if (x < 36) return 'watching'
+    if (x > 64) return 'music'
+    if (y < 44) return x < 52 ? 'fashion' : 'life'
+    return 'watching'
+  }
+  if (y < 56) {
+    if (x > 60) return 'life'
+    if (x < 40) return 'watching'
+    return 'music'
+  }
+  return x > 55 ? 'life' : 'watching'
 }
 
 export function scatterShardAllowed(nx: number, ny: number): boolean {
-  if (inPortraitSilhouette(nx, ny)) return false
-  const dist = Math.hypot(nx - 0.5, ny - 0.45)
-  return dist > 0.38 && dist < 0.62
+  if (!inPortraitSilhouette(nx, ny)) return false
+  if (ny > 0.48) return false
+
+  const half = bustHalfWidth(ny)
+  const dx = Math.abs(nx - BUST_CENTER_X)
+  const edgeRatio = dx / Math.max(half, 0.001)
+  return edgeRatio >= 0.72 && edgeRatio <= 0.98
+}
+
+/** Lift and compress normalized Y so the bust sits higher in the frame. */
+export function frameY(ny: number): number {
+  return ny * 0.86 + 0.06
 }

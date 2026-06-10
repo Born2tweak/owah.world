@@ -1,19 +1,17 @@
 # CURRENT STATE
-_Last updated: 2026-05-18_
+_Last updated: 2026-06-03_
 
-**New session handoff:** paste [`docs/CONTEXT-EXPORT.md`](docs/CONTEXT-EXPORT.md) (≤8000 chars) for milestone, bugs, ownership, and QA.
+**New session handoff:** paste [`docs/CONTEXT-EXPORT.md`](docs/CONTEXT-EXPORT.md) (≤8000 chars) and [`AGENTS.md`](AGENTS.md) for learned prefs.
 
 ---
 
-## Phase 1 Status: COMPLETE (pending browser visual QA)
-
-### Routes
+## Routes (summary)
 | Route | Status | Notes |
 |-------|--------|-------|
-| `/` | Working | CD scene, description overlay, crystal field |
-| `/code` | Stub | Placeholder text, `--accent-code` color |
-| `/words` | Stub | Placeholder text |
-| `/world` | Stub | Placeholder text |
+| `/` | Working | CD scene, description overlay |
+| `/code` | Working | 3D CodeWorld, pillars, ProjectModal |
+| `/words` | Working | WordsDesktopSkeleton, text-first archive |
+| `/world` | Working | WorldScene — M2B on `master`; **local M2C Redux** bust readability (uncommitted) |
 
 ### Build
 - `npx tsc --noEmit` — 0 errors

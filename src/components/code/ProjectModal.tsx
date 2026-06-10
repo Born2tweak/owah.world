@@ -38,7 +38,7 @@ export default function ProjectModal({ project, onClose }: ProjectModalProps) {
         onClick={(event) => event.stopPropagation()}
       >
         <header className={styles.header}>
-          <div>
+          <div className={styles.headerMain}>
             <p className={styles.eyebrow}>
               {statusLabel} / {project.type}
             </p>
@@ -46,6 +46,22 @@ export default function ProjectModal({ project, onClose }: ProjectModalProps) {
               {project.title}
             </h2>
             <p className={styles.tagline}>{project.tagline}</p>
+            <div className={styles.headerActions}>
+              {project.githubUrl ? (
+                <a className={styles.action} href={project.githubUrl} target="_blank" rel="noopener noreferrer">
+                  {project.repoLabel}
+                </a>
+              ) : (
+                <span className={`${styles.action} ${styles.actionDisabled}`}>Repo Unavailable</span>
+              )}
+              {project.liveUrl ? (
+                <a className={styles.action} href={project.liveUrl} target="_blank" rel="noopener noreferrer">
+                  {project.liveLabel}
+                </a>
+              ) : (
+                <span className={`${styles.action} ${styles.actionDisabled}`}>No Live Demo</span>
+              )}
+            </div>
           </div>
           <button ref={closeButtonRef} type="button" className={styles.close} onClick={onClose}>
             Close
@@ -103,26 +119,6 @@ export default function ProjectModal({ project, onClose }: ProjectModalProps) {
                     {item}
                   </span>
                 ))}
-              </div>
-            </article>
-
-            <article className={styles.card}>
-              <h3 className={styles.cardTitle}>Links</h3>
-              <div className={styles.actions}>
-                {project.githubUrl ? (
-                  <a className={styles.action} href={project.githubUrl} target="_blank" rel="noopener noreferrer">
-                    {project.repoLabel}
-                  </a>
-                ) : (
-                  <span className={`${styles.action} ${styles.actionDisabled}`}>Repo Unavailable</span>
-                )}
-                {project.liveUrl ? (
-                  <a className={styles.action} href={project.liveUrl} target="_blank" rel="noopener noreferrer">
-                    {project.liveLabel}
-                  </a>
-                ) : (
-                  <span className={`${styles.action} ${styles.actionDisabled}`}>No Live Demo</span>
-                )}
               </div>
             </article>
           </div>

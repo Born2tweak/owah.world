@@ -5,7 +5,7 @@ import styles from './TopNav.module.css'
 
 export default function TopNav() {
   return (
-    <header className={styles.root}>
+    <header className={styles.root} data-global-top-nav>
       <Link href="/" className={styles.homeLink} aria-label="Home">
         <h1 className={styles.title}>
           <span className={styles.wordA}>OWAH</span>

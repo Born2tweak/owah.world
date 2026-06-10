@@ -15,7 +15,7 @@ export default function Dock() {
   const pathname = usePathname()
 
   return (
-    <nav className={styles.root} aria-label="Main navigation">
+    <nav className={styles.root} aria-label="Main navigation" data-global-dock>
       <div className={styles.buttonContainer}>
         {NAV_ITEMS.map((item) => {
           const isActive = item.exact

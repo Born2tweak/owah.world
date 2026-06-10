@@ -23,7 +23,7 @@ function CrosshairIcon() {
 
 export default function CornerHUD() {
   return (
-    <div className={styles.root} aria-hidden="true">
+    <div className={styles.root} aria-hidden="true" data-global-corner-hud>
 
       {/* Top-left */}
       <div className={`${styles.corner} ${styles.tl}`}>

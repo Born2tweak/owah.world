@@ -39,7 +39,6 @@ export const CODE_PROJECTS: CodeProject[] = [
     type: 'Flagship Experience',
     githubUrl: 'https://github.com/Born2tweak/owah.world',
     liveUrl: 'https://owah-world.vercel.app',
-    previewImage: '/projects/owahworld-landing.png',
     repoLabel: 'View Repo',
     liveLabel: 'View Live',
     accent: '#00c4a8',

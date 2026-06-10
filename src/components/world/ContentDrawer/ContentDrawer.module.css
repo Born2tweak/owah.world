@@ -2,127 +2,297 @@
   position: relative;
   width: 0;
   min-width: 0;
+  max-height: calc(100dvh - 176px);
   overflow: hidden;
+  align-self: start;
   transition: width var(--duration-normal) var(--ease-smooth);
 }
 
 .drawerOpen {
-  width: min(340px, 32vw);
+  width: min(360px, 34vw);
   min-width: 280px;
 }
 
-.drawerPanel {
-  height: 100%;
-  min-height: 480px;
-  border: 1px solid color-mix(in srgb, var(--drawer-accent) 40%, rgba(255, 255, 255, 0.12));
-  background: rgba(6, 10, 18, 0.88);
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.06),
-    -12px 0 40px rgba(0, 0, 0, 0.35);
+.motionShell {
+  width: min(360px, 34vw);
+  min-width: 280px;
+  max-height: calc(100dvh - 176px);
+}
+
+.glassPanel {
   display: flex;
   flex-direction: column;
-  backdrop-filter: blur(12px);
+  max-height: calc(100dvh - 176px);
+  border: 1px solid color-mix(in srgb, var(--drawer-accent) 48%, rgba(255, 255, 255, 0.14));
+  border-radius: 2px;
+  background:
+    linear-gradient(165deg, rgba(255, 255, 255, 0.07) 0%, transparent 42%),
+    linear-gradient(180deg, rgba(8, 14, 24, 0.78), rgba(4, 8, 16, 0.92));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.04),
+    0 0 32px color-mix(in srgb, var(--drawer-accent) 22%, transparent),
+    -16px 0 48px rgba(0, 0, 0, 0.38);
+  backdrop-filter: blur(18px) saturate(1.45);
+  -webkit-backdrop-filter: blur(18px) saturate(1.45);
 }
 
 .drawerHeader {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 12px;
-  padding: 14px 14px 10px;
-  border-bottom: 1px solid rgba(0, 240, 255, 0.2);
+  gap: 10px;
+  padding: 12px 12px 10px;
+  border-bottom: 1px solid color-mix(in srgb, var(--drawer-accent) 32%, rgba(255, 255, 255, 0.08));
+  flex-shrink: 0;
+}
+
+.headerCopy {
+  min-width: 0;
 }
 
 .drawerEyebrow {
-  margin: 0 0 4px;
+  margin: 0 0 3px;
   font-family: var(--font-mono);
   font-size: 9px;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: rgba(0, 240, 255, 0.7);
+  color: color-mix(in srgb, var(--drawer-accent) 72%, rgba(255, 255, 255, 0.5));
 }
 
 .drawerTitle {
   margin: 0;
   font-family: var(--font-display);
-  font-size: 18px;
-  letter-spacing: 0.04em;
+  font-size: 17px;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
   color: rgba(240, 252, 255, 0.96);
 }
 
 .closeBtn {
-  border: 1px solid rgba(0, 240, 255, 0.35);
-  background: rgba(4, 10, 18, 0.8);
-  color: rgba(0, 240, 255, 0.9);
+  flex-shrink: 0;
+  border: 1px solid color-mix(in srgb, var(--drawer-accent) 42%, rgba(255, 255, 255, 0.12));
+  background: rgba(4, 10, 18, 0.72);
+  color: color-mix(in srgb, var(--drawer-accent) 88%, white);
   width: 28px;
   height: 28px;
   font-size: 18px;
   line-height: 1;
   cursor: pointer;
+  transition:
+    border-color var(--duration-fast) var(--ease-smooth),
+    box-shadow var(--duration-fast) var(--ease-smooth);
 }
 
-.drawerNav {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  padding: 10px 14px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.navItem {
-  padding: 4px 8px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  font-family: var(--font-mono);
-  font-size: 9px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: rgba(200, 220, 235, 0.65);
-}
-
-.navItemActive {
+.closeBtn:hover {
   border-color: var(--drawer-accent);
-  color: var(--drawer-accent);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--drawer-accent) 35%, transparent);
+}
+
+.denseBody {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
 }
 
 .drawerBody {
   flex: 1;
-  padding: 16px 14px 20px;
+  min-height: 0;
+  padding: 12px 12px 14px;
   overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
-.placeholderLabel {
-  margin: 0 0 8px;
+.drawerLead {
+  margin: 0 0 12px;
+  font-size: 11px;
+  line-height: 1.55;
+  color: rgba(200, 220, 235, 0.78);
+}
+
+/* Fashion — 4 mock cards */
+.fashionGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.mockCard {
+  padding: 10px 10px 12px;
+  border: 1px solid color-mix(in srgb, var(--drawer-accent) 28%, rgba(255, 255, 255, 0.1));
+  background: rgba(6, 12, 20, 0.55);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+}
+
+.mockCardTag {
+  display: block;
+  margin-bottom: 6px;
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 8px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--drawer-accent);
+  color: color-mix(in srgb, var(--drawer-accent) 70%, rgba(255, 255, 255, 0.4));
 }
 
-.placeholderCopy {
-  margin: 0 0 16px;
-  font-size: 12px;
-  line-height: 1.6;
-  color: rgba(210, 228, 240, 0.88);
-}
-
-.fragmentMeta {
+.mockCardTitle {
   margin: 0;
+  font-family: var(--font-display);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(235, 248, 255, 0.94);
+}
+
+/* Music / Watching sections */
+.sectionStack {
+  display: grid;
+  gap: 12px;
+}
+
+.mockSection {
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.mockSection:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.mockSectionTitle {
+  margin: 0 0 8px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--drawer-accent) 75%, rgba(255, 255, 255, 0.45));
+}
+
+.mockList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+  font-size: 12px;
+  color: rgba(215, 232, 245, 0.9);
+}
+
+.mockChipRow {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.mockChip {
+  display: inline-block;
+  padding: 4px 8px;
+  border: 1px solid color-mix(in srgb, var(--drawer-accent) 30%, rgba(255, 255, 255, 0.1));
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(210, 228, 242, 0.88);
+}
+
+/* Watching rows */
+.mediaRow {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.mediaTile {
+  aspect-ratio: 2 / 3;
+  display: flex;
+  align-items: flex-end;
+  padding: 6px;
+  border: 1px solid color-mix(in srgb, var(--drawer-accent) 26%, rgba(255, 255, 255, 0.08));
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.04),
+    rgba(4, 10, 18, 0.72)
+  );
+}
+
+.mediaTileLabel {
+  font-size: 8px;
+  line-height: 1.35;
+  letter-spacing: 0.04em;
+  color: rgba(220, 236, 248, 0.86);
+}
+
+/* Life timeline */
+.timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
   display: grid;
   gap: 10px;
+}
+
+.timelineItem {
+  position: relative;
+  padding-left: 12px;
+  border-left: 1px solid color-mix(in srgb, var(--drawer-accent) 40%, rgba(255, 255, 255, 0.12));
+}
+
+.timelineTime {
+  display: block;
+  margin-bottom: 3px;
   font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.04em;
-  color: rgba(180, 205, 220, 0.85);
-}
-
-.fragmentMeta dt {
-  margin: 0 0 2px;
+  font-size: 8px;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: rgba(0, 240, 255, 0.65);
+  color: color-mix(in srgb, var(--drawer-accent) 68%, rgba(255, 255, 255, 0.4));
 }
 
-.fragmentMeta dd {
+.timelineLabel {
   margin: 0;
+  font-size: 11px;
+  line-height: 1.5;
+  color: rgba(215, 232, 245, 0.9);
+}
+
+@media (max-width: 1100px) {
+  .drawerOpen,
+  .motionShell {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .drawer {
+    max-height: none;
+  }
+
+  .glassPanel,
+  .motionShell {
+    max-height: min(52dvh, 420px);
+  }
+}
+
+@media (max-width: 640px) {
+  .fashionGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .mediaRow {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .glassPanel,
+  .motionShell {
+    max-height: min(48dvh, 380px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drawer {
+    transition: none;
+  }
 }

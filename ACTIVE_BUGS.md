@@ -1,5 +1,5 @@
 # ACTIVE BUGS
-_Last updated: 2026-05-20_
+_Last updated: 2026-06-03_
 
 ---
 
@@ -40,6 +40,11 @@ _No critical bugs._
 **Status:** Accepted behavior  
 **Description:** AnimatePresence unmounts CDScene on route exit. Return to "/" rebuilds Canvas (~200-400ms). Deferred to Phase 6.
 
+### BUG-009: .next dev cache stale
+**Status:** Mitigated 2026-06-03 — use `npm run dev:clean`  
+**Symptoms:** `layout.css` 404, unstyled CornerHUD on white background; `Cannot find module './79.js'`  
+**Fix:** Stop port 3000, delete `.next`, `npm run dev`; hard-refresh `/world`
+
 ---
 
 ## CLOSED
@@ -52,4 +57,3 @@ _No critical bugs._
 
 ### BUG-005: Layout duplication history — CLOSED
 ### BUG-006: TopNav home link missing — CLOSED 2026-05-18
-### BUG-009: .next cache stale errors — CLOSED

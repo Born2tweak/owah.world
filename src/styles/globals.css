@@ -68,6 +68,48 @@ main {
   pointer-events: none;
 }
 
+/* ─── Global chrome: prevent FOUC before route CSS modules hydrate ─── */
+[data-global-corner-hud] {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: var(--z-ui);
+}
+
+[data-global-chrome-bg] {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-background);
+  pointer-events: none;
+}
+
+/* ─── World route: SSR-safe chrome via scene marker (no body class / hydration) ─── */
+body:has([data-world-scene]) {
+  background: #03060c;
+}
+
+body:has([data-world-scene]) [data-global-chrome-bg] {
+  opacity: 0.18;
+}
+
+body:has([data-world-scene]) [data-global-top-nav],
+body:has([data-world-scene]) [data-global-corner-hud] {
+  display: none !important;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+body:has([data-world-scene]) [data-global-dock] {
+  bottom: clamp(14px, 2vh, 22px);
+  opacity: 0.96;
+}
+
+body:has([data-world-scene]) [data-global-dock] .pill {
+  min-width: 120px;
+  min-height: 42px;
+  padding: 10px 22px;
+}
+
 /* ─── Utility: full cover ─── */
 .cover {
   position: absolute;
@@ -75,3 +117,4 @@ main {
   width: 100%;
   height: 100%;
 }
+

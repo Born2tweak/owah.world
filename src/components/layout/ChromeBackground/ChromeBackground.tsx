@@ -90,7 +90,7 @@ export default function ChromeBackground() {
   }, [])
 
   return (
-    <div className={styles.root} aria-hidden="true">
+    <div className={styles.root} aria-hidden="true" data-global-chrome-bg>
       <canvas ref={canvasRef} className={styles.canvas} />
     </div>
   )

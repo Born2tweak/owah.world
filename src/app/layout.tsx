@@ -38,8 +38,12 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={`${syncopate.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable}`}>
-      <body>
+    <html
+      lang="en"
+      className={`${syncopate.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable}`}
+      suppressHydrationWarning
+    >
+      <body suppressHydrationWarning>
         <ChromeBackground />
         <CornerHUD />
         <TopNav />
