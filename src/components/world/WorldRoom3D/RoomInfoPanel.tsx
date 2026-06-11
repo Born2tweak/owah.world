@@ -33,7 +33,7 @@ export default function RoomInfoPanel({ zone, onClose }: RoomInfoPanelProps) {
           <p className={styles.infoEyebrow}>Zone</p>
           <h2 className={styles.infoTitle}>{labels.title}</h2>
           <p className={styles.infoSubtitle}>{labels.subtitle}</p>
-          <p className={styles.infoHint}>Content arrives in a later milestone. The room is the interface.</p>
+          <p className={styles.infoHint}>Walk the room. Objects carry the story.</p>
         </motion.aside>
       ) : null}
     </AnimatePresence>
