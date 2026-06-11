@@ -43,7 +43,7 @@ export default function WorldRoomCanvas({
         antialias: true,
         powerPreference: 'high-performance',
         toneMapping: THREE.ACESFilmicToneMapping,
-        toneMappingExposure: 0.82,
+        toneMappingExposure: 0.9,
       }}
       shadows
       dpr={[1, 1.5]}
@@ -59,12 +59,12 @@ export default function WorldRoomCanvas({
         />
         <ContactShadows
           position={[0, 0.008, -2.8]}
-          opacity={0.42}
-          scale={14}
-          blur={2.2}
-          far={3.8}
+          opacity={0.56}
+          scale={15.5}
+          blur={2.6}
+          far={4.4}
           color="#001820"
-          resolution={512}
+          resolution={1024}
         />
       </Suspense>
     </WebGLCanvas>

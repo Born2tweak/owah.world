@@ -1,5 +1,5 @@
 /**
- * Curated personal world data — sourced from WORLD_PROFILE.md and collected archives.
+ * Curated personal world data - sourced from WORLD_PROFILE.md and collected archives.
  * Static props only; no API integrations.
  */
 
@@ -8,6 +8,13 @@ export type AlbumCanon = {
   title: string
   artist: string
   cover: string
+}
+
+export type MediaArchiveItem = {
+  title: string
+  format: 'anime' | 'film' | 'series'
+  hue: string
+  band: string
 }
 
 /** Hero albums for the archive wall (World Music folder + profile canon). */
@@ -26,36 +33,40 @@ export const ALBUM_CANON: AlbumCanon[] = [
   { id: 'dying-live', title: 'Dying to Live', artist: 'Kodak Black', cover: '/world/music/Dying2Live.jpg' },
 ]
 
-/** Currently spinning — recent rotation from profile + CSV. */
+/** Currently spinning - recent rotation from profile + CSV. */
 export const NOW_SPINNING = {
   track: 'New Detroit',
   artist: 'Lelo',
   album: 'Nightingale',
 }
 
-/** Watching archive — museum spines (abstract color bands, no titles). */
-export const MEDIA_ARCHIVE_SPINES = [
-  { hue: '#1a2030', band: '#8b1a1a' }, // Berserk — dark + blood
-  { hue: '#182030', band: '#c41e3a' }, // Code Geass — military crimson
-  { hue: '#141820', band: '#4a6fa5' }, // Evangelion — cold blue
-  { hue: '#1c1820', band: '#ff6600' }, // Naruto — warm accent
-  { hue: '#101820', band: '#e8e8e8' }, // Bleach — monochrome spirit
-  { hue: '#1a1828', band: '#6b4c9a' }, // Monster — noir purple
-  { hue: '#142028', band: '#3d8b8b' }, // HxH — teal calm
-  { hue: '#181820', band: '#b8860b' }, // FMA — brass military
-  { hue: '#1a1a22', band: '#2a4a6a' }, // Cowboy Bebop — jazz night
-  { hue: '#121820', band: '#4a5568' }, // Akagi — slate tension
-  { hue: '#1c1c24', band: '#7c3aed' }, // Mob Psycho — psychic violet
-  { hue: '#141418', band: '#334155' }, // Death Note — graphite
+/** Watching archive - legible mocked media archive using local palette and known canon. */
+export const MEDIA_ARCHIVE_SPINES: MediaArchiveItem[] = [
+  { title: 'Berserk', format: 'anime', hue: '#161a22', band: '#8b1a1a' },
+  { title: 'Code Geass', format: 'anime', hue: '#182030', band: '#c41e3a' },
+  { title: 'Evangelion', format: 'anime', hue: '#141820', band: '#4a6fa5' },
+  { title: 'Naruto', format: 'anime', hue: '#1c1820', band: '#ff6600' },
+  { title: 'Bleach', format: 'anime', hue: '#101820', band: '#e8e8e8' },
+  { title: 'Monster', format: 'anime', hue: '#1a1828', band: '#6b4c9a' },
+  { title: 'Hunter x Hunter', format: 'anime', hue: '#142028', band: '#3d8b8b' },
+  { title: 'Fullmetal', format: 'anime', hue: '#181820', band: '#b8860b' },
+  { title: 'Cowboy Bebop', format: 'anime', hue: '#1a1a22', band: '#2a4a6a' },
+  { title: 'Akagi', format: 'anime', hue: '#121820', band: '#4a5568' },
+  { title: 'Mob Psycho', format: 'anime', hue: '#1c1c24', band: '#7c3aed' },
+  { title: 'Death Note', format: 'anime', hue: '#141418', band: '#334155' },
+  { title: '91 Days', format: 'series', hue: '#17191f', band: '#6b7280' },
+  { title: 'Perfect Blue', format: 'film', hue: '#191a24', band: '#2563eb' },
+  { title: 'Samurai Champloo', format: 'anime', hue: '#131c22', band: '#14b8a6' },
 ]
 
 /** Active watchlist from MAL export. */
 export const NOW_WATCHING = {
   title: '91 Days',
   mood: 'noir revenge',
+  format: 'series',
 }
 
-/** Life feed ambient signals — environmental storytelling only. */
+/** Life feed ambient signals - environmental storytelling only. */
 export const LIFE_SIGNALS = [
   { label: 'rotation', color: '#3dff9a', phase: 0 },
   { label: 'archive', color: '#00c8e8', phase: 1.4 },

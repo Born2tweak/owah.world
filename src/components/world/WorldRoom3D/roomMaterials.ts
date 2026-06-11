@@ -1,16 +1,29 @@
-export const CYAN = '#0a8fb8'
-export const CYAN_DEEP = '#064f68'
-export const CYAN_WASH = '#0d6a88'
-export const ICE_BLUE = '#b8dce8'
-export const CHROME = '#d8e8f0'
-export const CHROME_DARK = '#9ab0bc'
-export const MARBLE = '#e8f0f5'
-export const MARBLE_WARM = '#eef2f6'
-export const MARBLE_VEIN = '#9ec4d8'
-export const GLASS = '#b8dce8'
-export const WOOD_DARK = '#1a2228'
-export const FABRIC_DARK = '#1e2830'
-export const FABRIC_MID = '#2e3e4c'
-export const FABRIC_LIGHT = '#c8d4dc'
-export const FABRIC_SILK = '#4a5a68'
-
+export const CYAN = '#1698c6'
+
+export const CYAN_DEEP = '#0a3f57'
+
+export const CYAN_WASH = '#116986'
+
+export const ICE_BLUE = '#d5ecf8'
+
+export const CHROME = '#edf4f8'
+
+export const CHROME_DARK = '#8ea6b4'
+
+export const MARBLE = '#f4f8fb'
+
+export const MARBLE_WARM = '#eef4f8'
+
+export const MARBLE_VEIN = '#88b9d2'
+
+export const GLASS = '#d0ecfb'
+
+export const WOOD_DARK = '#151b22'
+
+export const FABRIC_DARK = '#161d25'
+
+export const FABRIC_MID = '#243240'
+
+export const FABRIC_LIGHT = '#d8e4eb'
+
+export const FABRIC_SILK = '#415364'
