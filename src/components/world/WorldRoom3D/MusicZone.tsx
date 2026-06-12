@@ -1,11 +1,16 @@
 'use client'
 
-import { useTexture } from '@react-three/drei'
+import { Text, useTexture } from '@react-three/drei'
 import { CHROME, CHROME_DARK, FABRIC_DARK, MARBLE, WOOD_DARK } from './roomMaterials'
 import { ALBUM_CANON } from './worldPersonalData'
 import PersonalAlbumFrame from './PersonalAlbumFrame'
+import { useSpotify } from './useSpotify'
 
 /** Positions are local to music hotspot anchor [0, 0, -3.2] in world space. */
+
+function normalizeLabel(value: string) {
+  return value.toLowerCase().replace(/[^a-z0-9]+/g, '')
+}
 
 function SpeakerTower({ x, emissive }: { x: number; emissive: number }) {
   return (
@@ -99,7 +104,7 @@ function ListeningLounge({ emissive }: { emissive: number }) {
   )
 }
 
-function AlbumArchiveWall({ emissive }: { emissive: number }) {
+function AlbumArchiveWall({ activeAlbumId, emissive }: { activeAlbumId: string | null; emissive: number }) {
   const cols = 4
   const colGap = 0.46
   const startX = -((cols - 1) * colGap) / 2
@@ -122,8 +127,15 @@ function AlbumArchiveWall({ emissive }: { emissive: number }) {
         const jitterX = col % 2 === 0 ? 0.012 : -0.01
         const jitterY = row === 0 && col === 1 ? 0.02 : row === 2 && col === 2 ? -0.015 : 0
         const pullZ = album.id === 'jeffery' || album.id === 'marathon' ? 0.05 : 0.02
+        const isActive = album.id === activeAlbumId
         return (
           <group key={album.id} position={[startX + col * colGap + jitterX, rowY[row] + jitterY, -1.12 + pullZ]}>
+            {isActive ? (
+              <mesh position={[0, 0, -0.015]}>
+                <boxGeometry args={[0.42, 0.42, 0.014]} />
+                <meshStandardMaterial color="#09191b" emissive="#3dff9a" emissiveIntensity={0.55 + emissive * 1.8} metalness={0.2} roughness={0.2} />
+              </mesh>
+            ) : null}
             <PersonalAlbumFrame cover={album.cover} position={[0, 0, 0]} size={0.34} emissive={emissive} />
           </group>
         )
@@ -169,10 +181,73 @@ function TurntableStation({ emissive }: { emissive: number }) {
   )
 }
 
+function SpotifySignalPedestal({
+  configured,
+  emissive,
+  recentTracks,
+  source,
+  topTracks,
+  track,
+}: {
+  configured: boolean
+  emissive: number
+  recentTracks: string[]
+  source: 'fallback' | 'spotify'
+  topTracks: string[]
+  track: { artist: string; title: string }
+}) {
+  const accent = source === 'spotify' ? '#3dff9a' : '#6cc7ff'
+  const signalBars = source === 'spotify' ? [0.32, 0.5, 0.78, 0.58] : [0.24, 0.38, 0.46, 0.34]
+
+  return (
+    <group position={[0.28, 0.18, 0.95]} rotation={[0, -0.36, 0]}>
+      <mesh castShadow receiveShadow>
+        <boxGeometry args={[1.2, 0.96, 0.08]} />
+        <meshPhysicalMaterial color="#08131a" metalness={0.22} roughness={0.18} transmission={0.16} transparent opacity={0.9} />
+      </mesh>
+      <mesh position={[0, 0, 0.03]}>
+        <boxGeometry args={[1.08, 0.84, 0.012]} />
+        <meshStandardMaterial color="#0d1820" emissive={accent} emissiveIntensity={0.08 + emissive * 0.2} />
+      </mesh>
+      {signalBars.map((height, index) => (
+        <mesh key={height} position={[-0.42 + index * 0.11, -0.18 + height / 2, 0.042]}>
+          <boxGeometry args={[0.05, height, 0.015]} />
+          <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={0.32 + emissive * (0.5 + index * 0.08)} />
+        </mesh>
+      ))}
+      <Text position={[-0.02, 0.29, 0.05]} fontSize={0.065} anchorX="center" anchorY="middle" color="#d8f8ff" maxWidth={0.72}>
+        {source === 'spotify' ? 'LIVE ROTATION' : 'CURATED ROTATION'}
+      </Text>
+      <Text position={[-0.02, 0.14, 0.05]} fontSize={0.058} anchorX="center" anchorY="middle" color="#ffffff" maxWidth={0.88}>
+        {track.title}
+      </Text>
+      <Text position={[-0.02, 0.03, 0.05]} fontSize={0.044} anchorX="center" anchorY="middle" color="#9fc2d1" maxWidth={0.9}>
+        {track.artist}
+      </Text>
+      <Text position={[0.14, -0.11, 0.05]} fontSize={0.034} anchorX="right" anchorY="middle" color="#9fd4df" maxWidth={0.86}>
+        {recentTracks.slice(0, 2).join('  /  ')}
+      </Text>
+      <Text position={[0.14, -0.22, 0.05]} fontSize={0.03} anchorX="right" anchorY="middle" color="#7f9aaa" maxWidth={0.86}>
+        {topTracks.slice(0, 2).join('  /  ')}
+      </Text>
+      <mesh position={[0.5, 0.33, 0.045]}>
+        <boxGeometry args={[0.08, 0.08, 0.016]} />
+        <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={configured ? 0.8 : 0.28} />
+      </mesh>
+    </group>
+  )
+}
+
 type MusicZoneProps = { highlighted: boolean }
 
 export default function MusicZone({ highlighted }: MusicZoneProps) {
+  const spotify = useSpotify()
   const emissive = highlighted ? 0.45 : 0.1
+  const activeAlbumId =
+    ALBUM_CANON.find((album) => normalizeLabel(album.title) === normalizeLabel(spotify.nowPlaying?.album ?? ''))?.id ??
+    ALBUM_CANON.find((album) => normalizeLabel(album.title) === normalizeLabel(spotify.nowPlaying?.title ?? ''))?.id ??
+    null
+  const liveTrack = spotify.nowPlaying ?? spotify.recentTracks[0] ?? spotify.topTracks[0] ?? null
 
   return (
     <group>
@@ -195,7 +270,18 @@ export default function MusicZone({ highlighted }: MusicZoneProps) {
 
       <ListeningLounge emissive={emissive} />
       <TurntableStation emissive={emissive} />
-      <AlbumArchiveWall emissive={emissive} />
+      <AlbumArchiveWall activeAlbumId={activeAlbumId} emissive={emissive} />
+
+      {liveTrack ? (
+        <SpotifySignalPedestal
+          configured={spotify.configured}
+          emissive={emissive}
+          recentTracks={spotify.recentTracks.map((track) => track.title)}
+          source={spotify.source}
+          topTracks={spotify.topTracks.map((track) => track.title)}
+          track={{ artist: liveTrack.artist, title: liveTrack.title }}
+        />
+      ) : null}
 
       <mesh position={[0.1, 0.06, 0.56]} rotation={[0, 0.06, 0]}>
         <boxGeometry args={[2.65, 0.03, 0.06]} />

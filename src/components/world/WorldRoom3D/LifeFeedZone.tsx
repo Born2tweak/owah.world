@@ -2,11 +2,35 @@
 
 import { useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
-import type { Group, Mesh } from 'three'
+import { Text, useTexture } from '@react-three/drei'
+import type { Group, Mesh, Texture } from 'three'
 import { CHROME_DARK, GLASS, MARBLE } from './roomMaterials'
 import { LIFE_SIGNALS } from './worldPersonalData'
+import { lifeFeedAssets, type LifeFeedAsset, type LifeFeedAssetCategory } from './worldLifeFeedManifest'
 
 /** Ambient activity layer - environmental storytelling, not dashboards. */
+
+const MEMORY_ARCHIVE_IDS = [
+  'fit-night-leather-11',
+  'fit-red-leather-mural-06',
+  'fit-shadow-black-08',
+  'archive-art-lounge-01',
+  'lifestyle-sunset-water-03',
+  'fit-black-jacket-03',
+  'lifestyle-clear-water-02',
+  'fit-city-navy-09',
+  'archive-mural-wall-02',
+]
+
+const memoryAssets = MEMORY_ARCHIVE_IDS.map((id) => lifeFeedAssets.find((asset) => asset.id === id)).filter(
+  (asset): asset is LifeFeedAsset => Boolean(asset)
+)
+
+const categoryColors: Record<LifeFeedAssetCategory, string> = {
+  fits: '#ffb347',
+  lifestyle: '#38e7ff',
+  archive: '#b7f7d2',
+}
 
 function SignalSegment({
   x,
@@ -40,9 +64,78 @@ function SignalSegment({
   )
 }
 
+function MemoryReadout({ highlighted }: { highlighted: boolean }) {
+  return (
+    <group position={[0, 0.44, 0.055]}>
+      <Text position={[-1.18, 0.02, 0]} fontSize={0.04} color="#ffd7a3" anchorX="left" anchorY="middle">
+        @ANDR1ANK
+      </Text>
+      <Text position={[1.18, 0.02, 0]} fontSize={0.03} color="#9fb4c2" anchorX="right" anchorY="middle">
+        LOCAL ARCHIVE
+      </Text>
+      <Text position={[0, -0.1, 0]} fontSize={0.034} color="#e2e8f0" anchorX="center" anchorY="middle" maxWidth={1.58}>
+        LIVING MEMORY FRAGMENTS
+      </Text>
+      <mesh position={[0, -0.2, 0]}>
+        <boxGeometry args={[highlighted ? 1.42 : 1.12, 0.012, 0.01]} />
+        <meshStandardMaterial color="#ffb347" emissive="#ffb347" emissiveIntensity={highlighted ? 0.42 : 0.2} />
+      </mesh>
+    </group>
+  )
+}
+
+function ArchiveMemoryPanel({
+  asset,
+  highlighted,
+  index,
+  texture,
+}: {
+  asset: LifeFeedAsset
+  highlighted: boolean
+  index: number
+  texture: Texture
+}) {
+  const isHero = index === 0
+  const column = (index - 1) % 4
+  const row = Math.floor((index - 1) / 4)
+  const color = categoryColors[asset.category]
+  const x = isHero ? -0.9 : -0.28 + column * 0.37
+  const y = isHero ? 0.75 : 0.77 - row * 0.34
+  const width = isHero ? 0.54 : 0.28
+  const height = isHero ? 0.72 : 0.28
+  const tilt = isHero ? -0.07 : (column - 1.5) * 0.018
+
+  return (
+    <group position={[x, y, 0.09]} rotation={[0, tilt, 0]}>
+      <mesh castShadow>
+        <boxGeometry args={[width + 0.06, height + 0.08, 0.035]} />
+        <meshStandardMaterial color="#0d131b" metalness={0.56} roughness={0.26} />
+      </mesh>
+      <mesh position={[0, 0.005, 0.026]}>
+        <planeGeometry args={[width, height]} />
+        <meshStandardMaterial map={texture} color="#ffffff" roughness={0.34} metalness={0.02} />
+      </mesh>
+      <mesh position={[0, 0.005, 0.031]}>
+        <planeGeometry args={[width + 0.02, height + 0.02]} />
+        <meshPhysicalMaterial color={GLASS} transmission={0.7} transparent opacity={0.18} roughness={0.02} metalness={0.04} />
+      </mesh>
+      <mesh position={[0, -height / 2 - 0.032, 0.034]}>
+        <boxGeometry args={[width * 0.72, 0.018, 0.012]} />
+        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={highlighted ? 0.42 : 0.22} />
+      </mesh>
+      {isHero && (
+        <Text position={[0, -height / 2 - 0.075, 0.04]} fontSize={0.03} color="#f8fafc" anchorX="center" anchorY="middle" maxWidth={0.46}>
+          {asset.label?.toUpperCase() ?? 'LIFE ARCHIVE'}
+        </Text>
+      )}
+    </group>
+  )
+}
+
 type LifeFeedZoneProps = { highlighted: boolean }
 
 export default function LifeFeedZone({ highlighted }: LifeFeedZoneProps) {
+  const memoryTextures = useTexture(memoryAssets.map((asset) => asset.src)) as Texture[]
   const emissive = highlighted ? 0.55 : 0.18
   const barRef = useRef<Mesh>(null)
   const sweepRef = useRef<Mesh>(null)
@@ -105,6 +198,12 @@ export default function LifeFeedZone({ highlighted }: LifeFeedZoneProps) {
           highlighted={highlighted}
           yOffset={i === 1 ? 0.006 : i === 3 ? -0.004 : 0}
         />
+      ))}
+
+      <MemoryReadout highlighted={highlighted} />
+
+      {memoryAssets.map((asset, i) => (
+        <ArchiveMemoryPanel key={asset.id} asset={asset} highlighted={highlighted} index={i} texture={memoryTextures[i]} />
       ))}
 
       <mesh position={[0, 0.09, 0.045]}>

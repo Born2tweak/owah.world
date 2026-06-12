@@ -1,11 +1,12 @@
 'use client'
 
-import { Text } from '@react-three/drei'
+import { Text, useTexture } from '@react-three/drei'
 import { useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
+import type * as THREE from 'three'
 import type { Mesh } from 'three'
 import { CHROME, CHROME_DARK, MARBLE, WOOD_DARK } from './roomMaterials'
-import { MEDIA_ARCHIVE_SPINES, NOW_WATCHING } from './worldPersonalData'
+import { type MyAnimeListEntry, useMyAnimeList } from './useMyAnimeList'
 
 /** Museum media archive - one backlit wall, cobalt showroom, not convention purple. */
 
@@ -18,8 +19,8 @@ const ROW_Y = [0.7, 0.02, -0.66]
 const SPINES_CENTER_X = -0.56
 const FEATURED_X = 0.82
 
-function ArchiveSpine({ spine, x, y, pull, tilt }: {
-  spine: (typeof MEDIA_ARCHIVE_SPINES)[number]
+function ArchiveSpine({ entry, x, y, pull, tilt }: {
+  entry: MyAnimeListEntry
   x: number
   y: number
   pull: number
@@ -29,11 +30,15 @@ function ArchiveSpine({ spine, x, y, pull, tilt }: {
     <group position={[x, y, 0.13 + pull]} rotation={[0, tilt, 0]}>
       <mesh castShadow>
         <boxGeometry args={[SPINE_W, SPINE_H, 0.1]} />
-        <meshStandardMaterial color={spine.hue} roughness={0.5} metalness={0.16} />
+        <meshStandardMaterial color={entry.hue} roughness={0.5} metalness={0.16} />
       </mesh>
       <mesh position={[0, SPINE_H * 0.36, 0.052]}>
         <boxGeometry args={[SPINE_W * 0.82, 0.04, 0.007]} />
-        <meshStandardMaterial color={spine.band} emissive={spine.band} emissiveIntensity={0.2} />
+        <meshStandardMaterial color={entry.band} emissive={entry.band} emissiveIntensity={0.2} />
+      </mesh>
+      <mesh position={[0, -SPINE_H * 0.4, 0.053]}>
+        <boxGeometry args={[SPINE_W * 0.62, 0.05, 0.008]} />
+        <meshStandardMaterial color={entry.score === 10 ? '#f8fafc' : '#7090e8'} emissive={entry.score === 10 ? '#ffffff' : '#7090e8'} emissiveIntensity={0.22} />
       </mesh>
       <Text
         position={[0, -SPINE_H * 0.06, 0.054]}
@@ -44,14 +49,15 @@ function ArchiveSpine({ spine, x, y, pull, tilt }: {
         anchorX="center"
         anchorY="middle"
       >
-        {spine.title.toUpperCase()}
+        {entry.title.toUpperCase()}
       </Text>
     </group>
   )
 }
 
-function FeaturedPanel({ spine, y, emissive }: {
-  spine: (typeof MEDIA_ARCHIVE_SPINES)[number]
+function FeaturedPanel({ entry, texture, y, emissive }: {
+  entry: MyAnimeListEntry
+  texture: THREE.Texture | null
   y: number
   emissive: number
 }) {
@@ -63,7 +69,7 @@ function FeaturedPanel({ spine, y, emissive }: {
       </mesh>
       <mesh position={[0, 0, 0.022]}>
         <planeGeometry args={[0.68, 0.52]} />
-        <meshStandardMaterial color={spine.hue} roughness={0.42} metalness={0.2} />
+        <meshStandardMaterial map={texture ?? null} color={texture ? '#ffffff' : entry.hue} roughness={0.42} metalness={0.2} />
       </mesh>
       <mesh position={[0, 0, 0.026]}>
         <planeGeometry args={[0.68, 0.52]} />
@@ -71,21 +77,27 @@ function FeaturedPanel({ spine, y, emissive }: {
       </mesh>
       <mesh position={[-0.31, 0, 0.03]}>
         <boxGeometry args={[0.012, 0.5, 0.008]} />
-        <meshStandardMaterial color={spine.band} emissive={spine.band} emissiveIntensity={0.3 + emissive * 0.5} />
+        <meshStandardMaterial color={entry.band} emissive={entry.band} emissiveIntensity={0.3 + emissive * 0.5} />
       </mesh>
       <Text position={[0.02, 0.08, 0.035]} fontSize={0.062} color="#f8fafc" maxWidth={0.58} anchorX="center" anchorY="middle">
-        {spine.title.toUpperCase()}
+        {entry.title.toUpperCase()}
       </Text>
       <Text position={[0.02, -0.12, 0.035]} fontSize={0.04} color="#93c5fd" maxWidth={0.56} anchorX="center" anchorY="middle">
-        {spine.format.toUpperCase()}
+        COMPLETED / {entry.score}
+      </Text>
+      <Text position={[0.26, -0.22, 0.035]} fontSize={0.032} color="#cbd5e1" maxWidth={0.3} anchorX="right" anchorY="middle">
+        {entry.mediaType}
       </Text>
     </group>
   )
 }
 
-function MediaArchiveWall({ emissive }: { emissive: number }) {
-  const spines = MEDIA_ARCHIVE_SPINES.slice(0, SPINE_COLS * SPINE_ROWS)
-  const featured = MEDIA_ARCHIVE_SPINES.slice(12, 15)
+function MediaArchiveWall({ emissive, entries, source }: { emissive: number; entries: MyAnimeListEntry[]; source: 'fallback' | 'myanimelist' }) {
+  const spines = entries.slice(0, SPINE_COLS * SPINE_ROWS)
+  const featured = entries
+    .filter((entry, index, archive) => entry.image && archive.findIndex((candidate) => candidate.image === entry.image) === index)
+    .slice(0, 3)
+  const textures = useTexture(featured.map((entry) => entry.image ?? ''))
   const startX = SPINES_CENTER_X - ((SPINE_COLS - 1) * (SPINE_W + SPINE_GAP)) / 2
 
   return (
@@ -94,6 +106,12 @@ function MediaArchiveWall({ emissive }: { emissive: number }) {
         <boxGeometry args={[2.7, 2.2, 0.3]} />
         <meshStandardMaterial color={WOOD_DARK} metalness={0.35} roughness={0.38} />
       </mesh>
+      <Text position={[-1.16, 0.94, 0.18]} fontSize={0.055} color="#dbeafe" anchorX="left" anchorY="middle">
+        MAL / COMPLETED 9+
+      </Text>
+      <Text position={[1.08, 0.94, 0.18]} fontSize={0.034} color={source === 'myanimelist' ? '#c7d2fe' : '#93c5fd'} anchorX="right" anchorY="middle">
+        {source === 'myanimelist' ? 'LIVE LIST' : 'LOCAL EXPORT'}
+      </Text>
 
       {ROW_Y.map((y) => (
         <group key={y}>
@@ -114,11 +132,17 @@ function MediaArchiveWall({ emissive }: { emissive: number }) {
         const x = startX + col * (SPINE_W + SPINE_GAP)
         const pull = i === 5 ? 0.05 : 0
         const tilt = i === 10 ? 0.07 : 0
-        return <ArchiveSpine key={spine.title} spine={spine} x={x} y={ROW_Y[row]} pull={pull} tilt={tilt} />
+        return <ArchiveSpine key={spine.id} entry={spine} x={x} y={ROW_Y[row]} pull={pull} tilt={tilt} />
       })}
 
-      {featured.map((spine, i) => (
-        <FeaturedPanel key={spine.title} spine={spine} y={0.66 - i * 0.68} emissive={emissive} />
+      {featured.map((entry, i) => (
+        <FeaturedPanel
+          key={entry.id}
+          entry={entry}
+          texture={Array.isArray(textures) ? textures[i] : textures}
+          y={0.66 - i * 0.68}
+          emissive={emissive}
+        />
       ))}
     </group>
   )
@@ -151,7 +175,7 @@ function ViewingChair({ emissive }: { emissive: number }) {
   )
 }
 
-function NowWatchingStand({ emissive }: { emissive: number }) {
+function NowWatchingStand({ emissive, entry }: { emissive: number; entry: MyAnimeListEntry }) {
   const edgeColor = '#7090e8'
   const glowRef = useRef<Mesh>(null)
 
@@ -182,13 +206,13 @@ function NowWatchingStand({ emissive }: { emissive: number }) {
         <meshStandardMaterial color={edgeColor} emissive={edgeColor} emissiveIntensity={emissive * 0.5} />
       </mesh>
       <Text position={[0, 0.98, 0.02]} rotation={[0.08, 0, 0]} fontSize={0.062} color="#f8fafc" maxWidth={0.36} anchorX="center">
-        {NOW_WATCHING.title.toUpperCase()}
+        {entry.title.toUpperCase()}
       </Text>
       <Text position={[0, 0.78, 0.02]} rotation={[0.08, 0, 0]} fontSize={0.045} color="#93c5fd" maxWidth={0.34} anchorX="center">
-        {NOW_WATCHING.mood}
+        COMPLETED
       </Text>
       <Text position={[0, 0.64, 0.02]} rotation={[0.08, 0, 0]} fontSize={0.042} color="#cbd5e1" maxWidth={0.34} anchorX="center">
-        {NOW_WATCHING.format}
+        SCORE {entry.score} / 10
       </Text>
       <mesh position={[0, 0.02, 0]}>
         <cylinderGeometry args={[0.15, 0.18, 0.05, 20]} />
@@ -201,8 +225,10 @@ function NowWatchingStand({ emissive }: { emissive: number }) {
 type WatchingZoneProps = { highlighted: boolean }
 
 export default function WatchingZone({ highlighted }: WatchingZoneProps) {
+  const mal = useMyAnimeList()
   const emissive = highlighted ? 0.45 : 0.12
   const cobaltGlow = highlighted ? 0.5 : 0.18
+  const heroEntry = mal.entries[0]
 
   return (
     <group>
@@ -216,10 +242,10 @@ export default function WatchingZone({ highlighted }: WatchingZoneProps) {
         <meshStandardMaterial color="#0d1620" metalness={0.42} roughness={0.34} />
       </mesh>
 
-      <MediaArchiveWall emissive={emissive} />
+      <MediaArchiveWall emissive={emissive} entries={mal.entries} source={mal.source} />
 
       <ViewingChair emissive={emissive} />
-      <NowWatchingStand emissive={emissive} />
+      {heroEntry ? <NowWatchingStand emissive={emissive} entry={heroEntry} /> : null}
 
       <mesh position={[0.1, 0.06, 0.52]} rotation={[0, 0.05, 0]}>
         <boxGeometry args={[2.3, 0.03, 0.07]} />

@@ -27,3 +27,6 @@ dist-ssr
 
 # AutoClaw KDream data
 .autoclaw/
+
+# Local ingestion scratch space
+.local-archives/

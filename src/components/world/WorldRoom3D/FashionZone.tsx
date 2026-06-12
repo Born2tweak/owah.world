@@ -1,6 +1,7 @@
 'use client'
 
-import { Text } from '@react-three/drei'
+import { Text, useTexture } from '@react-three/drei'
+import type * as THREE from 'three'
 import {
   CHROME,
   CHROME_DARK,
@@ -9,6 +10,7 @@ import {
   GLASS,
   MARBLE,
 } from './roomMaterials'
+import { type PinterestFitPin, usePinterestFits } from './usePinterest'
 
 type Silhouette = 'military-coat' | 'pinstripe-wide' | 'leather-bomber' | 'long-drape' | 'asymmetric'
 
@@ -30,12 +32,6 @@ const GARMENTS: GarmentSpec[] = [
   { x: 0, width: 0.44, height: 0.96, depth: 0.2, color: '#0e1018', silhouette: 'leather-bomber', forwardPull: 0.16, yaw: 0.08 },
   { x: 0.66, width: 0.34, height: 1.32, depth: 0.18, color: FABRIC_SILK, silhouette: 'long-drape' },
   { x: 1.32, width: 0.38, height: 1.1, depth: 0.18, color: FABRIC_DARK, silhouette: 'asymmetric' },
-]
-
-const MOODBOARD_CARDS = [
-  { y: 0.78, label: 'OUTERWEAR', accent: '#00c8e8' },
-  { y: 0, label: 'DRAPE', accent: '#8ea6b4' },
-  { y: -0.78, label: 'LEATHER', accent: '#c41e3a' },
 ]
 
 function fabricMat(color: string, emissive: number) {
@@ -303,43 +299,85 @@ function FootwearPlinth({ emissive }: { emissive: number }) {
   )
 }
 
-/** Wall-mounted moodboard lightbox on the left room wall - archive cards, not flat posters. */
-function MoodboardPanel({ emissive }: { emissive: number }) {
+function FitArchiveCard({
+  accent,
+  emissive,
+  pin,
+  texture,
+  x,
+  y,
+}: {
+  accent: string
+  emissive: number
+  pin: PinterestFitPin
+  texture: THREE.Texture
+  x: number
+  y: number
+}) {
+  const width = pin.aspect < 0.7 ? 0.34 : 0.42
+  const height = width / Math.max(pin.aspect, 0.5)
+
+  return (
+    <group position={[x, y, 0.058]} rotation={[0, 0, x > 0 ? 0.035 : -0.025]}>
+      <mesh castShadow>
+        <boxGeometry args={[0.42, 0.7, 0.028]} />
+        <meshStandardMaterial color="#111820" roughness={0.5} metalness={0.2} />
+      </mesh>
+      <mesh position={[0, 0.08, 0.018]}>
+        <planeGeometry args={[width, Math.min(height, 0.54)]} />
+        <meshStandardMaterial map={texture} roughness={0.35} metalness={0.05} emissive="#001018" emissiveIntensity={emissive * 0.2} />
+      </mesh>
+      <mesh position={[0, -0.25, 0.022]}>
+        <boxGeometry args={[0.33, 0.025, 0.01]} />
+        <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={0.22 + emissive * 0.5} />
+      </mesh>
+      <Text position={[0, -0.32, 0.026]} fontSize={0.032} color="#d9edf5" anchorX="center" anchorY="middle" maxWidth={0.36}>
+        {pin.title.toUpperCase()}
+      </Text>
+    </group>
+  )
+}
+
+/** Wall-mounted Fits lightbox on the left room wall - selected board images as archive inserts. */
+function MoodboardPanel({ emissive, pins, source }: { emissive: number; pins: PinterestFitPin[]; source: 'fallback' | 'pinterest' }) {
+  const selectedPins = pins.slice(0, 4)
+  const textures = useTexture(selectedPins.map((pin) => pin.image))
+  const accent = source === 'pinterest' ? '#e60023' : '#00c8e8'
+
   return (
     <group position={[-1.7, 1.45, 0.5]} rotation={[0, Math.PI / 2, 0]}>
       <mesh castShadow>
-        <boxGeometry args={[1.06, 2.6, 0.07]} />
+        <boxGeometry args={[1.18, 2.66, 0.07]} />
         <meshStandardMaterial color="#0a1018" metalness={0.45} roughness={0.3} />
       </mesh>
       <mesh position={[0, 0, 0.038]}>
-        <planeGeometry args={[0.94, 2.46]} />
+        <planeGeometry args={[1.06, 2.5]} />
         <meshStandardMaterial color="#10202c" emissive="#1a4458" emissiveIntensity={0.18 + emissive * 0.4} roughness={0.4} />
       </mesh>
-      <Text position={[-0.36, 1.12, 0.05]} fontSize={0.052} color="#9fd8ec" anchorX="left" anchorY="middle">
-        ARCHIVE / DARKWEAR
+      <mesh position={[0, 0, 0.061]}>
+        <planeGeometry args={[1.0, 2.42]} />
+        <meshPhysicalMaterial color={GLASS} transmission={0.28} transparent opacity={0.12} roughness={0.02} metalness={0.1} />
+      </mesh>
+      <Text position={[-0.43, 1.14, 0.068]} fontSize={0.05} color="#9fd8ec" anchorX="left" anchorY="middle">
+        PINTEREST / FITS
       </Text>
-      {MOODBOARD_CARDS.map((card) => (
-        <group key={card.label} position={[0, card.y - 0.16, 0.055]}>
-          <mesh castShadow>
-            <boxGeometry args={[0.78, 0.6, 0.025]} />
-            <meshStandardMaterial color="#141a22" roughness={0.55} metalness={0.18} />
-          </mesh>
-          <mesh position={[0, 0.31, 0.005]}>
-            <boxGeometry args={[0.1, 0.04, 0.03]} />
-            <meshStandardMaterial color={CHROME} metalness={0.95} roughness={0.08} />
-          </mesh>
-          <mesh position={[-0.34, 0, 0.016]}>
-            <boxGeometry args={[0.014, 0.52, 0.008]} />
-            <meshStandardMaterial color={card.accent} emissive={card.accent} emissiveIntensity={0.25 + emissive * 0.5} />
-          </mesh>
-          <mesh position={[0.05, 0.08, 0.014]} rotation={[0, 0, -0.06]}>
-            <planeGeometry args={[0.56, 0.3]} />
-            <meshStandardMaterial color="#1c2630" roughness={0.7} />
-          </mesh>
-          <Text position={[0.05, -0.2, 0.018]} fontSize={0.044} color="#cbd5e1" anchorX="center" anchorY="middle">
-            {card.label}
-          </Text>
-        </group>
+      <Text position={[0.43, 1.14, 0.068]} fontSize={0.034} color={source === 'pinterest' ? '#ffd6dd' : '#8ea6b4'} anchorX="right" anchorY="middle">
+        {source === 'pinterest' ? 'LIVE BOARD' : 'LOCAL SYNC'}
+      </Text>
+      <mesh position={[-0.46, 1.0, 0.066]}>
+        <boxGeometry args={[0.1, 0.015, 0.01]} />
+        <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={0.35 + emissive * 0.7} />
+      </mesh>
+      {selectedPins.map((pin, index) => (
+        <FitArchiveCard
+          key={pin.id}
+          accent={index === 0 ? accent : pin.dominantColor}
+          emissive={emissive}
+          pin={pin}
+          texture={Array.isArray(textures) ? textures[index] : textures}
+          x={index % 2 === 0 ? -0.25 : 0.25}
+          y={index < 2 ? 0.44 : -0.46}
+        />
       ))}
     </group>
   )
@@ -348,6 +386,7 @@ function MoodboardPanel({ emissive }: { emissive: number }) {
 type FashionZoneProps = { highlighted: boolean }
 
 export default function FashionZone({ highlighted }: FashionZoneProps) {
+  const fitsBoard = usePinterestFits()
   const emissive = highlighted ? 0.35 : 0.06
 
   return (
@@ -359,7 +398,7 @@ export default function FashionZone({ highlighted }: FashionZoneProps) {
 
       <WardrobeLightbox emissive={emissive} />
       <FootwearPlinth emissive={emissive} />
-      <MoodboardPanel emissive={emissive} />
+      <MoodboardPanel emissive={emissive} pins={fitsBoard.pins} source={fitsBoard.source} />
     </group>
   )
 }
