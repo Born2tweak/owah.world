@@ -314,58 +314,66 @@ function FitArchiveCard({
   x: number
   y: number
 }) {
-  const width = pin.aspect < 0.7 ? 0.34 : 0.42
-  const height = width / Math.max(pin.aspect, 0.5)
+  const height = 0.72
+  const width = Math.min(Math.max(height * pin.aspect, 0.36), 0.6)
 
   return (
-    <group position={[x, y, 0.058]} rotation={[0, 0, x > 0 ? 0.035 : -0.025]}>
+    <group position={[x, y, 0.062]} rotation={[0, 0, x > 0 ? 0.022 : -0.018]}>
       <mesh castShadow>
-        <boxGeometry args={[0.42, 0.7, 0.028]} />
+        <boxGeometry args={[width + 0.08, height + 0.2, 0.028]} />
         <meshStandardMaterial color="#111820" roughness={0.5} metalness={0.2} />
       </mesh>
-      <mesh position={[0, 0.08, 0.018]}>
-        <planeGeometry args={[width, Math.min(height, 0.54)]} />
+      <mesh position={[0, 0.05, 0.018]}>
+        <planeGeometry args={[width, height]} />
         <meshStandardMaterial map={texture} roughness={0.35} metalness={0.05} emissive="#001018" emissiveIntensity={emissive * 0.2} />
       </mesh>
-      <mesh position={[0, -0.25, 0.022]}>
-        <boxGeometry args={[0.33, 0.025, 0.01]} />
+      <mesh position={[0, 0.05, 0.022]}>
+        <planeGeometry args={[width + 0.012, height + 0.012]} />
+        <meshPhysicalMaterial color={GLASS} transmission={0.6} transparent opacity={0.12} roughness={0.02} metalness={0.06} />
+      </mesh>
+      <mesh position={[0, 0.41, 0.02]}>
+        <boxGeometry args={[0.09, 0.032, 0.026]} />
+        <meshStandardMaterial color={CHROME} metalness={0.95} roughness={0.08} />
+      </mesh>
+      <mesh position={[-width / 2 + 0.12, -0.39, 0.022]}>
+        <boxGeometry args={[0.24, 0.018, 0.01]} />
         <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={0.22 + emissive * 0.5} />
       </mesh>
-      <Text position={[0, -0.32, 0.026]} fontSize={0.032} color="#d9edf5" anchorX="center" anchorY="middle" maxWidth={0.36}>
+      <Text position={[-width / 2, -0.45, 0.026]} fontSize={0.034} color="#d9edf5" anchorX="left" anchorY="middle" maxWidth={width + 0.04} letterSpacing={0.06}>
         {pin.title.toUpperCase()}
       </Text>
     </group>
   )
 }
 
-/** Wall-mounted Fits lightbox on the left room wall - selected board images as archive inserts. */
+/** Full-height Fits installation on the left room wall - the board carries real visual weight. */
 function MoodboardPanel({ emissive, pins, source }: { emissive: number; pins: PinterestFitPin[]; source: 'fallback' | 'pinterest' }) {
   const selectedPins = pins.slice(0, 4)
   const textures = useTexture(selectedPins.map((pin) => pin.image))
   const accent = source === 'pinterest' ? '#e60023' : '#00c8e8'
 
   return (
-    <group position={[-1.7, 1.45, 0.5]} rotation={[0, Math.PI / 2, 0]}>
+    <group position={[-1.7, 1.52, 0.5]} rotation={[0, Math.PI / 2, 0]}>
       <mesh castShadow>
-        <boxGeometry args={[1.18, 2.66, 0.07]} />
+        <boxGeometry args={[1.94, 2.92, 0.07]} />
         <meshStandardMaterial color="#0a1018" metalness={0.45} roughness={0.3} />
       </mesh>
       <mesh position={[0, 0, 0.038]}>
-        <planeGeometry args={[1.06, 2.5]} />
+        <planeGeometry args={[1.82, 2.78]} />
         <meshStandardMaterial color="#10202c" emissive="#1a4458" emissiveIntensity={0.18 + emissive * 0.4} roughness={0.4} />
       </mesh>
-      <mesh position={[0, 0, 0.061]}>
-        <planeGeometry args={[1.0, 2.42]} />
-        <meshPhysicalMaterial color={GLASS} transmission={0.28} transparent opacity={0.12} roughness={0.02} metalness={0.1} />
+      <mesh position={[0, 1.46, 0.02]}>
+        <boxGeometry args={[1.86, 0.03, 0.06]} />
+        <meshStandardMaterial color="#d3f4ff" emissive="#b4ecff" emissiveIntensity={0.3 + emissive * 0.5} />
       </mesh>
-      <Text position={[-0.43, 1.14, 0.068]} fontSize={0.05} color="#9fd8ec" anchorX="left" anchorY="middle">
-        PINTEREST / FITS
+      <Text position={[-0.82, 1.24, 0.068]} fontSize={0.072} color="#cfeefb" anchorX="left" anchorY="middle" letterSpacing={0.12}>
+        FITS / ARCHIVE
       </Text>
-      <Text position={[0.43, 1.14, 0.068]} fontSize={0.034} color={source === 'pinterest' ? '#ffd6dd' : '#8ea6b4'} anchorX="right" anchorY="middle">
-        {source === 'pinterest' ? 'LIVE BOARD' : 'LOCAL SYNC'}
+      <Text position={[0.82, 1.24, 0.068]} fontSize={0.032} color={source === 'pinterest' ? '#ffd6dd' : '#8ea6b4'} anchorX="right" anchorY="middle" letterSpacing={0.1}>
+        {source === 'pinterest' ? 'PINTEREST · LIVE' : 'PINTEREST · SYNC'}
       </Text>
-      <mesh position={[-0.46, 1.0, 0.066]}>
-        <boxGeometry args={[0.1, 0.015, 0.01]} />
+      <mesh position={[-0.82, 1.1, 0.066]}>
+        <boxGeometry args={[0.34, 0.016, 0.01]} />
         <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={0.35 + emissive * 0.7} />
       </mesh>
       {selectedPins.map((pin, index) => (
@@ -375,10 +383,13 @@ function MoodboardPanel({ emissive, pins, source }: { emissive: number; pins: Pi
           emissive={emissive}
           pin={pin}
           texture={Array.isArray(textures) ? textures[index] : textures}
-          x={index % 2 === 0 ? -0.25 : 0.25}
-          y={index < 2 ? 0.44 : -0.46}
+          x={index % 2 === 0 ? -0.45 : 0.46}
+          y={index < 2 ? 0.5 : -0.52}
         />
       ))}
+      <Text position={[0, -1.28, 0.066]} fontSize={0.03} color="#7e99a8" anchorX="center" anchorY="middle" letterSpacing={0.22}>
+        CURATED FROM THE FITS BOARD
+      </Text>
     </group>
   )
 }

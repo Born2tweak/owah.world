@@ -15,9 +15,13 @@ const SPINE_ROWS = 3
 const SPINE_W = 0.2
 const SPINE_H = 0.6
 const SPINE_GAP = 0.12
-const ROW_Y = [0.7, 0.02, -0.66]
+const ROW_Y = [0.58, -0.1, -0.78]
 const SPINES_CENTER_X = -0.56
 const FEATURED_X = 0.82
+
+function truncate(value: string, max: number) {
+  return value.length > max ? `${value.slice(0, max - 1).trimEnd()}…` : value
+}
 
 function ArchiveSpine({ entry, x, y, pull, tilt }: {
   entry: MyAnimeListEntry
@@ -32,29 +36,30 @@ function ArchiveSpine({ entry, x, y, pull, tilt }: {
         <boxGeometry args={[SPINE_W, SPINE_H, 0.1]} />
         <meshStandardMaterial color={entry.hue} roughness={0.5} metalness={0.16} />
       </mesh>
-      <mesh position={[0, SPINE_H * 0.36, 0.052]}>
-        <boxGeometry args={[SPINE_W * 0.82, 0.04, 0.007]} />
+      <mesh position={[0, SPINE_H * 0.38, 0.052]}>
+        <boxGeometry args={[SPINE_W * 0.82, 0.035, 0.007]} />
         <meshStandardMaterial color={entry.band} emissive={entry.band} emissiveIntensity={0.2} />
       </mesh>
-      <mesh position={[0, -SPINE_H * 0.4, 0.053]}>
-        <boxGeometry args={[SPINE_W * 0.62, 0.05, 0.008]} />
+      <mesh position={[0, -SPINE_H * 0.41, 0.053]}>
+        <boxGeometry args={[SPINE_W * 0.58, 0.04, 0.008]} />
         <meshStandardMaterial color={entry.score === 10 ? '#f8fafc' : '#7090e8'} emissive={entry.score === 10 ? '#ffffff' : '#7090e8'} emissiveIntensity={0.22} />
       </mesh>
       <Text
-        position={[0, -SPINE_H * 0.06, 0.054]}
+        position={[0, -SPINE_H * 0.02, 0.054]}
         rotation={[0, 0, Math.PI / 2]}
-        fontSize={0.038}
+        fontSize={0.032}
         color="#f1f5f9"
-        maxWidth={SPINE_H * 0.8}
+        maxWidth={SPINE_H * 0.72}
         anchorX="center"
         anchorY="middle"
       >
-        {entry.title.toUpperCase()}
+        {truncate(entry.title, 14).toUpperCase()}
       </Text>
     </group>
   )
 }
 
+/** Framed media panel: artwork on top, caption band below - text never sits on the image. */
 function FeaturedPanel({ entry, texture, y, emissive }: {
   entry: MyAnimeListEntry
   texture: THREE.Texture | null
@@ -64,29 +69,33 @@ function FeaturedPanel({ entry, texture, y, emissive }: {
   return (
     <group position={[FEATURED_X, y, 0.14]}>
       <mesh castShadow>
-        <boxGeometry args={[0.76, 0.6, 0.04]} />
+        <boxGeometry args={[0.78, 0.64, 0.04]} />
         <meshStandardMaterial color={CHROME_DARK} metalness={0.88} roughness={0.14} />
       </mesh>
-      <mesh position={[0, 0, 0.022]}>
-        <planeGeometry args={[0.68, 0.52]} />
-        <meshStandardMaterial map={texture ?? null} color={texture ? '#ffffff' : entry.hue} roughness={0.42} metalness={0.2} />
+      <mesh position={[0, 0, 0.021]}>
+        <planeGeometry args={[0.7, 0.56]} />
+        <meshStandardMaterial color="#0a1018" roughness={0.5} metalness={0.18} />
       </mesh>
-      <mesh position={[0, 0, 0.026]}>
-        <planeGeometry args={[0.68, 0.52]} />
-        <meshPhysicalMaterial color="#0a1420" transmission={0.4} transparent opacity={0.35} roughness={0.04} metalness={0.1} />
+      <mesh position={[0, 0.085, 0.026]}>
+        <planeGeometry args={[0.66, 0.37]} />
+        <meshStandardMaterial map={texture ?? null} color={texture ? '#ffffff' : entry.hue} roughness={0.42} metalness={0.1} />
       </mesh>
-      <mesh position={[-0.31, 0, 0.03]}>
-        <boxGeometry args={[0.012, 0.5, 0.008]} />
+      <mesh position={[0, 0.085, 0.03]}>
+        <planeGeometry args={[0.66, 0.37]} />
+        <meshPhysicalMaterial color="#0a1420" transmission={0.85} transparent opacity={0.1} roughness={0.04} metalness={0.1} />
+      </mesh>
+      <mesh position={[-0.345, 0, 0.03]}>
+        <boxGeometry args={[0.012, 0.54, 0.008]} />
         <meshStandardMaterial color={entry.band} emissive={entry.band} emissiveIntensity={0.3 + emissive * 0.5} />
       </mesh>
-      <Text position={[0.02, 0.08, 0.035]} fontSize={0.062} color="#f8fafc" maxWidth={0.58} anchorX="center" anchorY="middle">
-        {entry.title.toUpperCase()}
+      <Text position={[-0.3, -0.16, 0.035]} fontSize={0.042} color="#f8fafc" maxWidth={0.62} anchorX="left" anchorY="middle">
+        {truncate(entry.title, 18).toUpperCase()}
       </Text>
-      <Text position={[0.02, -0.12, 0.035]} fontSize={0.04} color="#93c5fd" maxWidth={0.56} anchorX="center" anchorY="middle">
-        COMPLETED / {entry.score}
+      <Text position={[-0.3, -0.245, 0.035]} fontSize={0.029} color="#93c5fd" anchorX="left" anchorY="middle" letterSpacing={0.1}>
+        COMPLETED · {entry.score}/10
       </Text>
-      <Text position={[0.26, -0.22, 0.035]} fontSize={0.032} color="#cbd5e1" maxWidth={0.3} anchorX="right" anchorY="middle">
-        {entry.mediaType}
+      <Text position={[0.31, -0.245, 0.035]} fontSize={0.026} color="#94a3b8" anchorX="right" anchorY="middle" letterSpacing={0.12}>
+        {entry.mediaType.toUpperCase()}
       </Text>
     </group>
   )
@@ -106,24 +115,22 @@ function MediaArchiveWall({ emissive, entries, source }: { emissive: number; ent
         <boxGeometry args={[2.7, 2.2, 0.3]} />
         <meshStandardMaterial color={WOOD_DARK} metalness={0.35} roughness={0.38} />
       </mesh>
-      <Text position={[-1.16, 0.94, 0.18]} fontSize={0.055} color="#dbeafe" anchorX="left" anchorY="middle">
-        MAL / COMPLETED 9+
+      <Text position={[-1.16, 1.0, 0.18]} fontSize={0.05} color="#dbeafe" anchorX="left" anchorY="middle" letterSpacing={0.14}>
+        MEDIA CANON
       </Text>
-      <Text position={[1.08, 0.94, 0.18]} fontSize={0.034} color={source === 'myanimelist' ? '#c7d2fe' : '#93c5fd'} anchorX="right" anchorY="middle">
-        {source === 'myanimelist' ? 'LIVE LIST' : 'LOCAL EXPORT'}
+      <Text position={[0.34, 1.0, 0.18]} fontSize={0.028} color={source === 'myanimelist' ? '#c7d2fe' : '#93c5fd'} anchorX="right" anchorY="middle" letterSpacing={0.12}>
+        {source === 'myanimelist' ? 'MAL · LIVE' : 'MAL · ARCHIVE'}
       </Text>
+      <mesh position={[-0.42, 0.92, 0.17]}>
+        <boxGeometry args={[1.5, 0.012, 0.01]} />
+        <meshStandardMaterial color="#7090e8" emissive="#7090e8" emissiveIntensity={0.2 + emissive * 0.4} />
+      </mesh>
 
       {ROW_Y.map((y) => (
-        <group key={y}>
-          <mesh position={[SPINES_CENTER_X, y - SPINE_H / 2 - 0.04, 0.12]}>
-            <boxGeometry args={[1.42, 0.035, 0.24]} />
-            <meshStandardMaterial color={CHROME_DARK} metalness={0.86} roughness={0.14} />
-          </mesh>
-          <mesh position={[SPINES_CENTER_X, y + SPINE_H / 2 + 0.05, 0.1]}>
-            <boxGeometry args={[1.36, 0.014, 0.04]} />
-            <meshStandardMaterial color="#7090e8" emissive="#7090e8" emissiveIntensity={0.18 + emissive * 0.4} />
-          </mesh>
-        </group>
+        <mesh key={y} position={[SPINES_CENTER_X, y - SPINE_H / 2 - 0.04, 0.12]}>
+          <boxGeometry args={[1.42, 0.035, 0.24]} />
+          <meshStandardMaterial color={CHROME_DARK} metalness={0.86} roughness={0.14} />
+        </mesh>
       ))}
 
       {spines.map((spine, i) => {
@@ -140,7 +147,7 @@ function MediaArchiveWall({ emissive, entries, source }: { emissive: number; ent
           key={entry.id}
           entry={entry}
           texture={Array.isArray(textures) ? textures[i] : textures}
-          y={0.66 - i * 0.68}
+          y={0.7 - i * 0.7}
           emissive={emissive}
         />
       ))}
@@ -205,14 +212,21 @@ function NowWatchingStand({ emissive, entry }: { emissive: number; entry: MyAnim
         <boxGeometry args={[0.01, 0.64, 0.48]} />
         <meshStandardMaterial color={edgeColor} emissive={edgeColor} emissiveIntensity={emissive * 0.5} />
       </mesh>
-      <Text position={[0, 0.98, 0.02]} rotation={[0.08, 0, 0]} fontSize={0.062} color="#f8fafc" maxWidth={0.36} anchorX="center">
-        {entry.title.toUpperCase()}
+      <Text position={[0, 1.1, 0.02]} rotation={[0.08, 0, 0]} fontSize={0.028} color="#93c5fd" anchorX="center" anchorY="middle" letterSpacing={0.22}>
+        CANON · COMPLETED
       </Text>
-      <Text position={[0, 0.78, 0.02]} rotation={[0.08, 0, 0]} fontSize={0.045} color="#93c5fd" maxWidth={0.34} anchorX="center">
-        COMPLETED
+      <Text position={[0, 0.95, 0.02]} rotation={[0.08, 0, 0]} fontSize={0.052} color="#f8fafc" maxWidth={0.42} anchorX="center" anchorY="middle" textAlign="center" lineHeight={1.15}>
+        {truncate(entry.title, 18).toUpperCase()}
       </Text>
-      <Text position={[0, 0.64, 0.02]} rotation={[0.08, 0, 0]} fontSize={0.042} color="#cbd5e1" maxWidth={0.34} anchorX="center">
+      <mesh position={[0, 0.82, 0.02]} rotation={[0.08, 0, 0]}>
+        <boxGeometry args={[0.26, 0.008, 0.004]} />
+        <meshStandardMaterial color="#7090e8" emissive="#7090e8" emissiveIntensity={0.35} />
+      </mesh>
+      <Text position={[0, 0.71, 0.02]} rotation={[0.08, 0, 0]} fontSize={0.04} color="#cbd5e1" anchorX="center" anchorY="middle">
         SCORE {entry.score} / 10
+      </Text>
+      <Text position={[0, 0.6, 0.02]} rotation={[0.08, 0, 0]} fontSize={0.026} color="#7e93a8" anchorX="center" anchorY="middle" letterSpacing={0.18}>
+        {entry.mediaType.toUpperCase()}
       </Text>
       <mesh position={[0, 0.02, 0]}>
         <cylinderGeometry args={[0.15, 0.18, 0.05, 20]} />

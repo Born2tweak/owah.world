@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { useCallback, useEffect } from 'react'
 import { isWorldCategory } from './roomZones'
 import { useWorldRoomStore } from './worldRoom.store'
@@ -65,11 +66,11 @@ export default function WorldRoom3D() {
 
       <div className={styles.hud} aria-hidden={false}>
         <header className={styles.hudTop}>
-          <div className={styles.brand}>
+          <Link href="/" className={styles.brand} aria-label="OWAH.WORLD — back to landing">
             <span className={styles.brandMain}>OWAH.WORLD</span>
             <span>|</span>
             <span>LIVING ARCHIVE</span>
-          </div>
+          </Link>
           <div className={styles.status}>
             <span className={styles.statusPulse} />
             <span>SYSTEM V1.0</span>
