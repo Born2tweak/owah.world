@@ -206,20 +206,6 @@ export default function RoomShell() {
         <meshStandardMaterial color={CHROME} metalness={0.92} roughness={0.08} />
       </mesh>
 
-      {[-5.1, 0, 5.1].map((x) => (
-        <mesh key={`pedestal-${x}`} position={[x, 0.12, -4.56]}>
-          <boxGeometry args={[2.64, 0.18, 0.88]} />
-          <meshStandardMaterial color="#10222c" metalness={0.42} roughness={0.24} />
-        </mesh>
-      ))}
-
-      {[-5.1, 0, 5.1].map((x) => (
-        <mesh key={`led-${x}`} position={[x, 0.22, -4.16]}>
-          <boxGeometry args={[2.52, 0.03, 0.04]} />
-          <meshStandardMaterial color="#00d4ff" emissive="#00c8e8" emissiveIntensity={0.52} metalness={0.8} roughness={0.15} />
-        </mesh>
-      ))}
-
       {[
         [-7.05, -1, 5],
         [7.05, -1, 5],

@@ -1,16 +1,16 @@
 'use client'
 
+import { Text } from '@react-three/drei'
 import {
   CHROME,
   CHROME_DARK,
   FABRIC_DARK,
-  FABRIC_MID,
   FABRIC_SILK,
   GLASS,
   MARBLE,
 } from './roomMaterials'
 
-type Silhouette = 'military-coat' | 'pinstripe-wide' | 'leather-bomber' | 'long-drape' | 'asymmetric' | 'structured'
+type Silhouette = 'military-coat' | 'pinstripe-wide' | 'leather-bomber' | 'long-drape' | 'asymmetric'
 
 type GarmentSpec = {
   x: number
@@ -23,14 +23,19 @@ type GarmentSpec = {
   yaw?: number
 }
 
-/** Darkwear archive - monochrome, structured, avant-garde. */
+/** Darkwear archive - five strong silhouettes, generous spacing, lit from behind. */
 const GARMENTS: GarmentSpec[] = [
-  { x: -1.34, width: 0.48, height: 1.32, depth: 0.24, color: '#141820', silhouette: 'military-coat' },
-  { x: -0.78, width: 0.38, height: 1.12, depth: 0.22, color: '#1a2030', silhouette: 'pinstripe-wide' },
-  { x: -0.2, width: 0.42, height: 1.02, depth: 0.2, color: '#0e1018', silhouette: 'leather-bomber', forwardPull: 0.18, yaw: 0.08 },
-  { x: 0.36, width: 0.34, height: 1.26, depth: 0.18, color: FABRIC_SILK, silhouette: 'long-drape' },
-  { x: 0.9, width: 0.36, height: 1.08, depth: 0.18, color: FABRIC_DARK, silhouette: 'asymmetric' },
-  { x: 1.42, width: 0.32, height: 1.02, depth: 0.16, color: FABRIC_MID, silhouette: 'structured' },
+  { x: -1.32, width: 0.5, height: 1.38, depth: 0.24, color: '#141820', silhouette: 'military-coat' },
+  { x: -0.66, width: 0.38, height: 1.06, depth: 0.22, color: '#1a2030', silhouette: 'pinstripe-wide' },
+  { x: 0, width: 0.44, height: 0.96, depth: 0.2, color: '#0e1018', silhouette: 'leather-bomber', forwardPull: 0.16, yaw: 0.08 },
+  { x: 0.66, width: 0.34, height: 1.32, depth: 0.18, color: FABRIC_SILK, silhouette: 'long-drape' },
+  { x: 1.32, width: 0.38, height: 1.1, depth: 0.18, color: FABRIC_DARK, silhouette: 'asymmetric' },
+]
+
+const MOODBOARD_CARDS = [
+  { y: 0.78, label: 'OUTERWEAR', accent: '#00c8e8' },
+  { y: 0, label: 'DRAPE', accent: '#8ea6b4' },
+  { y: -0.78, label: 'LEATHER', accent: '#c41e3a' },
 ]
 
 function fabricMat(color: string, emissive: number) {
@@ -142,13 +147,6 @@ function HangerGarment({ spec, emissive }: { spec: GarmentSpec; emissive: number
             </mesh>
           </>
         )
-      default:
-        return (
-          <mesh position={[0, shoulderY - spec.height * 0.48, 0.015]} castShadow>
-            <boxGeometry args={[sw * 0.85, spec.height * 0.82, spec.depth * 0.78]} />
-            {fabricMat(spec.color, emissive)}
-          </mesh>
-        )
     }
   }
 
@@ -179,9 +177,58 @@ function HangerGarment({ spec, emissive }: { spec: GarmentSpec; emissive: number
   )
 }
 
-function TabiBoot({ x, emissive }: { x: number; emissive: number }) {
+/** Full-height lightbox wardrobe: chrome frame + illuminated back panel so silhouettes read. */
+function WardrobeLightbox({ emissive }: { emissive: number }) {
   return (
-    <group position={[x, 0.1, 0.05]} scale={1.1}>
+    <group>
+      <mesh position={[0, 1.3, -1.0]}>
+        <boxGeometry args={[3.6, 2.56, 0.05]} />
+        <meshStandardMaterial
+          color="#9fd8ec"
+          emissive="#bfeaff"
+          emissiveIntensity={0.32 + emissive * 0.55}
+          roughness={0.3}
+          metalness={0.05}
+        />
+      </mesh>
+      <mesh position={[0, 1.3, -1.06]} castShadow receiveShadow>
+        <boxGeometry args={[3.78, 2.72, 0.08]} />
+        <meshStandardMaterial color="#0a3848" metalness={0.25} roughness={0.32} />
+      </mesh>
+
+      <mesh position={[0, 2.18, -0.78]} rotation={[0, 0, Math.PI / 2]}>
+        <cylinderGeometry args={[0.024, 0.024, 3.5, 16]} />
+        <meshStandardMaterial color={CHROME} metalness={1} roughness={0.05} />
+      </mesh>
+      {[-1.74, 1.74].map((x) => (
+        <mesh key={x} position={[x, 1.3, -0.84]}>
+          <boxGeometry args={[0.08, 2.6, 0.08]} />
+          <meshStandardMaterial color={CHROME} metalness={0.95} roughness={0.06} />
+        </mesh>
+      ))}
+      <mesh position={[0, 2.62, -0.86]}>
+        <boxGeometry args={[3.56, 0.07, 0.12]} />
+        <meshStandardMaterial color={CHROME} metalness={0.92} roughness={0.08} />
+      </mesh>
+      <mesh position={[0, 2.56, -0.82]}>
+        <boxGeometry args={[3.3, 0.025, 0.05]} />
+        <meshStandardMaterial color="#d3f4ff" emissive="#b4ecff" emissiveIntensity={0.5 + emissive * 0.6} />
+      </mesh>
+      <mesh position={[0, 0.04, -0.86]}>
+        <boxGeometry args={[3.56, 0.08, 0.3]} />
+        <meshStandardMaterial color="#10222c" metalness={0.42} roughness={0.24} />
+      </mesh>
+
+      {GARMENTS.map((spec) => (
+        <HangerGarment key={spec.x} spec={spec} emissive={emissive} />
+      ))}
+    </group>
+  )
+}
+
+function TabiBoot({ emissive }: { emissive: number }) {
+  return (
+    <group position={[0, 0.1, 0]} scale={1.1}>
       <mesh castShadow>
         <boxGeometry args={[0.22, 0.06, 0.14]} />
         <meshStandardMaterial color="#0a1018" roughness={0.4} metalness={0.2} />
@@ -198,9 +245,9 @@ function TabiBoot({ x, emissive }: { x: number; emissive: number }) {
   )
 }
 
-function PlatformClog({ x, emissive }: { x: number; emissive: number }) {
+function PlatformClog({ emissive }: { emissive: number }) {
   return (
-    <group position={[x, 0.12, -0.02]} scale={1.08}>
+    <group position={[0, 0.12, 0]} scale={1.08}>
       <mesh castShadow>
         <boxGeometry args={[0.2, 0.1, 0.16]} />
         <meshStandardMaterial color="#1a2030" roughness={0.35} metalness={0.15} />
@@ -213,9 +260,9 @@ function PlatformClog({ x, emissive }: { x: number; emissive: number }) {
   )
 }
 
-function LeatherBoot({ x, emissive }: { x: number; emissive: number }) {
+function LeatherBoot({ emissive }: { emissive: number }) {
   return (
-    <group position={[x, 0.08, 0.08]} rotation={[0, 0.2, 0]} scale={1.08}>
+    <group position={[0, 0.08, 0]} scale={1.08}>
       <mesh castShadow>
         <boxGeometry args={[0.2, 0.05, 0.13]} />
         <meshStandardMaterial color="#0a1018" roughness={0.4} />
@@ -230,7 +277,7 @@ function LeatherBoot({ x, emissive }: { x: number; emissive: number }) {
 
 function FootwearPlinth({ emissive }: { emissive: number }) {
   return (
-    <group position={[-1.62, 0, 1.08]} rotation={[0, 0.12, 0]} scale={1.18}>
+    <group position={[-1.5, 0, 1.0]} rotation={[0, 0.14, 0]} scale={1.18}>
       <mesh position={[0, 0.05, 0]} castShadow receiveShadow>
         <boxGeometry args={[1.18, 0.1, 0.66]} />
         <meshPhysicalMaterial color={MARBLE} metalness={0.2} roughness={0.18} clearcoat={0.35} />
@@ -244,130 +291,56 @@ function FootwearPlinth({ emissive }: { emissive: number }) {
         <meshPhysicalMaterial color={GLASS} transmission={0.55} transparent opacity={0.3} roughness={0.02} metalness={0.1} />
       </mesh>
       <group position={[-0.3, 0, 0.04]} rotation={[0, -0.25, 0]}>
-        <TabiBoot x={0} emissive={emissive} />
+        <TabiBoot emissive={emissive} />
       </group>
       <group position={[0.08, 0, -0.06]} rotation={[0, 0.35, 0]}>
-        <PlatformClog x={0} emissive={emissive} />
+        <PlatformClog emissive={emissive} />
       </group>
       <group position={[0.42, 0, 0.08]} rotation={[0, -0.15, 0]}>
-        <LeatherBoot x={0} emissive={emissive} />
+        <LeatherBoot emissive={emissive} />
       </group>
-      <mesh position={[0, 0.42, -0.22]}>
-        <boxGeometry args={[0.94, 0.024, 0.05]} />
-        <meshStandardMaterial color={CHROME} metalness={0.9} roughness={0.1} />
-      </mesh>
     </group>
   )
 }
 
-function AccessoryVitrine({ emissive }: { emissive: number }) {
-  const w = 1.22
-  const h = 0.86
-  const d = 0.78
-  const posts: [number, number, number][] = [
-    [-w / 2 + 0.03, h / 2, -d / 2 + 0.03],
-    [w / 2 - 0.03, h / 2, -d / 2 + 0.03],
-    [-w / 2 + 0.03, h / 2, d / 2 - 0.03],
-    [w / 2 - 0.03, h / 2, d / 2 - 0.03],
-  ]
-
+/** Wall-mounted moodboard lightbox on the left room wall - archive cards, not flat posters. */
+function MoodboardPanel({ emissive }: { emissive: number }) {
   return (
-    <group position={[1.36, 0, 1.42]} rotation={[0, -0.08, 0]}>
-      <mesh position={[0, 0.07, 0]} castShadow receiveShadow>
-        <boxGeometry args={[1.46, 0.14, 0.92]} />
-        <meshPhysicalMaterial color={MARBLE} metalness={0.25} roughness={0.16} clearcoat={0.4} />
+    <group position={[-1.7, 1.45, 0.5]} rotation={[0, Math.PI / 2, 0]}>
+      <mesh castShadow>
+        <boxGeometry args={[1.06, 2.6, 0.07]} />
+        <meshStandardMaterial color="#0a1018" metalness={0.45} roughness={0.3} />
       </mesh>
-      {posts.map(([x, y, z], i) => (
-        <mesh key={i} position={[x, y, z]}>
-          <boxGeometry args={[0.04, h, 0.04]} />
-          <meshStandardMaterial color={CHROME} metalness={0.96} roughness={0.05} />
-        </mesh>
+      <mesh position={[0, 0, 0.038]}>
+        <planeGeometry args={[0.94, 2.46]} />
+        <meshStandardMaterial color="#10202c" emissive="#1a4458" emissiveIntensity={0.18 + emissive * 0.4} roughness={0.4} />
+      </mesh>
+      <Text position={[-0.36, 1.12, 0.05]} fontSize={0.052} color="#9fd8ec" anchorX="left" anchorY="middle">
+        ARCHIVE / DARKWEAR
+      </Text>
+      {MOODBOARD_CARDS.map((card) => (
+        <group key={card.label} position={[0, card.y - 0.16, 0.055]}>
+          <mesh castShadow>
+            <boxGeometry args={[0.78, 0.6, 0.025]} />
+            <meshStandardMaterial color="#141a22" roughness={0.55} metalness={0.18} />
+          </mesh>
+          <mesh position={[0, 0.31, 0.005]}>
+            <boxGeometry args={[0.1, 0.04, 0.03]} />
+            <meshStandardMaterial color={CHROME} metalness={0.95} roughness={0.08} />
+          </mesh>
+          <mesh position={[-0.34, 0, 0.016]}>
+            <boxGeometry args={[0.014, 0.52, 0.008]} />
+            <meshStandardMaterial color={card.accent} emissive={card.accent} emissiveIntensity={0.25 + emissive * 0.5} />
+          </mesh>
+          <mesh position={[0.05, 0.08, 0.014]} rotation={[0, 0, -0.06]}>
+            <planeGeometry args={[0.56, 0.3]} />
+            <meshStandardMaterial color="#1c2630" roughness={0.7} />
+          </mesh>
+          <Text position={[0.05, -0.2, 0.018]} fontSize={0.044} color="#cbd5e1" anchorX="center" anchorY="middle">
+            {card.label}
+          </Text>
+        </group>
       ))}
-      {[
-        [0, h / 2, -d / 2 + 0.01, w, h],
-        [0, h / 2, d / 2 - 0.01, w, h],
-        [-w / 2 + 0.01, h / 2, 0, d, h],
-        [w / 2 - 0.01, h / 2, 0, d, h],
-      ].map(([x, y, z, pw, ph], i) => (
-        <mesh key={`glass-${i}`} position={[x, y, z]} rotation={[0, i >= 2 ? Math.PI / 2 : 0, 0]}>
-          <planeGeometry args={[pw, ph]} />
-          <meshPhysicalMaterial color={GLASS} transmission={0.9} transparent opacity={0.24} roughness={0.02} metalness={0.08} ior={1.45} />
-        </mesh>
-      ))}
-      <mesh position={[0, 0.24, 0]} rotation={[Math.PI / 2, 0, 0]} castShadow>
-        <torusGeometry args={[0.16, 0.02, 12, 32]} />
-        <meshStandardMaterial color="#8b1a1a" metalness={0.7} roughness={0.28} emissive="#c41e3a" emissiveIntensity={emissive * 0.55} />
-      </mesh>
-      <mesh position={[-0.26, 0.34, 0.05]} rotation={[0.3, 0.2, 0.5]}>
-        <boxGeometry args={[0.05, 0.22, 0.025]} />
-        <meshStandardMaterial color="#141820" metalness={0.5} roughness={0.35} />
-      </mesh>
-      <mesh position={[0.22, 0.3, -0.04]} rotation={[-0.2, -0.3, 0]}>
-        <boxGeometry args={[0.14, 0.1, 0.05]} />
-        <meshStandardMaterial color="#1a2030" roughness={0.55} metalness={0.15} />
-      </mesh>
-      <mesh position={[0, 0.02, d / 2 + 0.03]}>
-        <boxGeometry args={[1.28, 0.016, 0.06]} />
-        <meshStandardMaterial color="#c41e3a" emissive="#c41e3a" emissiveIntensity={0.12 + emissive * 0.35} />
-      </mesh>
-    </group>
-  )
-}
-
-function DressingTable({ emissive }: { emissive: number }) {
-  return (
-    <group position={[-0.22, 0, 0.62]} rotation={[0, -0.18, 0]} scale={1.1}>
-      <mesh position={[0, 0.42, 0]} castShadow receiveShadow>
-        <boxGeometry args={[0.92, 0.05, 0.54]} />
-        <meshPhysicalMaterial color={MARBLE} metalness={0.15} roughness={0.22} clearcoat={0.3} />
-      </mesh>
-      <mesh position={[-0.14, 0.47, 0.08]} rotation={[0.08, 0.2, 0.12]} castShadow>
-        <boxGeometry args={[0.32, 0.07, 0.24]} />
-        <meshStandardMaterial color="#141820" roughness={0.62} emissive="#001820" emissiveIntensity={emissive * 0.35} />
-      </mesh>
-      <mesh position={[0.22, 0.44, -0.04]}>
-        <boxGeometry args={[0.24, 0.014, 0.18]} />
-        <meshStandardMaterial color={CHROME_DARK} metalness={0.88} roughness={0.14} />
-      </mesh>
-      <mesh position={[0.24, 0.47, -0.02]} rotation={[0, 0.3, 0.15]}>
-        <boxGeometry args={[0.16, 0.03, 0.05]} />
-        <meshStandardMaterial color="#0a1018" metalness={0.5} roughness={0.35} />
-      </mesh>
-      <mesh position={[0.24, 0.47, 0.03]}>
-        <torusGeometry args={[0.03, 0.006, 8, 16]} />
-        <meshStandardMaterial color={CHROME} metalness={0.95} roughness={0.08} />
-      </mesh>
-      <mesh position={[-0.3, 0.46, -0.08]} rotation={[0.1, -0.15, 0]}>
-        <boxGeometry args={[0.12, 0.025, 0.04]} />
-        <meshStandardMaterial color="#1a2030" roughness={0.4} metalness={0.25} />
-      </mesh>
-    </group>
-  )
-}
-
-function ArchiveDisplay({ emissive }: { emissive: number }) {
-  return (
-    <group position={[0.62, 0, -0.98]} rotation={[0, 0.2, 0]} scale={1.12}>
-      <mesh position={[0, 0.32, 0]} castShadow receiveShadow>
-        <boxGeometry args={[0.9, 0.58, 0.44]} />
-        <meshPhysicalMaterial color="#1a2830" roughness={0.46} metalness={0.22} clearcoat={0.25} />
-      </mesh>
-      <mesh position={[0, 0.66, 0.02]} castShadow>
-        <boxGeometry args={[0.82, 0.09, 0.38]} />
-        <meshStandardMaterial color={MARBLE} metalness={0.15} roughness={0.22} />
-      </mesh>
-      <mesh position={[-0.3, 0.82, 0.09]} rotation={[-0.55, 0, 0]} castShadow>
-        <boxGeometry args={[0.38, 0.04, 0.42]} />
-        <meshStandardMaterial color="#1a2830" roughness={0.48} metalness={0.18} />
-      </mesh>
-      <mesh position={[0.02, 0.8, 0.05]} castShadow>
-        <boxGeometry args={[0.24, 0.36, 0.14]} />
-        <meshStandardMaterial color="#141820" roughness={0.52} emissive="#001820" emissiveIntensity={emissive * 0.4} />
-      </mesh>
-      <mesh position={[0.18, 0.98, 0.06]} rotation={[0, 0.15, 0]}>
-        <boxGeometry args={[0.2, 0.05, 0.09]} />
-        <meshStandardMaterial color="#1a2030" roughness={0.45} />
-      </mesh>
     </group>
   )
 }
@@ -384,32 +357,9 @@ export default function FashionZone({ highlighted }: FashionZoneProps) {
         <meshStandardMaterial color="#0e2838" emissive="#00c8e8" emissiveIntensity={emissive * 0.3} roughness={0.4} metalness={0.15} />
       </mesh>
 
-      <mesh position={[0, 1.12, -1.02]} receiveShadow castShadow>
-        <boxGeometry args={[3.7, 2.24, 0.08]} />
-        <meshPhysicalMaterial color="#0a3848" metalness={0.2} roughness={0.32} clearcoat={0.34} emissive="#002030" emissiveIntensity={0.08} />
-      </mesh>
-
-      <mesh position={[0, 2.18, -0.78]} rotation={[0, 0.08, Math.PI / 2]}>
-        <cylinderGeometry args={[0.024, 0.024, 3.25, 16]} />
-        <meshStandardMaterial color={CHROME} metalness={1} roughness={0.05} />
-      </mesh>
-      <mesh position={[-1.62, 1.05, -0.78]}>
-        <boxGeometry args={[0.08, 2.1, 0.08]} />
-        <meshStandardMaterial color={CHROME} metalness={0.95} roughness={0.06} />
-      </mesh>
-      <mesh position={[1.62, 1.05, -0.78]}>
-        <boxGeometry args={[0.08, 2.1, 0.08]} />
-        <meshStandardMaterial color={CHROME} metalness={0.95} roughness={0.06} />
-      </mesh>
-
-      {GARMENTS.map((spec) => (
-        <HangerGarment key={spec.x} spec={spec} emissive={emissive} />
-      ))}
-
+      <WardrobeLightbox emissive={emissive} />
       <FootwearPlinth emissive={emissive} />
-      <AccessoryVitrine emissive={emissive} />
-      <DressingTable emissive={emissive} />
-      <ArchiveDisplay emissive={emissive} />
+      <MoodboardPanel emissive={emissive} />
     </group>
   )
 }

@@ -99,52 +99,6 @@ function ListeningLounge({ emissive }: { emissive: number }) {
   )
 }
 
-function VinylCrate({ emissive }: { emissive: number }) {
-  const sleeveTex = useTexture('/world/music/Jeffery.jpg')
-
-  return (
-    <group position={[1.28, 0, 0.84]} rotation={[0, -0.28, 0]} scale={1.08}>
-      <mesh position={[0, 0.22, 0]} castShadow>
-        <boxGeometry args={[0.6, 0.42, 0.46]} />
-        <meshStandardMaterial color={WOOD_DARK} metalness={0.4} roughness={0.4} />
-      </mesh>
-      <mesh position={[0, 0.02, 0.16]}>
-        <boxGeometry args={[0.56, 0.02, 0.1]} />
-        <meshStandardMaterial color="#3dff9a" emissive="#3dff9a" emissiveIntensity={0.12 + emissive * 0.3} />
-      </mesh>
-      {[0.1, 0.03, -0.07].map((z, i) => (
-        <mesh key={z} position={[0, 0.32 + i * 0.025, z]} rotation={[0, 0.1 * i, 0]}>
-          <boxGeometry args={[0.4, 0.01, 0.38]} />
-          <meshStandardMaterial color="#0a1018" metalness={0.85} roughness={0.15} />
-        </mesh>
-      ))}
-      <mesh position={[0.26, 0.5, 0.16]} rotation={[0.15, -0.35, 0.08]}>
-        <boxGeometry args={[0.34, 0.34, 0.014]} />
-        <meshStandardMaterial map={sleeveTex} roughness={0.45} emissive="#001018" emissiveIntensity={emissive * 0.15} />
-      </mesh>
-      <mesh position={[0.34, 0.46, 0.18]} rotation={[0.2, -0.4, 0.1]}>
-        <boxGeometry args={[0.32, 0.32, 0.01]} />
-        <meshStandardMaterial color="#e8e4d8" roughness={0.88} />
-      </mesh>
-    </group>
-  )
-}
-
-function MarathonPlaque({ emissive }: { emissive: number }) {
-  return (
-    <group position={[1.12, 0.58, 0.1]}>
-      <mesh position={[0, 0.05, 0]} castShadow>
-        <boxGeometry args={[0.5, 0.1, 0.32]} />
-        <meshPhysicalMaterial color={MARBLE} metalness={0.2} roughness={0.2} clearcoat={0.3} />
-      </mesh>
-      <mesh position={[0, 0.12, 0.025]}>
-        <boxGeometry args={[0.42, 0.16, 0.024]} />
-        <meshStandardMaterial color="#b8860b" metalness={0.85} roughness={0.25} emissive="#8b6914" emissiveIntensity={emissive * 0.35} />
-      </mesh>
-    </group>
-  )
-}
-
 function AlbumArchiveWall({ emissive }: { emissive: number }) {
   const cols = 4
   const colGap = 0.46
@@ -187,11 +141,11 @@ function TurntableStation({ emissive }: { emissive: number }) {
         <boxGeometry args={[1.28, 0.1, 0.78]} />
         <meshPhysicalMaterial color={MARBLE} metalness={0.15} roughness={0.22} clearcoat={0.3} />
       </mesh>
-      <mesh position={[0, 0.485, 0.02]} rotation={[Math.PI / 2, 0, 0]}>
+      <mesh position={[0, 0.49, 0.02]}>
         <cylinderGeometry args={[0.34, 0.34, 0.03, 36]} />
         <meshStandardMaterial color="#080c10" metalness={0.9} roughness={0.1} />
       </mesh>
-      <mesh position={[0, 0.488, 0.02]} rotation={[Math.PI / 2, 0, 0]}>
+      <mesh position={[0, 0.508, 0.02]} rotation={[-Math.PI / 2, 0, 0]}>
         <ringGeometry args={[0.12, 0.31, 36]} />
         <meshStandardMaterial map={vinylTex} roughness={0.4} metalness={0.15} />
       </mesh>
@@ -242,23 +196,10 @@ export default function MusicZone({ highlighted }: MusicZoneProps) {
       <ListeningLounge emissive={emissive} />
       <TurntableStation emissive={emissive} />
       <AlbumArchiveWall emissive={emissive} />
-      <VinylCrate emissive={emissive} />
-      <MarathonPlaque emissive={emissive} />
 
       <mesh position={[0.1, 0.06, 0.56]} rotation={[0, 0.06, 0]}>
         <boxGeometry args={[2.65, 0.03, 0.06]} />
         <meshStandardMaterial color="#3dff9a" emissive="#3dff9a" emissiveIntensity={0.16 + emissive * 0.65} />
-      </mesh>
-
-      <mesh position={[0.56, 0.48, 0.44]}>
-        <boxGeometry args={[0.58, 0.01, 0.05]} />
-        <meshStandardMaterial
-          color="#3dff9a"
-          emissive="#3dff9a"
-          emissiveIntensity={0.25 + emissive * 0.5}
-          transparent
-          opacity={0.85}
-        />
       </mesh>
     </group>
   )
