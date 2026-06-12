@@ -186,11 +186,10 @@ function truncate(value: string, max: number) {
 }
 
 /**
- * Ambient music signal built into the upper wall - a slim marquee floating
- * above the album archive so it reads clearly without blocking the wall
- * or the turntable.
+ * Live music signal rendered inside the architectural wall display above
+ * the album archive - the room's existing screen becomes the Spotify face.
  */
-function SpotifySignalMarquee({
+function SpotifyWallDisplay({
   configured,
   emissive,
   recentTracks,
@@ -206,53 +205,50 @@ function SpotifySignalMarquee({
   track: { artist: string; title: string }
 }) {
   const accent = source === 'spotify' ? '#3dff9a' : '#6cc7ff'
-  const signalBars = source === 'spotify' ? [0.1, 0.2, 0.3, 0.22] : [0.08, 0.14, 0.18, 0.12]
-  const recentLine = recentTracks.slice(0, 2).map((title) => truncate(title, 18)).join('  /  ')
-  const topLine = topTracks.slice(0, 2).map((title) => truncate(title, 18)).join('  /  ')
+  const signalBars = source === 'spotify' ? [0.08, 0.16, 0.24, 0.18] : [0.06, 0.11, 0.15, 0.1]
+  const recentLine = recentTracks.slice(0, 2).map((title) => truncate(title, 16)).join('  /  ')
+  const topLine = topTracks.slice(0, 2).map((title) => truncate(title, 16)).join('  /  ')
 
   return (
-    <group position={[0, 2.84, -1.5]}>
-      <mesh castShadow>
-        <boxGeometry args={[2.94, 0.52, 0.07]} />
-        <meshPhysicalMaterial color="#08131a" metalness={0.3} roughness={0.2} transmission={0.12} transparent opacity={0.94} />
-      </mesh>
-      <mesh position={[0, 0, 0.032]}>
-        <boxGeometry args={[2.82, 0.42, 0.012]} />
-        <meshStandardMaterial color="#0c1a16" emissive={accent} emissiveIntensity={0.05 + emissive * 0.16} />
+    <group position={[0, 3.24, -1.56]}>
+      <mesh position={[0, 0, 0]}>
+        <planeGeometry args={[1.68, 1.2]} />
+        <meshStandardMaterial color="#060e12" emissive={accent} emissiveIntensity={0.025 + emissive * 0.08} roughness={0.32} metalness={0.2} />
       </mesh>
 
+      <mesh position={[-0.66, 0.46, 0.012]}>
+        <boxGeometry args={[0.04, 0.04, 0.01]} />
+        <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={configured ? 0.9 : 0.32} />
+      </mesh>
+      <Text position={[-0.56, 0.46, 0.012]} fontSize={0.045} anchorX="left" anchorY="middle" color="#9fd4c2" letterSpacing={0.22}>
+        {source === 'spotify' ? 'LIVE ROTATION' : 'CURATED ROTATION'}
+      </Text>
+
+      <Text position={[-0.66, 0.21, 0.012]} fontSize={0.105} anchorX="left" anchorY="middle" color="#ffffff" maxWidth={1.5}>
+        {truncate(track.title, 22)}
+      </Text>
+      <Text position={[-0.66, 0.04, 0.012]} fontSize={0.056} anchorX="left" anchorY="middle" color="#9fc2d1" maxWidth={1.4}>
+        {truncate(track.artist, 28)}
+      </Text>
+
       {signalBars.map((height, index) => (
-        <mesh key={index} position={[-1.28 + index * 0.085, -0.06 + height / 2, 0.044]}>
-          <boxGeometry args={[0.04, height, 0.014]} />
+        <mesh key={index} position={[-0.6 + index * 0.075, -0.18 + height / 2, 0.012]}>
+          <boxGeometry args={[0.036, height, 0.008]} />
           <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={0.34 + emissive * (0.5 + index * 0.08)} />
         </mesh>
       ))}
-      <mesh position={[-1.245, 0.155, 0.044]}>
-        <boxGeometry args={[0.05, 0.05, 0.014]} />
-        <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={configured ? 0.85 : 0.3} />
+
+      <mesh position={[0, -0.31, 0.012]}>
+        <boxGeometry args={[1.32, 0.008, 0.006]} />
+        <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={0.16 + emissive * 0.4} />
       </mesh>
 
-      <Text position={[-0.98, 0.135, 0.05]} fontSize={0.042} anchorX="left" anchorY="middle" color="#9fd4c2" letterSpacing={0.16}>
-        {source === 'spotify' ? 'LIVE ROTATION' : 'CURATED ROTATION'}
-      </Text>
-      <Text position={[-0.98, -0.005, 0.05]} fontSize={0.082} anchorX="left" anchorY="middle" color="#ffffff" maxWidth={2.0}>
-        {truncate(track.title, 26)}
-      </Text>
-      <Text position={[-0.98, -0.145, 0.05]} fontSize={0.046} anchorX="left" anchorY="middle" color="#9fc2d1" maxWidth={1.6}>
-        {truncate(track.artist, 30)}
-      </Text>
-
-      <Text position={[1.36, 0.07, 0.05]} fontSize={0.032} anchorX="right" anchorY="middle" color="#9fd4df" maxWidth={1.1}>
+      <Text position={[-0.66, -0.4, 0.012]} fontSize={0.036} anchorX="left" anchorY="middle" color="#9fd4df" maxWidth={1.4}>
         {recentLine}
       </Text>
-      <Text position={[1.36, -0.05, 0.05]} fontSize={0.028} anchorX="right" anchorY="middle" color="#7f9aaa" maxWidth={1.1}>
+      <Text position={[-0.66, -0.51, 0.012]} fontSize={0.032} anchorX="left" anchorY="middle" color="#7f9aaa" maxWidth={1.4}>
         {topLine}
       </Text>
-
-      <mesh position={[0, -0.245, 0.04]}>
-        <boxGeometry args={[2.7, 0.016, 0.02]} />
-        <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={0.2 + emissive * 0.55} />
-      </mesh>
     </group>
   )
 }
@@ -292,7 +288,7 @@ export default function MusicZone({ highlighted }: MusicZoneProps) {
       <AlbumArchiveWall activeAlbumId={activeAlbumId} emissive={emissive} />
 
       {liveTrack ? (
-        <SpotifySignalMarquee
+        <SpotifyWallDisplay
           configured={spotify.configured}
           emissive={emissive}
           recentTracks={spotify.recentTracks.map((track) => track.title)}

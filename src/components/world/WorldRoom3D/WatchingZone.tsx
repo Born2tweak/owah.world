@@ -1,11 +1,8 @@
 'use client'
 
 import { Text, useTexture } from '@react-three/drei'
-import { useRef } from 'react'
-import { useFrame } from '@react-three/fiber'
 import type * as THREE from 'three'
-import type { Mesh } from 'three'
-import { CHROME, CHROME_DARK, MARBLE, WOOD_DARK } from './roomMaterials'
+import { CHROME_DARK, WOOD_DARK } from './roomMaterials'
 import { type MyAnimeListEntry, useMyAnimeList } from './useMyAnimeList'
 
 /** Museum media archive - one backlit wall, cobalt showroom, not convention purple. */
@@ -182,67 +179,12 @@ function ViewingChair({ emissive }: { emissive: number }) {
   )
 }
 
-function NowWatchingStand({ emissive, entry }: { emissive: number; entry: MyAnimeListEntry }) {
-  const edgeColor = '#7090e8'
-  const glowRef = useRef<Mesh>(null)
-
-  useFrame(({ clock }) => {
-    if (!glowRef.current) return
-    const t = clock.getElapsedTime()
-    const pulse = 0.38 + Math.sin(t * 1.4) * 0.16 + emissive * 0.45
-    const mat = glowRef.current.material as { emissiveIntensity?: number }
-    if (mat.emissiveIntensity !== undefined) mat.emissiveIntensity = pulse
-  })
-
-  return (
-    <group position={[1.08, 0.52, 0.82]} rotation={[0, -0.12, 0]}>
-      <mesh position={[0, 0.42, 0]} castShadow>
-        <boxGeometry args={[0.06, 0.84, 0.06]} />
-        <meshStandardMaterial color={CHROME} metalness={0.92} roughness={0.1} />
-      </mesh>
-      <mesh position={[0, 0.86, 0]} rotation={[0.08, 0, 0]} castShadow>
-        <boxGeometry args={[0.52, 0.72, 0.02]} />
-        <meshPhysicalMaterial color="#0a1420" transmission={0.42} transparent opacity={0.62} roughness={0.05} metalness={0.1} />
-      </mesh>
-      <mesh position={[0, 0.86, 0.012]} rotation={[0.08, 0, 0]}>
-        <boxGeometry args={[0.48, 0.68, 0.006]} />
-        <meshStandardMaterial color="#141820" roughness={0.5} />
-      </mesh>
-      <mesh ref={glowRef} position={[0.22, 0.86, 0.015]} rotation={[0.08, 0, 0]}>
-        <boxGeometry args={[0.01, 0.64, 0.48]} />
-        <meshStandardMaterial color={edgeColor} emissive={edgeColor} emissiveIntensity={emissive * 0.5} />
-      </mesh>
-      <Text position={[0, 1.1, 0.02]} rotation={[0.08, 0, 0]} fontSize={0.028} color="#93c5fd" anchorX="center" anchorY="middle" letterSpacing={0.22}>
-        CANON · COMPLETED
-      </Text>
-      <Text position={[0, 0.95, 0.02]} rotation={[0.08, 0, 0]} fontSize={0.052} color="#f8fafc" maxWidth={0.42} anchorX="center" anchorY="middle" textAlign="center" lineHeight={1.15}>
-        {truncate(entry.title, 18).toUpperCase()}
-      </Text>
-      <mesh position={[0, 0.82, 0.02]} rotation={[0.08, 0, 0]}>
-        <boxGeometry args={[0.26, 0.008, 0.004]} />
-        <meshStandardMaterial color="#7090e8" emissive="#7090e8" emissiveIntensity={0.35} />
-      </mesh>
-      <Text position={[0, 0.71, 0.02]} rotation={[0.08, 0, 0]} fontSize={0.04} color="#cbd5e1" anchorX="center" anchorY="middle">
-        SCORE {entry.score} / 10
-      </Text>
-      <Text position={[0, 0.6, 0.02]} rotation={[0.08, 0, 0]} fontSize={0.026} color="#7e93a8" anchorX="center" anchorY="middle" letterSpacing={0.18}>
-        {entry.mediaType.toUpperCase()}
-      </Text>
-      <mesh position={[0, 0.02, 0]}>
-        <cylinderGeometry args={[0.15, 0.18, 0.05, 20]} />
-        <meshPhysicalMaterial color={MARBLE} metalness={0.15} roughness={0.2} clearcoat={0.3} />
-      </mesh>
-    </group>
-  )
-}
-
 type WatchingZoneProps = { highlighted: boolean }
 
 export default function WatchingZone({ highlighted }: WatchingZoneProps) {
   const mal = useMyAnimeList()
   const emissive = highlighted ? 0.45 : 0.12
   const cobaltGlow = highlighted ? 0.5 : 0.18
-  const heroEntry = mal.entries[0]
 
   return (
     <group>
@@ -259,7 +201,6 @@ export default function WatchingZone({ highlighted }: WatchingZoneProps) {
       <MediaArchiveWall emissive={emissive} entries={mal.entries} source={mal.source} />
 
       <ViewingChair emissive={emissive} />
-      {heroEntry ? <NowWatchingStand emissive={emissive} entry={heroEntry} /> : null}
 
       <mesh position={[0.1, 0.06, 0.52]} rotation={[0, 0.05, 0]}>
         <boxGeometry args={[2.3, 0.03, 0.07]} />

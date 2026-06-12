@@ -73,7 +73,7 @@ export default function RoomEnvironment({
 
       <RoomZoneHotspot
         zone="watching"
-        position={[5.1, 0, -3.2]}
+        position={[4.55, 0, -3.2]}
         size={[3.8, 2.8, 2.4]}
         isActive={activeZone === 'watching'}
         isHovered={hoveredZone === 'watching'}
@@ -85,8 +85,8 @@ export default function RoomEnvironment({
 
       <RoomZoneHotspot
         zone="life"
-        position={[-2.6, 0, -4.05]}
-        size={[1.5, 3.3, 1.0]}
+        position={[6.86, 0, -1.6]}
+        size={[0.8, 3.4, 3.0]}
         isActive={activeZone === 'life'}
         isHovered={hoveredZone === 'life'}
         onHover={onHover}

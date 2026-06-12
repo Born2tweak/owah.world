@@ -12,8 +12,8 @@ export type RoomCameraState = {
 export const ZONE_WORLD_ANCHORS: Record<WorldCategory, [number, number, number]> = {
   fashion: [-5.1, 0, -2.8],
   music: [0, 0, -3.2],
-  watching: [5.1, 0, -3.2],
-  life: [-2.6, 0, -4.05],
+  watching: [4.55, 0, -3.2],
+  life: [6.86, 0, -1.6],
 }
 
 export const ROOM_ZONE_ORDER: RoomZone[] = [
@@ -36,18 +36,18 @@ export const ROOM_CAMERA_STATES: Record<RoomZone, RoomCameraState> = {
     fov: 42,
   },
   music: {
-    position: [2.0, 1.75, 1.6],
-    target: [0, 1.1, -3.35],
+    position: [2.0, 1.9, 1.6],
+    target: [0, 1.3, -3.35],
     fov: 41,
   },
   watching: {
-    position: [2.8, 1.85, 1.8],
-    target: [5.1, 1.4, -3.6],
+    position: [2.25, 1.85, 1.8],
+    target: [4.55, 1.4, -3.6],
     fov: 42,
   },
   life: {
-    position: [-0.5, 2.0, 0.15],
-    target: [-2.6, 1.7, -4.05],
+    position: [3.1, 1.95, -0.3],
+    target: [6.86, 1.85, -1.6],
     fov: 44,
   },
 }
