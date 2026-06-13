@@ -3,44 +3,40 @@
 import { useFrame, useThree } from '@react-three/fiber'
 import { useRef } from 'react'
 import * as THREE from 'three'
-import type { ArchiveView } from './wordsArchive.types'
-import { cameraForState } from './wordsArchiveData'
+import type { ArchiveMode } from './wordsArchive.types'
+import { cameraForMode } from './wordsArchiveData'
 
 type ArchiveCameraRigProps = {
-  activeView: ArchiveView
-  focusedBookId: string | null
+  mode: ArchiveMode
+  zoom: number
 }
 
-export default function ArchiveCameraRig({ activeView, focusedBookId }: ArchiveCameraRigProps) {
+export default function ArchiveCameraRig({ mode, zoom }: ArchiveCameraRigProps) {
   const { camera } = useThree()
   const lookTarget = useRef(new THREE.Vector3())
   const desiredPosition = useRef(new THREE.Vector3())
-  const desiredFov = useRef(48)
 
   // R3F camera rigs intentionally mutate the scene camera each frame.
   // eslint-disable-next-line react-hooks/immutability -- drei/R3F camera animation pattern
   useFrame((_, delta) => {
-    const state = cameraForState(activeView, focusedBookId)
-    desiredPosition.current.set(...state.position)
+    const state = cameraForMode(mode)
+    desiredPosition.current.set(state.position[0] * zoom, state.position[1] * zoom, state.position[2] * zoom)
     lookTarget.current.set(...state.target)
-    desiredFov.current = state.fov
 
-    const positionLerp = 1 - Math.exp(-2.8 * delta)
-    const targetLerp = 1 - Math.exp(-2.4 * delta)
-    const fovLerp = 1 - Math.exp(-3.2 * delta)
-
-    camera.position.lerp(desiredPosition.current, positionLerp)
+    const posLerp = 1 - Math.exp(-3 * delta)
+    const lookLerp = 1 - Math.exp(-3 * delta)
+    camera.position.lerp(desiredPosition.current, posLerp)
 
     const currentLook = new THREE.Vector3()
     camera.getWorldDirection(currentLook)
     const currentTarget = camera.position.clone().add(currentLook)
-    currentTarget.lerp(lookTarget.current, targetLerp)
+    currentTarget.lerp(lookTarget.current, lookLerp)
     camera.lookAt(currentTarget)
 
     if ('fov' in camera) {
       const persp = camera as THREE.PerspectiveCamera
-      // eslint-disable-next-line react-hooks/immutability -- animate perspective FOV per view
-      persp.fov = THREE.MathUtils.lerp(persp.fov, desiredFov.current, fovLerp)
+      // eslint-disable-next-line react-hooks/immutability -- animate FOV per mode
+      persp.fov = THREE.MathUtils.lerp(persp.fov, state.fov, posLerp)
       persp.updateProjectionMatrix()
     }
   })

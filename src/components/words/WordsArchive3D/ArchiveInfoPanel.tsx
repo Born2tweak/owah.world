@@ -1,73 +1,112 @@
 'use client'
 
 import { AnimatePresence, motion } from 'framer-motion'
-import type { ArchiveView } from './wordsArchive.types'
-import { BOOK_BY_ID, WING_BY_ID } from './wordsArchiveData'
+import type { FaceId } from './wordsArchive.types'
+import { FACE_BY_ID, WORK_BY_ID } from './wordsArchiveData'
 import styles from './WordsArchive3D.module.css'
 
 type ArchiveInfoPanelProps = {
-  activeView: ArchiveView
-  focusedBookId: string | null
+  focusedWorkId: string | null
+  quoteMode: boolean
   onBack: () => void
+  onSelectRelated: (id: string) => void
 }
 
-export default function ArchiveInfoPanel({ activeView, focusedBookId, onBack }: ArchiveInfoPanelProps) {
-  const book = focusedBookId ? BOOK_BY_ID[focusedBookId] ?? null : null
-  const wing = activeView !== 'overview' ? WING_BY_ID[activeView] : null
-  const accent = wing?.accent ?? '#caa45a'
+export default function ArchiveInfoPanel({ focusedWorkId, quoteMode, onBack, onSelectRelated }: ArchiveInfoPanelProps) {
+  const work = focusedWorkId ? WORK_BY_ID[focusedWorkId] ?? null : null
+  const face = work ? FACE_BY_ID[work.face] : null
+  const accent = face?.accent ?? '#cdb88a'
 
   return (
-    <AnimatePresence mode="wait">
-      {book ? (
+    <AnimatePresence>
+      {work && face ? (
         <motion.aside
-          key={book.id}
+          key={work.id}
           className={styles.readingPanel}
-          style={{ ['--wing-accent' as string]: accent }}
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 10 }}
-          transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-          aria-label={`${book.title} detail`}
+          style={{ ['--accent' as string]: accent }}
+          initial={{ opacity: 0, x: 36 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: 24 }}
+          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+          aria-label={`${work.title} reading panel`}
         >
-          <button type="button" className={styles.panelBack} onClick={onBack}>
-            ← Back to {wing?.label ?? 'archive'}
+          <button type="button" className={styles.readingBack} onClick={onBack}>
+            ← Back to {face.label}
           </button>
-          <p className={styles.panelEyebrow}>{book.type.toUpperCase()}{book.year ? ` · ${book.year}` : ''}</p>
-          <h2 className={styles.panelTitle}>{book.title}</h2>
-          <p className={styles.panelAuthor}>{book.author}</p>
-          <p className={styles.panelDescription}>{book.description}</p>
-          <ul className={styles.themeList}>
-            {book.themes.map((theme) => (
-              <li key={theme} className={styles.themeChip}>{theme}</li>
+
+          <div className={styles.readingHead}>
+            <div className={styles.readingCover} style={{ backgroundImage: `url(${work.image})` }} aria-hidden />
+            <div>
+              <p className={styles.readingAuthor}>{work.author}</p>
+              <h2 className={styles.readingTitle}>{work.title}</h2>
+              <p className={styles.readingYear} style={{ color: accent }}>{work.year}</p>
+            </div>
+          </div>
+
+          {work.passages[0] ? (
+            <blockquote className={styles.readingQuote}>“{work.passages[0].text}”</blockquote>
+          ) : null}
+
+          <ul className={styles.themeRow}>
+            {work.themes.map((t) => (
+              <li key={t} className={styles.themePill}>{t}</li>
             ))}
           </ul>
-          {book.file ? (
-            <a className={styles.openButton} href={book.file} target="_blank" rel="noreferrer">
-              Open work ↗
+
+          <div className={styles.readingGrid}>
+            <section>
+              <h3 className={styles.readingLabel}>About this work</h3>
+              <p className={styles.readingBody}>{work.overview}</p>
+            </section>
+            <section>
+              <h3 className={styles.readingLabel}>Key ideas</h3>
+              <ul className={styles.ideaList}>
+                {work.keyIdeas.map((idea) => (
+                  <li key={idea}>{idea}</li>
+                ))}
+              </ul>
+            </section>
+          </div>
+
+          {(quoteMode || work.passages.length > 1) && work.passages.length > 0 ? (
+            <section>
+              <h3 className={styles.readingLabel}>Strongest passages</h3>
+              <div className={styles.passageList}>
+                {work.passages.map((p) => (
+                  <div key={p.text} className={styles.passageCard}>
+                    <span className={styles.passageQuoteMark} style={{ color: accent }}>“</span>
+                    <p className={styles.passageText}>{p.text}</p>
+                    <p className={styles.passageRef}>{p.ref}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+          ) : null}
+
+          {work.related.length ? (
+            <section>
+              <h3 className={styles.readingLabel}>Connected works</h3>
+              <div className={styles.relatedRow}>
+                {work.related.map((id) => {
+                  const rel = WORK_BY_ID[id]
+                  if (!rel) return null
+                  return (
+                    <button key={id} type="button" className={styles.relatedChip} onClick={() => onSelectRelated(id)} style={{ ['--accent' as string]: FACE_BY_ID[rel.face].accent }}>
+                      {rel.author.split(' ').slice(-1)[0]} · {rel.title.length > 22 ? `${rel.title.slice(0, 21)}…` : rel.title}
+                    </button>
+                  )
+                })}
+              </div>
+            </section>
+          ) : null}
+
+          {work.file ? (
+            <a className={styles.continueButton} href={work.file} target="_blank" rel="noreferrer" style={{ background: accent }}>
+              Continue reading ↗
             </a>
           ) : (
-            <span className={styles.openButtonDisabled}>In progress — coming to life</span>
+            <span className={styles.continueDisabled}>Full text coming soon</span>
           )}
-        </motion.aside>
-      ) : wing ? (
-        <motion.aside
-          key={wing.id}
-          className={styles.wingPanel}
-          style={{ ['--wing-accent' as string]: accent }}
-          initial={{ opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 8 }}
-          transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-          aria-label={`${wing.label} wing`}
-        >
-          <button type="button" className={styles.panelBack} onClick={onBack}>
-            ← Overview
-          </button>
-          <p className={styles.panelEyebrow}>Wing</p>
-          <h2 className={styles.panelTitle}>{wing.label}</h2>
-          <p className={styles.panelAuthor}>{wing.eyebrow}</p>
-          <p className={styles.panelDescription}>{wing.subtitle}</p>
-          <p className={styles.panelHint}>Click a book to pull it from the shelf.</p>
         </motion.aside>
       ) : null}
     </AnimatePresence>
