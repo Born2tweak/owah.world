@@ -1,4 +1,6 @@
-export type FaceId = 'liberation' | 'mysticism' | 'psychology' | 'culture'
+export type FaceId = 'liberation' | 'mysticism' | 'psychology' | 'governance' | 'culture' | 'author'
+
+export type CubeSide = 'front' | 'back' | 'left' | 'right' | 'top' | 'bottom'
 
 export type ArchiveMode = 'overview' | 'face' | 'work'
 
@@ -13,27 +15,23 @@ export type ArchiveWork = {
   author: string
   year: string
   face: FaceId
-  /** Public path to the cube image (portrait / cover / symbolic artwork). */
   image: string
-  /** Public path to the openable file, or null. */
   file: string | null
-  /** One-line thesis shown on hover. */
   thesis: string
+  influence: number
   overview: string
+  whyItMatters: string
   themes: string[]
   keyIdeas: string[]
   passages: Passage[]
-  /** Related work ids, may cross faces — drives the connection graph. */
   related: string[]
 }
 
 export type Face = {
   id: FaceId
   label: string
-  thesis: string
   accent: string
-  /** Cube Y-rotation (radians) that brings this face to the front. */
-  faceRotationY: number
+  side: CubeSide
 }
 
 export type CameraState = {

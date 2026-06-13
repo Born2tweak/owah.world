@@ -15,49 +15,39 @@ type WorkTileProps = {
   hovered: boolean
   focused: boolean
   related: boolean
-  faceActive: boolean
+  interactive: boolean
   onHover: (id: string | null) => void
-  onFocus: (id: string) => void
+  onActivate: (id: string) => void
 }
 
-export default function WorkTile({
-  work,
-  slot,
-  accent,
-  hovered,
-  focused,
-  related,
-  faceActive,
-  onHover,
-  onFocus,
-}: WorkTileProps) {
+export default function WorkTile({ work, slot, accent, hovered, focused, related, interactive, onHover, onActivate }: WorkTileProps) {
   const texture = useTexture(work.image)
-  const groupRef = useRef<THREE.Group>(null)
-  const frameRef = useRef<THREE.MeshStandardMaterial>(null)
+  const group = useRef<THREE.Group>(null)
+  const edge = useRef<THREE.MeshStandardMaterial>(null)
   const [local, setLocal] = useState(false)
   const hot = hovered || local
-  const pointerDown = useRef<{ x: number; y: number } | null>(null)
+  const down = useRef<{ x: number; y: number } | null>(null)
 
   useFrame((_, delta) => {
-    if (!groupRef.current) return
-    let z = 0.06
-    let scale = 1
+    if (!group.current) return
+    let z = 0
+    let s = 1
     if (focused) {
-      z = 1.7
-      scale = 1.85
-    } else if (hot && faceActive) {
-      z = 0.34
-      scale = 1.1
-    } else if (faceActive) {
+      z = 1.5
+      s = 1.7
+    } else if (hot && interactive) {
       z = 0.16
+      s = 1.06
+    } else if (related && interactive) {
+      z = 0.07
     }
     const k = 1 - Math.exp(-9 * delta)
-    groupRef.current.position.z = THREE.MathUtils.lerp(groupRef.current.position.z, z, k)
-    const s = THREE.MathUtils.lerp(groupRef.current.scale.x, scale, k)
-    groupRef.current.scale.setScalar(s)
-    if (frameRef.current) {
-      const target = focused ? 1.2 : hot ? 0.85 : related ? 0.6 : faceActive ? 0.3 : 0.14
-      frameRef.current.emissiveIntensity = THREE.MathUtils.lerp(frameRef.current.emissiveIntensity, target, k)
+    group.current.position.z = THREE.MathUtils.lerp(group.current.position.z, z, k)
+    const ns = THREE.MathUtils.lerp(group.current.scale.x, s, k)
+    group.current.scale.setScalar(ns)
+    if (edge.current) {
+      const target = focused ? 1.2 : hot ? 0.9 : related ? 0.7 : 0.0
+      edge.current.emissiveIntensity = THREE.MathUtils.lerp(edge.current.emissiveIntensity, target, k)
     }
   })
 
@@ -73,36 +63,36 @@ export default function WorkTile({
     onHover(null)
     document.body.style.cursor = 'auto'
   }
-  const down = (e: ThreeEvent<PointerEvent>) => {
-    pointerDown.current = { x: e.clientX, y: e.clientY }
+  const pd = (e: ThreeEvent<PointerEvent>) => {
+    down.current = { x: e.clientX, y: e.clientY }
   }
-  const up = (e: ThreeEvent<PointerEvent>) => {
-    if (!pointerDown.current) return
-    const dx = e.clientX - pointerDown.current.x
-    const dy = e.clientY - pointerDown.current.y
-    pointerDown.current = null
+  const pu = (e: ThreeEvent<PointerEvent>) => {
+    if (!down.current) return
+    const dx = e.clientX - down.current.x
+    const dy = e.clientY - down.current.y
+    down.current = null
     if (Math.hypot(dx, dy) < 7) {
       e.stopPropagation()
-      onFocus(work.id)
+      onActivate(work.id)
     }
   }
 
   return (
-    <group ref={groupRef} position={[slot[0], slot[1], 0.06]} onPointerOver={over} onPointerOut={out} onPointerDown={down} onPointerUp={up}>
-      {/* frame / glow backing */}
-      <mesh>
-        <boxGeometry args={[TILE_SIZE + 0.08, TILE_SIZE + 0.08, 0.1]} />
-        <meshStandardMaterial ref={frameRef} color="#0c1016" emissive={accent} emissiveIntensity={0.2} roughness={0.4} metalness={0.4} />
+    <group ref={group} position={[slot[0], slot[1], 0]} onPointerOver={over} onPointerOut={out} onPointerDown={pd} onPointerUp={pu}>
+      {/* accent edge that lights on hover/related/focus */}
+      <mesh position={[0, 0, -0.02]}>
+        <boxGeometry args={[TILE_SIZE + 0.03, TILE_SIZE + 0.03, 0.05]} />
+        <meshStandardMaterial ref={edge} color="#05070b" emissive={accent} emissiveIntensity={0} roughness={0.4} metalness={0.5} />
       </mesh>
       {/* image */}
-      <mesh position={[0, 0, 0.055]}>
+      <mesh position={[0, 0, 0.012]}>
         <planeGeometry args={[TILE_SIZE, TILE_SIZE]} />
-        <meshStandardMaterial map={texture} toneMapped={false} roughness={0.6} metalness={0.05} />
+        <meshStandardMaterial map={texture} toneMapped={false} roughness={0.62} metalness={0.04} />
       </mesh>
       {/* glass sheen */}
-      <mesh position={[0, 0, 0.06]}>
+      <mesh position={[0, 0, 0.02]}>
         <planeGeometry args={[TILE_SIZE, TILE_SIZE]} />
-        <meshPhysicalMaterial color="#cfe6f2" transmission={0.9} transparent opacity={hot ? 0.05 : 0.12} roughness={0.05} metalness={0.1} />
+        <meshPhysicalMaterial color="#dbeafe" transmission={0.92} transparent opacity={hot ? 0.04 : 0.1} roughness={0.04} metalness={0.05} />
       </mesh>
     </group>
   )
