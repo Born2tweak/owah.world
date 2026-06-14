@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef } from 'react'
+import { useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import WebGLCanvas from './WebGLCanvas'
 import { Environment } from '@react-three/drei'
@@ -8,6 +8,62 @@ import { EffectComposer, Bloom, ChromaticAberration, Vignette } from '@react-thr
 import { BlendFunction } from 'postprocessing'
 import * as THREE from 'three'
 import CDMesh from './CDMesh'
+import { WORLD_ACCENT, useLandingStore } from '@/lib/stores/landing.store'
+
+/**
+ * Additive accent light only — never touches the base lighting, materials,
+ * camera, or CD. Idle: a slow influence pulse cycling code/words/world
+ * colours. Hover a world card: that accent warms the scene. It also drifts
+ * toward the cursor for subtle reflection/sparkle shifts on the artifact.
+ */
+function AccentInfluence() {
+  const lightRef = useRef<THREE.PointLight>(null)
+  const hoveredWorld = useLandingStore((s) => s.hoveredWorld)
+  const current = useRef(new THREE.Color('#6fb0ff'))
+  const target = useMemo(() => new THREE.Color(), [])
+
+  useFrame((state, delta) => {
+    const light = lightRef.current
+    if (!light) return
+    const t = state.clock.elapsedTime
+
+    let accent = '#6fb0ff'
+    let intensity = 0
+
+    if (hoveredWorld) {
+      accent = WORLD_ACCENT[hoveredWorld]
+      intensity = 1.35
+    } else {
+      // subtle influence pulse: energy emanating toward each world in turn
+      const cycle = t % 13
+      if (cycle < 1.3) {
+        accent = WORLD_ACCENT.code
+        intensity = Math.sin((cycle / 1.3) * Math.PI) * 0.55
+      } else if (cycle > 4.3 && cycle < 5.6) {
+        accent = WORLD_ACCENT.words
+        intensity = Math.sin(((cycle - 4.3) / 1.3) * Math.PI) * 0.55
+      } else if (cycle > 8.6 && cycle < 9.9) {
+        accent = WORLD_ACCENT.world
+        intensity = Math.sin(((cycle - 8.6) / 1.3) * Math.PI) * 0.55
+      }
+    }
+
+    target.set(accent)
+    const k = 1 - Math.exp(-6 * delta)
+    current.current.lerp(target, k)
+    light.color.copy(current.current)
+    light.intensity = THREE.MathUtils.lerp(light.intensity, intensity, 1 - Math.exp(-5 * delta))
+
+    // cursor reactivity — drift the accent toward the pointer (restrained)
+    const px = state.pointer.x * 3.4
+    const py = 0.3 + state.pointer.y * 2.1
+    const c = 1 - Math.exp(-3 * delta)
+    light.position.x = THREE.MathUtils.lerp(light.position.x, px, c)
+    light.position.y = THREE.MathUtils.lerp(light.position.y, py, c)
+  })
+
+  return <pointLight ref={lightRef} position={[0, 0.3, 2.6]} intensity={0} distance={10} decay={2} />
+}
 
 type Placement = {
   position: [number, number, number]
@@ -199,6 +255,7 @@ export default function CDScene() {
         />
         <pointLight position={[-4.8, 2.5, 1.4]} intensity={3.2} color="#aecdff" distance={10} />
         <pointLight position={[4.5, -1.4, 2.2]} intensity={2.5} color="#28fff0" distance={8} />
+        <AccentInfluence />
 
         <ArchitecturalFraming />
         <group scale={0.98} position={[0, 0.18, 0.2]}>

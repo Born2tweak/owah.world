@@ -1,0 +1,203 @@
+.root {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* ---------- left identity block ---------- */
+.welcome {
+  position: absolute;
+  left: clamp(20px, 4vw, 56px);
+  top: 50%;
+  transform: translateY(-50%);
+  max-width: min(330px, 40vw);
+  pointer-events: none;
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: rgba(140, 224, 236, 0.78);
+  margin: 0 0 10px;
+}
+
+.brand {
+  font-family: var(--font-title);
+  font-size: clamp(2rem, 4.4vw, 3.4rem);
+  line-height: 0.98;
+  letter-spacing: 0.02em;
+  color: #eef6fb;
+  margin: 0 0 18px;
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.55);
+}
+
+.brand b {
+  font-weight: 700;
+  color: rgba(150, 224, 236, 0.92);
+}
+
+.intro {
+  font-family: var(--font-display);
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: rgba(214, 230, 240, 0.74);
+  margin: 0 0 22px;
+  max-width: 300px;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.5);
+}
+
+.stats {
+  display: flex;
+  gap: 22px;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.statValue {
+  font-family: var(--font-title);
+  font-size: 18px;
+  color: #eef6fb;
+}
+
+.statLabel {
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(150, 180, 200, 0.6);
+}
+
+/* ---------- right world directory ---------- */
+.directory {
+  position: absolute;
+  right: clamp(20px, 3vw, 48px);
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: min(340px, 42vw);
+  max-height: 78vh;
+}
+
+.card {
+  --accent: #28fff0;
+  position: relative;
+  display: block;
+  text-decoration: none;
+  pointer-events: auto;
+  padding: 18px 20px;
+  border-radius: 16px;
+  border: 1px solid rgba(200, 226, 240, 0.14);
+  background: linear-gradient(165deg, rgba(16, 26, 40, 0.42), rgba(4, 10, 20, 0.32));
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.1) inset, 0 14px 40px rgba(0, 0, 0, 0.32);
+  transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1), border-color 260ms ease,
+    box-shadow 260ms ease, background 260ms ease;
+}
+
+.card:hover,
+.card:focus-visible {
+  transform: translateX(-6px) scale(1.025);
+  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+  background: linear-gradient(165deg, rgba(22, 34, 52, 0.55), rgba(6, 14, 26, 0.4));
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.16) inset,
+    0 0 30px color-mix(in srgb, var(--accent) 26%, transparent),
+    0 18px 48px rgba(0, 0, 0, 0.4);
+  outline: none;
+}
+
+.cardHead {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.cardIndex {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: color-mix(in srgb, var(--accent) 80%, #ffffff 20%);
+}
+
+.cardTitle {
+  font-family: var(--font-title);
+  font-size: 1.25rem;
+  letter-spacing: 0.04em;
+  color: #f2f8fc;
+  margin: 0;
+}
+
+.cardSubtitle {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--accent) 70%, #cfe0ec 30%);
+  margin: 0 0 10px;
+}
+
+.cardDesc {
+  font-family: var(--font-display);
+  font-size: 12px;
+  line-height: 1.5;
+  color: rgba(206, 222, 234, 0.72);
+  margin: 0 0 14px;
+}
+
+.cardCta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--accent) 85%, #ffffff 15%);
+}
+
+.cardArrow {
+  transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.card:hover .cardArrow,
+.card:focus-visible .cardArrow {
+  transform: translateX(5px);
+}
+
+@media (max-width: 900px) {
+  .welcome {
+    top: auto;
+    bottom: 120px;
+    transform: none;
+    max-width: calc(100vw - 40px);
+  }
+  .stats {
+    display: none;
+  }
+  .directory {
+    position: absolute;
+    right: 16px;
+    left: 16px;
+    top: 84px;
+    transform: none;
+    width: auto;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .card {
+    padding: 12px 14px;
+  }
+  .cardDesc {
+    display: none;
+  }
+}

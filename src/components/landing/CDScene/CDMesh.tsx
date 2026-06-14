@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense, useMemo, useRef, useState } from 'react'
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { useTexture } from '@react-three/drei'
 import type { ThreeEvent } from '@react-three/fiber'
@@ -9,7 +9,11 @@ import { useCDStore } from '@/lib/stores/cd.store'
 
 const _lerpTarget = new THREE.Vector3()
 
-function createVinylTextTexture() {
+/**
+ * Engraved circular inscription. Layout / placement / sizing preserved;
+ * only the font treatment is upgraded (Syncopate, engraved teal-silver).
+ */
+function createVinylTextTexture(fontFamily: string) {
   const size = 1024
   const canvas = document.createElement('canvas')
   canvas.width = size
@@ -21,10 +25,7 @@ function createVinylTextTexture() {
   const text = 'O W A H . W O R L D   SYSTEM V1.0   LIVING DIGITAL WORLD   '
 
   ctx.clearRect(0, 0, size, size)
-  ctx.font = '700 30px "Arial", sans-serif'
-  ctx.fillStyle = 'rgba(235, 245, 255, 0.88)'
-  ctx.strokeStyle = 'rgba(0, 8, 18, 0.92)'
-  ctx.lineWidth = 5
+  ctx.font = `700 27px ${fontFamily}`
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
 
@@ -33,12 +34,20 @@ function createVinylTextTexture() {
     ctx.save()
     ctx.translate(cx + Math.cos(angle) * radius, cy + Math.sin(angle) * radius)
     ctx.rotate(angle + Math.PI / 2)
-    ctx.strokeText(text[i], 0, 0)
+
+    // engraved: dark recessed stroke, pale-silver face, faint top catch-light
+    ctx.strokeStyle = 'rgba(0, 10, 20, 0.9)'
+    ctx.lineWidth = 5
+    ctx.strokeText(text[i], 0, 0.7)
+    ctx.fillStyle = 'rgba(214, 236, 244, 0.94)'
     ctx.fillText(text[i], 0, 0)
+    ctx.fillStyle = 'rgba(150, 224, 232, 0.32)'
+    ctx.fillText(text[i], 0, -0.6)
+
     ctx.restore()
   }
 
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.24)'
+  ctx.strokeStyle = 'rgba(180, 232, 240, 0.22)'
   ctx.lineWidth = 1
   for (let i = 0; i < 4; i++) {
     ctx.beginPath()
@@ -47,6 +56,17 @@ function createVinylTextTexture() {
   }
 
   return new THREE.CanvasTexture(canvas)
+}
+
+/** Resolve the app's loaded display family (Syncopate) for canvas use. */
+function resolveTitleFont(): string {
+  if (typeof window === 'undefined') return '"Arial", sans-serif'
+  const probe = document.createElement('span')
+  probe.style.cssText = 'position:absolute;visibility:hidden;font-family:var(--font-title)'
+  document.body.appendChild(probe)
+  const fam = getComputedStyle(probe).fontFamily
+  document.body.removeChild(probe)
+  return fam || '"Arial", sans-serif'
 }
 
 function createHologramTexture() {
@@ -167,9 +187,28 @@ function CDMeshInner() {
     tex.colorSpace = THREE.SRGBColorSpace
   })
 
-  const vinylTex = useMemo(() => createVinylTextTexture(), [])
+  const [vinylTex, setVinylTex] = useState<THREE.CanvasTexture | null>(null)
   const hologramTex = useMemo(() => createHologramTexture(), [])
   const facetTex = useMemo(() => createFacetTexture(), [])
+
+  useEffect(() => {
+    let alive = true
+    const family = resolveTitleFont()
+    const build = () => {
+      if (!alive) return
+      const tex = createVinylTextTexture(family)
+      setVinylTex((prev) => {
+        if (prev) prev.dispose()
+        return tex
+      })
+    }
+    build()
+    // re-render once the webfont (Syncopate) has actually loaded
+    document.fonts?.ready?.then(build)
+    return () => {
+      alive = false
+    }
+  }, [])
 
   const [hovered, setHovered] = useState(false)
   const pointerDown = useRef(false)
