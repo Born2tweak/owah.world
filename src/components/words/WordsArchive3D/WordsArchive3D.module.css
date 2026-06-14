@@ -63,16 +63,15 @@
   color: rgba(15, 27, 42, 0.6);
 }
 
-/* left intro column — sits below the brand, never overlaps it */
+/* left intro column — anchored well below the brand, never overlaps it */
 .introPanel {
   position: absolute;
-  top: 96px;
-  bottom: 110px;
+  top: clamp(116px, 17vh, 168px);
   left: clamp(18px, 3.5vw, 44px);
   width: min(264px, 38vw);
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   pointer-events: auto;
 }
 
@@ -153,13 +152,23 @@
 
 .overviewButton:hover { background: rgba(255, 255, 255, 0.62); transform: translateY(-1px); }
 
-.dragHint {
+/* clean 3-line controls hint, bottom-left, clear of dock + panels */
+.controlsHint {
+  position: absolute;
+  left: clamp(18px, 3.5vw, 44px);
+  bottom: clamp(20px, 4vh, 32px);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  pointer-events: none;
+}
+
+.controlsHint span {
   font-family: var(--font-mono);
   font-size: 9px;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: rgba(18, 32, 50, 0.45);
-  margin: 0;
+  color: rgba(18, 32, 50, 0.5);
 }
 
 /* hovered tile preview — top centre, clear of the dock */
