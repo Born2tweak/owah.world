@@ -108,13 +108,11 @@ export default function WordsArchive3D() {
           {mode !== 'overview' ? (
             <button type="button" className={styles.overviewButton} onClick={returnToOverview}>↺ Back to overview</button>
           ) : null}
-        </aside>
 
-        <div className={styles.controlsHint} aria-hidden>
-          <span>Drag to Rotate</span>
-          <span>Scroll to Zoom</span>
-          <span>Click to Explore</span>
-        </div>
+          <p className={styles.controlsHint} aria-hidden>
+            Drag to Rotate · Scroll to Zoom · Click to Explore
+          </p>
+        </aside>
 
         {hoverWork ? (
           <div className={styles.hoverPreview} style={{ ['--accent' as string]: FACE_BY_ID[hoverWork.face].accent }}>
