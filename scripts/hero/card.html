@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>OWAH.WORLD card</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Space+Grotesk:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root { --accent: #28fff0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; background: #01050d; overflow: hidden; }
+  .stage {
+    position: fixed; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center;
+    background:
+      radial-gradient(120% 90% at 50% 30%, rgba(20,40,60,0.55), rgba(1,5,13,0.0) 60%),
+      radial-gradient(80% 60% at 50% 120%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 70%),
+      #01050d;
+  }
+  /* faint scanning grid for "operating system" feel */
+  .stage::before {
+    content: ""; position: absolute; inset: 0; opacity: 0.06;
+    background-image:
+      linear-gradient(rgba(120,220,255,0.6) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(120,220,255,0.6) 1px, transparent 1px);
+    background-size: 64px 64px; mask-image: radial-gradient(70% 60% at 50% 50%, #000, transparent 80%);
+  }
+  .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px; letter-spacing: 0.42em; text-transform: uppercase;
+    color: color-mix(in srgb, var(--accent) 75%, #cfe6ef 25%);
+    opacity: 0; transform: translateY(8px);
+    animation: fadeUp 700ms 120ms ease forwards;
+  }
+  .title {
+    font-family: 'Syncopate', sans-serif; font-weight: 700;
+    font-size: clamp(48px, 9vw, 132px); line-height: 0.98; letter-spacing: 0.18em;
+    color: #eef6fb; margin: 22px 0 0; padding-left: 0.18em;
+    opacity: 0; filter: blur(6px); transform: scale(1.04);
+    animation: titleIn 1100ms 220ms cubic-bezier(.2,.8,.2,1) forwards;
+    text-shadow: 0 0 38px color-mix(in srgb, var(--accent) 30%, transparent);
+  }
+  .title b { font-weight: 400; color: color-mix(in srgb, var(--accent) 70%, #eef6fb 30%); }
+  .divider {
+    width: 0; height: 1px; margin: 30px 0; background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    box-shadow: 0 0 16px var(--accent);
+    animation: lineGrow 900ms 540ms cubic-bezier(.2,.8,.2,1) forwards;
+  }
+  .sub {
+    font-family: 'Space Grotesk', sans-serif; font-weight: 300;
+    font-size: clamp(15px, 1.7vw, 24px); letter-spacing: 0.06em;
+    color: rgba(214, 234, 244, 0.82); max-width: 70%;
+    opacity: 0; transform: translateY(10px);
+    animation: fadeUp 800ms 700ms ease forwards;
+  }
+  @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+  @keyframes titleIn { to { opacity: 1; filter: blur(0); transform: scale(1); } }
+  @keyframes lineGrow { to { width: min(280px, 34vw); } }
+  /* vertical layout tweak */
+  body[data-orient="v"] .title { font-size: clamp(40px, 12vw, 120px); }
+  body[data-orient="v"] .sub { max-width: 86%; }
+</style>
+</head>
+<body>
+  <div class="stage" id="stage">
+    <div class="eyebrow" id="eyebrow"></div>
+    <h1 class="title" id="title"></h1>
+    <div class="divider"></div>
+    <p class="sub" id="sub"></p>
+  </div>
+  <script>
+    const p = new URLSearchParams(location.search);
+    const accent = p.get('accent') || '#28fff0';
+    document.documentElement.style.setProperty('--accent', accent);
+    document.body.dataset.orient = p.get('orient') || 'h';
+    const eyebrow = p.get('eyebrow') || '';
+    const sub = p.get('sub') || '';
+    document.getElementById('eyebrow').textContent = eyebrow;
+    document.getElementById('sub').textContent = sub;
+    // title supports a highlighted suffix via "|" separator: "OWAH|.WORLD"
+    const rawTitle = p.get('title') || 'OWAH.WORLD';
+    const el = document.getElementById('title');
+    if (rawTitle.includes('|')) {
+      const [a, b] = rawTitle.split('|');
+      el.innerHTML = a + '<b>' + b + '</b>';
+    } else {
+      el.textContent = rawTitle;
+    }
+    if (!eyebrow) document.getElementById('eyebrow').style.display = 'none';
+    if (!sub) document.getElementById('sub').style.display = 'none';
+  </script>
+</body>
+</html>
