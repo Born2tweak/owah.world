@@ -79,16 +79,34 @@ async function gotoScene(page, path) {
   await sleep(path === '/words' ? 7000 : 4500)
 }
 
-async function dragCD(page) {
-  const cx = H.width / 2
-  const cy = H.height / 2
-  await page.mouse.move(cx + 40, cy)
-  await page.mouse.down()
-  for (let i = 0; i < 24; i++) {
-    await page.mouse.move(cx + 40 - i * 6, cy + Math.sin(i / 4) * 18)
-    await sleep(40)
+// Drive the CD through every axis: spin flings, tilt sweeps, diagonals —
+// revealing all faces, edges, iridescence and reflections.
+async function cdTour(page) {
+  const stroke = async (x0, y0, x1, y1, steps, stepDelay) => {
+    await page.mouse.move(x0, y0)
+    await page.mouse.down()
+    for (let i = 1; i <= steps; i++) {
+      const t = i / steps
+      await page.mouse.move(x0 + (x1 - x0) * t, y0 + (y1 - y0) * t)
+      await sleep(stepDelay)
+    }
+    await page.mouse.up()
   }
-  await page.mouse.up()
+  // fast horizontal flings -> multi-turn decelerating spin (all Y angles)
+  await stroke(1520, 540, 440, 540, 16, 18)
+  await sleep(1500)
+  await stroke(1520, 515, 440, 565, 16, 18)
+  await sleep(1400)
+  // vertical tilt -> top face / underside / edge reflections
+  await stroke(960, 840, 960, 280, 14, 24)
+  await sleep(1300)
+  await stroke(960, 280, 960, 840, 14, 24)
+  await sleep(1200)
+  // diagonal sweeps -> oblique angles, crystal refractions catch the light
+  await stroke(1500, 300, 460, 800, 18, 20)
+  await sleep(1600)
+  await stroke(460, 800, 1500, 300, 18, 20)
+  await sleep(1700)
 }
 
 console.log(`Capturing from ${TARGET} (headless=${HEADLESS})`)
@@ -116,9 +134,9 @@ for (const [orient, size] of want('cards') || ONLY.length === 0 ? [['h', H], ['v
 if (want('scene-landing'))
   await record('scene-landing', H, async (page) => {
     await gotoScene(page, '/')
-    await sleep(900)
-    await dragCD(page)
-    await sleep(3000)
+    await sleep(700)
+    await cdTour(page)
+    await sleep(1400)
   })
 
 if (want('scene-words'))

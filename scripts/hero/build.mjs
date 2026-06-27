@@ -1,6 +1,6 @@
-// Assembles the hero promo from raw clips (scripts/hero/raw) into:
-//   public/hero/owah-hero-16x9.mp4 (+ .webm), owah-hero-9x16.mp4, owah-hero-poster.jpg
-// Silent, ~12s, loop-friendly. Requires ffmpeg on PATH.
+// Assembles the 8s landing hero promo from raw clips (scripts/hero/raw) into:
+//   public/hero/owah-hero-16x9.mp4 (+ .webm), owah-hero-poster.jpg
+// Landing only — the CD turning through all angles/reflections. Silent, ~8s.
 
 import { spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
@@ -12,12 +12,10 @@ const ROOT = join(__dirname, '..', '..')
 const RAW = join(__dirname, 'raw')
 const SEG = join(__dirname, 'seg')
 const OUT = join(ROOT, 'public', 'hero')
-const T = 0.45 // crossfade seconds
+const T = 0.4 // crossfade seconds
 
-for (const d of [SEG, OUT]) {
-  if (d === SEG && existsSync(SEG)) rmSync(SEG, { recursive: true, force: true })
-  mkdirSync(d, { recursive: true })
-}
+if (existsSync(SEG)) rmSync(SEG, { recursive: true, force: true })
+for (const d of [SEG, OUT]) mkdirSync(d, { recursive: true })
 
 function ff(args) {
   const r = spawnSync('ffmpeg', ['-y', '-hide_banner', '-loglevel', 'error', ...args], { stdio: 'inherit' })
@@ -28,70 +26,52 @@ function probeDur(file) {
   return parseFloat(r.stdout.trim())
 }
 
-// beat = { clip, ss, dur }  (clip is the raw basename without extension; orientation suffix added per render)
+// 8s landing cut: brief brand open -> CD rotation showcase (dominant) -> URL close.
+// `speed` < 1 slows, > 1 speeds the clip via setpts before trimming.
 const SEQUENCE = [
-  { clip: 'card-open', ss: 0.15, dur: 2.4 },
-  { clip: 'scene-landing', ss: 5.5, dur: 3.4, scene: true },
-  { clip: 'card-words', ss: 0.15, dur: 1.7 },
-  { clip: 'scene-words', ss: 5.0, dur: 3.6, scene: true },
-  { clip: 'card-close', ss: 0.15, dur: 2.4 },
+  { clip: 'card-open-h', ss: 0.15, dur: 1.4 },
+  { clip: 'scene-landing', ss: 7.0, dur: 5.6, scene: true, speed: 1.15 },
+  { clip: 'card-close-h', ss: 0.15, dur: 1.8 },
 ]
 
-function vf(orient, scene) {
-  const pad = 'tpad=stop_mode=clone:stop_duration=4'
-  if (orient === 'h') {
-    return `scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080,fps=30,${pad},format=yuv420p,setsar=1`
-  }
-  // 9:16
-  if (scene) {
-    return `crop=608:1080:656:0,scale=1080:1920,fps=30,${pad},format=yuv420p,setsar=1`
-  }
-  return `scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,fps=30,${pad},format=yuv420p,setsar=1`
-}
+const VF_BASE = 'scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080,fps=30'
 
-function render(orient, outName) {
-  const W = orient === 'h' ? 1920 : 1080
-  const Hh = orient === 'h' ? 1080 : 1920
-  // 1) normalize each beat to a fixed-length segment
+function render() {
   const segs = SEQUENCE.map((b, i) => {
-    const src = b.scene ? `${b.clip}.webm` : `${b.clip}-${orient}.webm`
-    const seg = join(SEG, `${orient}-${i}.mp4`)
-    ff(['-ss', String(b.ss), '-i', join(RAW, src), '-an', '-vf', vf(orient, b.scene), '-t', String(b.dur),
+    const seg = join(SEG, `h-${i}.mp4`)
+    const pts = b.speed && b.speed !== 1 ? `,setpts=${(1 / b.speed).toFixed(4)}*PTS` : ''
+    const vf = `${VF_BASE}${pts},tpad=stop_mode=clone:stop_duration=4,format=yuv420p,setsar=1`
+    ff(['-ss', String(b.ss), '-i', join(RAW, `${b.clip}.webm`), '-an', '-vf', vf, '-t', String(b.dur),
         '-c:v', 'libx264', '-preset', 'fast', '-crf', '16', seg])
     return seg
   })
-  // 2) xfade chain
+
   const durs = SEQUENCE.map((b) => b.dur)
   let filter = ''
   let prev = '0:v'
   let acc = durs[0]
   for (let i = 1; i < segs.length; i++) {
-    const off = (acc - T).toFixed(3)
     const out = i === segs.length - 1 ? 'vx' : `x${i}`
-    filter += `[${prev}][${i}:v]xfade=transition=fade:duration=${T}:offset=${off}[${out}];`
+    filter += `[${prev}][${i}:v]xfade=transition=fade:duration=${T}:offset=${(acc - T).toFixed(3)}[${out}];`
     prev = out
     acc = acc + durs[i] - T
   }
   const total = acc
-  filter += `[vx]fade=t=in:st=0:d=0.35,fade=t=out:st=${(total - 0.4).toFixed(3)}:d=0.4[v]`
+  filter += `[vx]fade=t=in:st=0:d=0.3,fade=t=out:st=${(total - 0.4).toFixed(3)}:d=0.4[v]`
+
   const inputs = segs.flatMap((s) => ['-i', s])
-  const out = join(OUT, outName)
+  const out = join(OUT, 'owah-hero-16x9.mp4')
   ff([...inputs, '-filter_complex', filter, '-map', '[v]', '-an',
       '-c:v', 'libx264', '-profile:v', 'high', '-pix_fmt', 'yuv420p', '-crf', '19', '-preset', 'slow',
       '-movflags', '+faststart', out])
-  console.log(`  ✓ ${outName}  (${probeDur(out).toFixed(2)}s, ${W}x${Hh})`)
+  console.log(`  ✓ owah-hero-16x9.mp4  (${probeDur(out).toFixed(2)}s)`)
   return out
 }
 
-console.log('Building 16:9 master…')
-const master = render('h', 'owah-hero-16x9.mp4')
-
-console.log('Building 9:16…')
-render('v', 'owah-hero-9x16.mp4')
-
-console.log('WebM + poster…')
+console.log('Building 8s landing hero…')
+const master = render()
 ff(['-i', master, '-an', '-c:v', 'libvpx-vp9', '-crf', '32', '-b:v', '0', '-row-mt', '1', join(OUT, 'owah-hero-16x9.webm')])
-ff(['-ss', '1.2', '-i', master, '-frames:v', '1', '-q:v', '3', join(OUT, 'owah-hero-poster.jpg')])
+ff(['-ss', '3.0', '-i', master, '-frames:v', '1', '-q:v', '3', join(OUT, 'owah-hero-poster.jpg')])
 
 rmSync(SEG, { recursive: true, force: true })
-console.log('\nDone → public/hero/')
+console.log('Done → public/hero/owah-hero-16x9.mp4 (+ webm, poster)')
