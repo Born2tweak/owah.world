@@ -74,107 +74,7 @@
   color: rgba(150, 180, 200, 0.6);
 }
 
-/* ---------- right world directory ---------- */
-.directory {
-  position: absolute;
-  right: clamp(20px, 3vw, 48px);
-  top: 50%;
-  transform: translateY(-50%);
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  width: min(340px, 42vw);
-  max-height: 78vh;
-}
-
-.card {
-  --accent: #28fff0;
-  position: relative;
-  display: block;
-  text-decoration: none;
-  pointer-events: auto;
-  padding: 18px 20px;
-  border-radius: 16px;
-  border: 1px solid rgba(200, 226, 240, 0.14);
-  background: linear-gradient(165deg, rgba(16, 26, 40, 0.42), rgba(4, 10, 20, 0.32));
-  backdrop-filter: blur(20px) saturate(150%);
-  -webkit-backdrop-filter: blur(20px) saturate(150%);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.1) inset, 0 14px 40px rgba(0, 0, 0, 0.32);
-  transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1), border-color 260ms ease,
-    box-shadow 260ms ease, background 260ms ease;
-}
-
-.card:hover,
-.card:focus-visible {
-  transform: translateX(-6px) scale(1.025);
-  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
-  background: linear-gradient(165deg, rgba(22, 34, 52, 0.55), rgba(6, 14, 26, 0.4));
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.16) inset,
-    0 0 30px color-mix(in srgb, var(--accent) 26%, transparent),
-    0 18px 48px rgba(0, 0, 0, 0.4);
-  outline: none;
-}
-
-.cardHead {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  margin-bottom: 8px;
-}
-
-.cardIndex {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.1em;
-  color: color-mix(in srgb, var(--accent) 80%, #ffffff 20%);
-}
-
-.cardTitle {
-  font-family: var(--font-title);
-  font-size: 1.25rem;
-  letter-spacing: 0.04em;
-  color: #f2f8fc;
-  margin: 0;
-}
-
-.cardSubtitle {
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: color-mix(in srgb, var(--accent) 70%, #cfe0ec 30%);
-  margin: 0 0 10px;
-}
-
-.cardDesc {
-  font-family: var(--font-display);
-  font-size: 12px;
-  line-height: 1.5;
-  color: rgba(206, 222, 234, 0.72);
-  margin: 0 0 14px;
-}
-
-.cardCta {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: color-mix(in srgb, var(--accent) 85%, #ffffff 15%);
-}
-
-.cardArrow {
-  transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.card:hover .cardArrow,
-.card:focus-visible .cardArrow {
-  transform: translateX(5px);
-}
-
-/* ---------- tablet band (641–900): keep two zones but reflow ---------- */
+/* ---------- tablet band (641–900): reflow the identity block ---------- */
 @media (max-width: 900px) {
   .welcome {
     top: 96px;
@@ -183,18 +83,10 @@
     max-width: min(420px, calc(100vw - 48px));
   }
   .stats { display: none; }
-  .directory {
-    right: clamp(16px, 3vw, 28px);
-    width: min(320px, 46vw);
-  }
-  .cardDesc { display: none; }
 }
 
 /* ---------- phones (≤640px): the CD is the hero ----------
-   The bottom Dock already navigates CODE / WORDS / WORLD, so the overlay
-   blocks are redundant here. Hide them entirely and let the (enlarged) CD
-   fill the whole screen, framed only by the TopNav pill and the Dock. */
+   The bottom Dock already navigates CODE / WORDS / WORLD. */
 @media (max-width: 640px) {
   .welcome { display: none; }
-  .directory { display: none; }
 }
