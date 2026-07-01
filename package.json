@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "next dev",
     "dev:clean": "node scripts/dev-clean.mjs",
+    "hero:words": "node scripts/hero/build-words.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"

@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import ArchiveInfoPanel from './ArchiveInfoPanel'
 import WordsArchiveCanvas from './WordsArchiveCanvas'
 import { useWordsArchiveStore } from './wordsArchive.store'
@@ -9,6 +9,7 @@ import { FACES, FACE_BY_ID, WORK_BY_ID } from './wordsArchiveData'
 import styles from './WordsArchive3D.module.css'
 
 export default function WordsArchive3D() {
+  const [filmOpen, setFilmOpen] = useState(false)
   const mode = useWordsArchiveStore((s) => s.mode)
   const activeFace = useWordsArchiveStore((s) => s.activeFace)
   const hoveredWorkId = useWordsArchiveStore((s) => s.hoveredWorkId)
@@ -112,6 +113,10 @@ export default function WordsArchive3D() {
           <p className={styles.controlsHint} aria-hidden>
             Drag to Rotate · Scroll to Zoom · Click to Explore
           </p>
+
+          <button type="button" className={styles.filmButton} onClick={() => setFilmOpen(true)}>
+            Watch the archive film
+          </button>
         </aside>
 
         {hoverWork ? (
@@ -124,6 +129,24 @@ export default function WordsArchive3D() {
       </div>
 
       <ArchiveInfoPanel focusedWorkId={focusedWorkId} onBack={back} onSelectRelated={focusWork} />
+
+      {filmOpen ? (
+        <div className={styles.filmModal} role="dialog" aria-modal="true" aria-label="Words archive hero film">
+          <button type="button" className={styles.filmBackdrop} aria-label="Close film" onClick={() => setFilmOpen(false)} />
+          <div className={styles.filmCard}>
+            <div className={styles.filmHeader}>
+              <span>Archive of Influence / Hero Film</span>
+              <button type="button" className={styles.filmClose} onClick={() => setFilmOpen(false)}>
+                Close
+              </button>
+            </div>
+            <video className={styles.filmPlayer} poster="/hero/words-hero-poster.jpg" controls autoPlay muted loop playsInline>
+              <source src="/hero/words-hero-16x9.webm" type="video/webm" />
+              <source src="/hero/words-hero-16x9.mp4" type="video/mp4" />
+            </video>
+          </div>
+        </div>
+      ) : null}
     </div>
   )
 }

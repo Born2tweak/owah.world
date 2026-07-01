@@ -165,6 +165,91 @@
   pointer-events: none;
 }
 
+.filmButton {
+  pointer-events: auto;
+  width: fit-content;
+  margin-top: 16px;
+  border: 1px solid rgba(18, 32, 50, 0.2);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.42);
+  color: #0d1726;
+  padding: 9px 14px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 12px 34px rgba(70, 94, 132, 0.16);
+  transition: transform 150ms ease, background 150ms ease, box-shadow 150ms ease;
+}
+
+.filmButton:hover {
+  background: rgba(255, 255, 255, 0.66);
+  box-shadow: 0 14px 40px rgba(118, 92, 190, 0.22);
+  transform: translateY(-1px);
+}
+
+.filmModal {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  padding: clamp(18px, 4vw, 48px);
+}
+
+.filmBackdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(3, 8, 16, 0.72);
+  backdrop-filter: blur(18px);
+  cursor: pointer;
+}
+
+.filmCard {
+  position: relative;
+  width: min(1040px, 94vw);
+  border-radius: 24px;
+  overflow: hidden;
+  border: 1px solid rgba(226, 236, 246, 0.18);
+  background: rgba(7, 11, 20, 0.92);
+  box-shadow: 0 36px 120px rgba(0, 0, 0, 0.58);
+}
+
+.filmHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 13px 16px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(226, 236, 246, 0.78);
+}
+
+.filmClose {
+  border: 1px solid rgba(226, 236, 246, 0.16);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(226, 236, 246, 0.86);
+  padding: 7px 11px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.filmClose:hover { background: rgba(255, 255, 255, 0.12); }
+
+.filmPlayer {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #02060d;
+}
+
 /* hovered tile preview — top centre, clear of the dock */
 .hoverPreview {
   --accent: #cdb88a;
@@ -282,6 +367,9 @@
   .introBody, .stats, .controlsHint { display: none; }
   .faceNav { flex-direction: row; flex-wrap: wrap; }
   .readingPanel { top: auto; bottom: 0; right: 0; width: 100vw; max-height: 64vh; border-radius: 18px 18px 0 0; }
+  .filmButton { margin-top: 8px; }
+  .filmCard { width: 100%; border-radius: 18px; }
+  .filmHeader { align-items: flex-start; flex-direction: column; }
 }
 
 /* short viewports: drop the lower-priority lines so the stack never reaches the corner HUD */
