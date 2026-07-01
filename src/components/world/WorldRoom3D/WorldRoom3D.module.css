@@ -177,10 +177,10 @@
   position: absolute;
   bottom: clamp(88px, 12vh, 108px);
   left: clamp(16px, 3vw, 28px);
-  width: min(220px, calc(100vw - 48px));
-  padding: 12px 14px 14px;
+  width: min(300px, calc(100vw - 48px));
+  padding: 18px 20px 20px;
   border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 10px;
+  border-radius: 12px;
   background: rgba(4, 12, 20, 0.28);
   backdrop-filter: blur(10px);
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.22);
@@ -217,7 +217,7 @@
 .infoTitle {
   margin-top: 4px;
   font-family: var(--font-title);
-  font-size: 1.05rem;
+  font-size: 1.2rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: rgba(240, 250, 255, 0.88);
@@ -240,15 +240,19 @@
   color: rgba(160, 190, 210, 0.38);
 }
 
-/* mobile: detail panel moves to the top so it clears the bottom zone nav + dock */
+/* mobile: detail panel moves to the top (clears the bottom zone nav + dock)
+   and stays compact — not edge-to-edge */
 @media (max-width: 640px) {
   .infoPanel {
-    top: 64px;
+    top: 60px;
     bottom: auto;
     left: 12px;
-    right: 12px;
-    width: auto;
+    right: auto;
+    width: min(258px, calc(100vw - 24px));
+    padding: 13px 15px 15px;
   }
+  .infoTitle { font-size: 1.05rem; }
+  .infoHint { font-size: 9.5px; }
   .zoneCurrent {
     min-width: 104px;
   }
