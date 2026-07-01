@@ -219,10 +219,17 @@ function ArchitecturalFraming() {
 }
 
 export default function CDScene() {
+  // On phones the landscape framing leaves the CD tiny — pull the camera in
+  // and widen the FOV so the artifact fills the portrait frame.
+  const isMobile = typeof window !== 'undefined' && window.matchMedia('(max-width: 640px)').matches
+  const camera = isMobile
+    ? { position: [0, 0.2, 7.0] as [number, number, number], fov: 50 }
+    : { position: [0, 0, 10.5] as [number, number, number], fov: 39 }
+
   return (
     <div style={{ width: '100%', height: '100vh', position: 'absolute', inset: 0, zIndex: 1, background: '#01050d' }}>
       <WebGLCanvas
-        camera={{ position: [0, 0, 10.5], fov: 39 }}
+        camera={camera}
         gl={{
           antialias: true,
           powerPreference: 'high-performance',
