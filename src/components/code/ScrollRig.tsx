@@ -59,11 +59,41 @@ export default function ScrollRig({ progress, setProgress, focusedTitle, modalOp
       setProgress((current) => clampProgress(current + step))
     }
 
+    // touch: vertical swipe anywhere scrubs the path (wheel/keys don't fire on touch).
+    // Skip when the gesture starts on the drag rail so the two don't fight.
+    let lastTouchY: number | null = null
+    function onTouchStart(event: TouchEvent) {
+      if (modalOpen) return
+      const t = event.target
+      if (t instanceof HTMLElement && t.closest('.code-scrollRig__rail')) {
+        lastTouchY = null
+        return
+      }
+      lastTouchY = event.touches[0]?.clientY ?? null
+    }
+    function onTouchMove(event: TouchEvent) {
+      if (modalOpen || lastTouchY == null) return
+      const y = event.touches[0]?.clientY ?? lastTouchY
+      const dy = lastTouchY - y
+      lastTouchY = y
+      if (event.cancelable) event.preventDefault()
+      setProgress((current) => clampProgress(current + dy * 0.0015))
+    }
+    function onTouchEnd() {
+      lastTouchY = null
+    }
+
     window.addEventListener('wheel', onWheel, { passive: false })
     window.addEventListener('keydown', onKeyDown)
+    window.addEventListener('touchstart', onTouchStart, { passive: true })
+    window.addEventListener('touchmove', onTouchMove, { passive: false })
+    window.addEventListener('touchend', onTouchEnd)
     return () => {
       window.removeEventListener('wheel', onWheel)
       window.removeEventListener('keydown', onKeyDown)
+      window.removeEventListener('touchstart', onTouchStart)
+      window.removeEventListener('touchmove', onTouchMove)
+      window.removeEventListener('touchend', onTouchEnd)
     }
   }, [modalOpen, setProgress])
 
@@ -108,7 +138,7 @@ export default function ScrollRig({ progress, setProgress, focusedTitle, modalOp
           </div>
           <div className="code-scrollRig__scrollHint" aria-label="Scroll to explore code world">
             <div className="code-scrollRig__hintTop">
-              <span>Scroll to explore</span>
+              <span>Scroll · swipe · drag</span>
               <span>{Math.round(progress * 100)}%</span>
             </div>
             <div className="code-scrollRig__hintTrack" aria-hidden="true">
@@ -371,16 +401,36 @@ export default function ScrollRig({ progress, setProgress, focusedTitle, modalOp
 
         @media (max-width: 700px) {
           .code-scrollRig__sticky {
-            padding: 96px 16px 120px;
+            padding: 84px 14px 118px;
           }
 
           .code-scrollRig__hud {
-            width: min(100%, 340px);
+            width: min(100%, 320px);
+            padding: 14px 15px 15px;
+          }
+
+          .code-scrollRig__hud h1 {
+            font-size: 1.7rem;
+            margin-top: 8px;
+          }
+
+          /* trim the long description on phones — keep title + meter + hint */
+          .code-scrollRig__hud > p {
+            display: none;
+          }
+
+          .code-scrollRig__meter {
+            margin-top: 12px;
+          }
+
+          .code-scrollRig__scrollHint {
+            margin-top: 12px;
+            padding: 10px 12px 10px;
           }
 
           .code-scrollRig__rail {
             width: 40px;
-            height: 56vh;
+            height: 52vh;
           }
         }
       `}</style>

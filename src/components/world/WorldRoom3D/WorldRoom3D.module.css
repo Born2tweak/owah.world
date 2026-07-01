@@ -90,7 +90,7 @@
 
 .hudBottom {
   position: absolute;
-  bottom: clamp(72px, 10vh, 96px);
+  bottom: clamp(88px, 12vh, 110px);
   left: 0;
   right: 0;
   display: flex;
@@ -104,6 +104,73 @@
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: rgba(140, 190, 210, 0.45);
+}
+
+/* on-screen zone navigator — the only way to move on touch (no wheel/keys) */
+.zoneNav {
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+  pointer-events: auto;
+  padding: 5px;
+  border-radius: 999px;
+  border: 1px solid rgba(120, 200, 230, 0.2);
+  background: linear-gradient(180deg, rgba(10, 22, 32, 0.6), rgba(4, 10, 18, 0.44));
+  backdrop-filter: blur(14px) saturate(150%);
+  -webkit-backdrop-filter: blur(14px) saturate(150%);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+.zoneArrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  min-height: 40px;
+  border: none;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(224, 244, 252, 0.9);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease;
+}
+
+.zoneArrow:hover,
+.zoneArrow:active {
+  background: rgba(0, 212, 255, 0.16);
+  color: #fff;
+}
+
+.zoneCurrent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-width: 128px;
+  padding: 4px 14px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.zoneName {
+  font-family: var(--font-title);
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(240, 250, 255, 0.95);
+}
+
+.zoneSub {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(150, 200, 220, 0.6);
 }
 
 .infoPanel {
@@ -171,4 +238,18 @@
   font-size: 10px;
   line-height: 1.45;
   color: rgba(160, 190, 210, 0.38);
+}
+
+/* mobile: detail panel moves to the top so it clears the bottom zone nav + dock */
+@media (max-width: 640px) {
+  .infoPanel {
+    top: 64px;
+    bottom: auto;
+    left: 12px;
+    right: 12px;
+    width: auto;
+  }
+  .zoneCurrent {
+    min-width: 104px;
+  }
 }

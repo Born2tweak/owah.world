@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useCallback, useEffect } from 'react'
-import { isWorldCategory } from './roomZones'
+import { ZONE_LABELS, isWorldCategory } from './roomZones'
 import { useWorldRoomStore } from './worldRoom.store'
 import RoomInfoPanel from './RoomInfoPanel'
 import WorldRoomCanvas from './WorldRoomCanvas'
@@ -52,6 +52,7 @@ export default function WorldRoom3D() {
   }, [handleWheel, handleKeyDown])
 
   const panelZone = isWorldCategory(activeZone) ? activeZone : null
+  const currentLabel = activeZone === 'overview' ? 'Overview' : ZONE_LABELS[activeZone].title
 
   return (
     <div className={styles.worldRoom}>
@@ -79,9 +80,35 @@ export default function WorldRoom3D() {
           </div>
         </header>
         <footer className={styles.hudBottom}>
-          {activeZone === 'overview' ? (
-            <span className={styles.hint}>Scroll or arrow keys to move · Click zones to focus</span>
-          ) : null}
+          <div className={styles.zoneNav} role="group" aria-label="Zone navigation">
+            <button
+              type="button"
+              className={styles.zoneArrow}
+              onClick={() => cycleZone(-1)}
+              aria-label="Previous zone"
+            >
+              ‹
+            </button>
+            <button
+              type="button"
+              className={styles.zoneCurrent}
+              onClick={returnToOverview}
+              aria-label={activeZone === 'overview' ? 'Overview' : 'Back to overview'}
+            >
+              <span className={styles.zoneName}>{currentLabel}</span>
+              <span className={styles.zoneSub}>
+                {activeZone === 'overview' ? 'Tap ‹ › or a zone' : 'Tap to exit'}
+              </span>
+            </button>
+            <button
+              type="button"
+              className={styles.zoneArrow}
+              onClick={() => cycleZone(1)}
+              aria-label="Next zone"
+            >
+              ›
+            </button>
+          </div>
         </footer>
       </div>
 
